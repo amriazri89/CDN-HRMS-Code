@@ -6,7 +6,7 @@
   justify-content: center;
   
   height: 94.5vh; /* take full screen height */
-  width: 150%;
+  width: 220%;
 
   background: white;
   background-size: 100% 100%;
@@ -67,7 +67,7 @@
 
 /* Input focus effect */
 .login-signup-form input:focus {
-  border-color: #e7963a;
+  border-color: #1a4b58;
   color: black;
   background-color: #fff;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
@@ -78,7 +78,7 @@
 .login-signup-form button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #e7963a;
+  background-color: #1a4b58;
   color: white;
   border: none;
   border-radius: 6px;
@@ -88,7 +88,7 @@
 }
 
 .login-signup-form button:hover {
-  background-color: #dc9404;
+  background-color: rgb(27, 52, 105);
 }
 
 /* Small text */
@@ -103,7 +103,7 @@ body {
   margin: 0;
   padding: 0;
   height: 100vh;
-  background-image: url("../../assets/Etiqa-bg.png");
+  background-image: url("../../assets/hrms-bg.jpg");
   background-size: cover; /* Fill screen without stretching */
   background-position: center right 0%; /* Shift slightly to the right */
   background-repeat: no-repeat; /* No tiling */
@@ -161,7 +161,7 @@ p {
   left: 10px;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #e7963a;
+  color: #1a4b58;
   background: white;
   padding: 0 4px;
   opacity: 0.9;

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Login.css";
-import aclogo from "../../assets/Etiqa-logo.png";
+import aclogo from "../../assets/cdn-logo.jpg";
 import UserService from "../../services/UserService.js";
+import ROUTES from "../../routes";
 
 const Login = () => {
     useEffect(() => {
@@ -65,7 +66,7 @@ const Login = () => {
       await UserService.login(formData.username, formData.password);
       setMessageType("success");
       setMessage("Login successful! Redirecting...");
-      setTimeout(() => navigate("/etiqa/hrms/dashboard"), 1500);
+      setTimeout(() => navigate(ROUTES.DASHBOARD), 1500);
     } catch (err) {
       console.error("Login error:", err);
       setMessageType("error");
@@ -78,10 +79,10 @@ const Login = () => {
   return (
     <div className="login-page">
       <div className="login-signup-container">
-        <img src={aclogo} alt="Logo" className="login-icon" />
+        <img src={aclogo} alt="Logo" className="login-icon" style={{height:"20vh"}}/>
         <h1 className="portal-title">
-          <span style={{ color: "black" }}>Etiqa </span>
-          <span style={{ color: "#FAB427" }}>HRMS</span> Portal
+          <span style={{ color: "black" }}>CDN </span>
+          <span style={{ color: "#1a4b58" }}>HRMS</span> Portal
         </h1>
 
         {/* portal-level message */}
@@ -96,7 +97,7 @@ const Login = () => {
         )}
 
         <div className="login-signup-form">
-          <h2 className="form-heading">  Insurance and Takaful Service Company</h2>
+          <h2 className="form-heading">  Complete Developer Network</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <input
@@ -105,7 +106,7 @@ const Login = () => {
                 value={formData.username}
                 onChange={handleChange}
                 required
-                placeholder=" "
+                placeholder="username"
               />
               <label>Username</label>
             </div>
@@ -117,7 +118,7 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                placeholder=" "
+                placeholder="password"
               />
               <label>Password</label>
             </div>

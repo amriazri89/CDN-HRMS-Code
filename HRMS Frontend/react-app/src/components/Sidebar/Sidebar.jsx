@@ -1,15 +1,17 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
-import aclogo from "../../assets/Etiqa-logo-bg.png";
+import aclogo from "../../assets/cdn-logo-2.jpg";
+import ROUTES from "../../routes";
+
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const items = [
-    { to: "/etiqa/hrms/dashboard", label: "Dashboard" },
-    { to: "/etiqa/hrms/payroll", label: "Payroll" },
-    { to: "/etiqa/hrms/employee", label: "Employee" },
+    { to: ROUTES.DASHBOARD, label: "Dashboard" },
+    { to: ROUTES.PAYROLL, label: "Payroll" },
+    { to: ROUTES.EMPLOYEE, label: "Employee" },
   ];
 
 
