@@ -1,0 +1,67 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #d92727;
+  padding: 8px 20px; /* compact height */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-title {
+  font-size: 1rem;
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+  color: #f5fcfc;
+  margin: 0;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* space between icons */
+}
+
+.nav-icon {
+  font-size: 1.4rem; /* adjust icon size */
+  color: #e5e8ed;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nav-icon:hover {
+  color: #13c8ad; /* hover color */
+}
+/* Navbar.css */
+
+.profile-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* spacing between icon and text */
+  font-size: 14px;
+  color: #fff; /* adjust to match navbar theme */
+  cursor: default;
+}
+
+.profile-icon {
+  font-size: 20px;
+  color: #fff; /* profile icon color */
+}
+
+.nav-name {
+  font-weight: 600;
+  color: #ffd700; /* highlight the username (goldish) */
+}
+
+.logout-icon {
+  margin-left: 16px; /* space after profile section */
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.logout-icon:hover {
+  color: #ff4d4f; /* red on hover */
+}

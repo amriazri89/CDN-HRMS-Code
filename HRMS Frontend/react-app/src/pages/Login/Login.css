@@ -1,0 +1,212 @@
+/* Full page light animated background */
+.login-signup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  height: 94.5vh; /* take full screen height */
+  width: 150%;
+
+  background: white;
+  background-size: 100% 100%;
+  animation: gradientShift 12s ease infinite;
+
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  opacity: 0.99;
+   isolation: isolate;
+}
+/* Subtle animation for background */
+
+/* Company title */
+.portal-title {
+  font-size: 1.5rem;
+  color: #1f2937;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Card form */
+.login-signup-form {
+  width: 70%;
+  max-width: 400px; /* control max size */
+  padding: 1.5rem; /* spacing inside */
+  background: white;
+  color: black;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Section heading inside form */
+.form-heading {
+  font-size: 1.1rem;
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Input styling */
+.login-signup-form input {
+  width: 95%;
+  padding: 0.75rem;
+  color: black;
+  margin: 0.5rem 0 1rem 0;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  background-color: #f9fafb;
+  transition: all 0.3s ease;
+}
+
+/* Input focus effect */
+.login-signup-form input:focus {
+  border-color: #e7963a;
+  color: black;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  outline: none;
+}
+
+/* Button styling */
+.login-signup-form button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #e7963a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-signup-form button:hover {
+  background-color: #dc9404;
+}
+
+/* Small text */
+.login-signup-form p {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+body {  
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background-image: url("../../assets/Etiqa-bg.png");
+  background-size: cover; /* Fill screen without stretching */
+  background-position: center right 0%; /* Shift slightly to the right */
+  background-repeat: no-repeat; /* No tiling */
+}
+p {
+  font-size: 22px; /* bigger text */
+}
+.toggle-link {
+  font-size: 17px; /* bigger clickable link */
+  color: #2563eb;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.toggle-link:hover {
+  color: #1e40af;
+}
+/* Floating label container */
+.form-group {
+  position: relative;
+  width: 100%;
+  margin-bottom: 0.3rem;
+ 
+}
+
+/* Input fields */
+.form-group input {
+  width: 95%;
+  padding: 12px 10px;
+  font-size: 0.80rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #f9fafb;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Labels that float */
+.form-group label {
+  position: absolute;
+  left: 25px;
+  top: 44%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: #9ca3af;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+/* When focused or filled */
+.form-group input:focus + label,
+.form-group input:not(:placeholder-shown) + label {
+  top: 2px;
+  left: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #e7963a;
+  background: white;
+  padding: 0 4px;
+  opacity: 0.9;
+}
+.form-message {
+  font-size:5px;
+}
+
+/* Success message */
+.form-message.success {
+  color: rgb(125, 16, 49);
+}
+
+
+
+.form-message.error {
+  color: red;
+}
+
+.login-icon{
+  width: 220px;
+  height: 100px;
+  margin-bottom: 20px;
+}
+.portal-message {
+   width:180px;
+  margin: 15px 0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out; /* fade animation */
+}
+
+/* Success style */
+.portal-message {
+  font-size: 14px;
+  opacity: 1;
+}
+
+.portal-message.fade-out {
+  opacity: 0;
+}
+
+.portal-message.success { color: #c5090d; }
+.portal-message.error { background-color: #fdecea; color: #b71c1c; border: 1px solid #b71c1c; }

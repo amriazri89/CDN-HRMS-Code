@@ -1,0 +1,390 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|solutionrelative:hrms.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|solutionrelative:hrms.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.api\\controllers\\employeescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|solutionrelative:hrms.api\\controllers\\employeescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{20F45492-0408-49CB-BB93-1348803804DC}|HRMS.Infrastructure\\HRMS.Infrastructure.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.infrastructure\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{20F45492-0408-49CB-BB93-1348803804DC}|HRMS.Infrastructure\\HRMS.Infrastructure.csproj|solutionrelative:hrms.infrastructure\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{20F45492-0408-49CB-BB93-1348803804DC}|HRMS.Infrastructure\\HRMS.Infrastructure.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.infrastructure\\repositories\\employeerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{20F45492-0408-49CB-BB93-1348803804DC}|HRMS.Infrastructure\\HRMS.Infrastructure.csproj|solutionrelative:hrms.infrastructure\\repositories\\employeerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{20F45492-0408-49CB-BB93-1348803804DC}|HRMS.Infrastructure\\HRMS.Infrastructure.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.infrastructure\\hrms.infrastructure.csproj.backup.tmp||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{20F45492-0408-49CB-BB93-1348803804DC}|HRMS.Infrastructure\\HRMS.Infrastructure.csproj|solutionrelative:hrms.infrastructure\\hrms.infrastructure.csproj.backup.tmp||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{752891B5-7AA0-402D-A19A-A3F0B07741DC}|HRMS.Domain\\HRMS.Domain.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.domain\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{752891B5-7AA0-402D-A19A-A3F0B07741DC}|HRMS.Domain\\HRMS.Domain.csproj|solutionrelative:hrms.domain\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.application\\services\\employeenumbergenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|solutionrelative:hrms.application\\services\\employeenumbergenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|solutionrelative:hrms.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{752891B5-7AA0-402D-A19A-A3F0B07741DC}|HRMS.Domain\\HRMS.Domain.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.domain\\employmentrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{752891B5-7AA0-402D-A19A-A3F0B07741DC}|HRMS.Domain\\HRMS.Domain.csproj|solutionrelative:hrms.domain\\employmentrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.application\\interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|solutionrelative:hrms.application\\interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|solutionrelative:hrms.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.application\\interfaces\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|solutionrelative:hrms.application\\interfaces\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.application\\services\\payrollservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|solutionrelative:hrms.application\\services\\payrollservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.application\\interfaces\\ipayrollservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|solutionrelative:hrms.application\\interfaces\\ipayrollservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{752891B5-7AA0-402D-A19A-A3F0B07741DC}|HRMS.Domain\\HRMS.Domain.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.domain\\employee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{752891B5-7AA0-402D-A19A-A3F0B07741DC}|HRMS.Domain\\HRMS.Domain.csproj|solutionrelative:hrms.domain\\employee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.api\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|solutionrelative:hrms.api\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{752891B5-7AA0-402D-A19A-A3F0B07741DC}|HRMS.Domain\\HRMS.Domain.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.domain\\employeeworkingday.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{752891B5-7AA0-402D-A19A-A3F0B07741DC}|HRMS.Domain\\HRMS.Domain.csproj|solutionrelative:hrms.domain\\employeeworkingday.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{752891B5-7AA0-402D-A19A-A3F0B07741DC}|HRMS.Domain\\HRMS.Domain.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.domain\\employeeskillset.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{752891B5-7AA0-402D-A19A-A3F0B07741DC}|HRMS.Domain\\HRMS.Domain.csproj|solutionrelative:hrms.domain\\employeeskillset.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.application\\interfaces\\iemployeerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|solutionrelative:hrms.application\\interfaces\\iemployeerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.api\\hrms.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{0B3463D9-8C13-4F35-9E0F-B3FAB9FF3A41}|HRMS.API\\HRMS.API.csproj|solutionrelative:hrms.api\\hrms.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{20F45492-0408-49CB-BB93-1348803804DC}|HRMS.Infrastructure\\HRMS.Infrastructure.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.infrastructure\\hrms.infrastructure.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{20F45492-0408-49CB-BB93-1348803804DC}|HRMS.Infrastructure\\HRMS.Infrastructure.csproj|solutionrelative:hrms.infrastructure\\hrms.infrastructure.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|c:\\users\\lenovo\\documents\\github\\hrms\\hrms backend\\hrms.application\\hrms.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{5E2425D7-C18F-407D-9C3F-3BF8256DEDEA}|HRMS.Application\\HRMS.Application.csproj|solutionrelative:hrms.application\\hrms.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UserRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Infrastructure\\Repositories\\UserRepository.cs",
+              "RelativeDocumentMoniker": "HRMS.Infrastructure\\Repositories\\UserRepository.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Infrastructure\\Repositories\\UserRepository.cs",
+              "RelativeToolTip": "HRMS.Infrastructure\\Repositories\\UserRepository.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAQwD4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T13:46:55.723Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Domain\\User.cs",
+              "RelativeDocumentMoniker": "HRMS.Domain\\User.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Domain\\User.cs",
+              "RelativeToolTip": "HRMS.Domain\\User.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T13:41:18.554Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "EmployeeRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Infrastructure\\Repositories\\EmployeeRepository.cs",
+              "RelativeDocumentMoniker": "HRMS.Infrastructure\\Repositories\\EmployeeRepository.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Infrastructure\\Repositories\\EmployeeRepository.cs",
+              "RelativeToolTip": "HRMS.Infrastructure\\Repositories\\EmployeeRepository.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAACoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T10:25:15.902Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "HRMS.API\\Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "HRMS.API\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T13:47:29.392Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "HRMS.Infrastructure.csproj.Backup.tmp",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Infrastructure\\HRMS.Infrastructure.csproj.Backup.tmp",
+              "RelativeDocumentMoniker": "HRMS.Infrastructure\\HRMS.Infrastructure.csproj.Backup.tmp",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Infrastructure\\HRMS.Infrastructure.csproj.Backup.tmp",
+              "RelativeToolTip": "HRMS.Infrastructure\\HRMS.Infrastructure.csproj.Backup.tmp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-02-11T10:47:52.44Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\Program.cs",
+              "RelativeDocumentMoniker": "HRMS.API\\Program.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\Program.cs",
+              "RelativeToolTip": "HRMS.API\\Program.cs",
+              "ViewState": "AgIAAEoAAAAAAAAAAAAAAFsAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T11:03:37.703Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "EmployeesController.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\Controllers\\EmployeesController.cs",
+              "RelativeDocumentMoniker": "HRMS.API\\Controllers\\EmployeesController.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\Controllers\\EmployeesController.cs",
+              "RelativeToolTip": "HRMS.API\\Controllers\\EmployeesController.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAoAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T10:29:21.065Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "EmployeeNumberGenerator.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Services\\EmployeeNumberGenerator.cs",
+              "RelativeDocumentMoniker": "HRMS.Application\\Services\\EmployeeNumberGenerator.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Services\\EmployeeNumberGenerator.cs",
+              "RelativeToolTip": "HRMS.Application\\Services\\EmployeeNumberGenerator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T11:29:03.026Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\appsettings.json",
+              "RelativeDocumentMoniker": "HRMS.API\\appsettings.json",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\appsettings.json",
+              "RelativeToolTip": "HRMS.API\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-02-11T10:57:44.5Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "EmploymentRecord.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Domain\\EmploymentRecord.cs",
+              "RelativeDocumentMoniker": "HRMS.Domain\\EmploymentRecord.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Domain\\EmploymentRecord.cs",
+              "RelativeToolTip": "HRMS.Domain\\EmploymentRecord.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T10:09:11.226Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "IAuthService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Interfaces\\IAuthService.cs",
+              "RelativeDocumentMoniker": "HRMS.Application\\Interfaces\\IAuthService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Interfaces\\IAuthService.cs",
+              "RelativeToolTip": "HRMS.Application\\Interfaces\\IAuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T13:43:41.087Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "HRMS.Application\\Services\\AuthService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Services\\AuthService.cs",
+              "RelativeToolTip": "HRMS.Application\\Services\\AuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T13:45:24.036Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "IUserRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Interfaces\\IUserRepository.cs",
+              "RelativeDocumentMoniker": "HRMS.Application\\Interfaces\\IUserRepository.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Interfaces\\IUserRepository.cs",
+              "RelativeToolTip": "HRMS.Application\\Interfaces\\IUserRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T13:44:57.491Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Employee.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Domain\\Employee.cs",
+              "RelativeDocumentMoniker": "HRMS.Domain\\Employee.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Domain\\Employee.cs",
+              "RelativeToolTip": "HRMS.Domain\\Employee.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAgwB4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T10:08:40.636Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "IPayrollService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Interfaces\\IPayrollService.cs",
+              "RelativeDocumentMoniker": "HRMS.Application\\Interfaces\\IPayrollService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Interfaces\\IPayrollService.cs",
+              "RelativeToolTip": "HRMS.Application\\Interfaces\\IPayrollService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T10:21:22.898Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "PayrollService.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Services\\PayrollService.cs",
+              "RelativeDocumentMoniker": "HRMS.Application\\Services\\PayrollService.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Services\\PayrollService.cs",
+              "RelativeToolTip": "HRMS.Application\\Services\\PayrollService.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAxwDEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T10:22:58.069Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "HRMS.API\\Properties\\launchSettings.json",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\Properties\\launchSettings.json",
+              "RelativeToolTip": "HRMS.API\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-02-11T11:06:34.874Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "EmployeeWorkingDay.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Domain\\EmployeeWorkingDay.cs",
+              "RelativeDocumentMoniker": "HRMS.Domain\\EmployeeWorkingDay.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Domain\\EmployeeWorkingDay.cs",
+              "RelativeToolTip": "HRMS.Domain\\EmployeeWorkingDay.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T10:10:58.046Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "EmployeeSkillset.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Domain\\EmployeeSkillset.cs",
+              "RelativeDocumentMoniker": "HRMS.Domain\\EmployeeSkillset.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Domain\\EmployeeSkillset.cs",
+              "RelativeToolTip": "HRMS.Domain\\EmployeeSkillset.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T10:10:10.084Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "IEmployeeRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Interfaces\\IEmployeeRepository.cs",
+              "RelativeDocumentMoniker": "HRMS.Application\\Interfaces\\IEmployeeRepository.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\Interfaces\\IEmployeeRepository.cs",
+              "RelativeToolTip": "HRMS.Application\\Interfaces\\IEmployeeRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T10:18:11.157Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "HRMS.API.csproj",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\HRMS.API.csproj",
+              "RelativeDocumentMoniker": "HRMS.API\\HRMS.API.csproj",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.API\\HRMS.API.csproj",
+              "RelativeToolTip": "HRMS.API\\HRMS.API.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-02-11T10:34:59.308Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "HRMS.Infrastructure.csproj",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Infrastructure\\HRMS.Infrastructure.csproj",
+              "RelativeDocumentMoniker": "HRMS.Infrastructure\\HRMS.Infrastructure.csproj",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Infrastructure\\HRMS.Infrastructure.csproj",
+              "RelativeToolTip": "HRMS.Infrastructure\\HRMS.Infrastructure.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-02-11T10:37:35.312Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "HRMS.Application.csproj",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\HRMS.Application.csproj",
+              "RelativeDocumentMoniker": "HRMS.Application\\HRMS.Application.csproj",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\GitHub\\HRMS\\HRMS Backend\\HRMS.Application\\HRMS.Application.csproj",
+              "RelativeToolTip": "HRMS.Application\\HRMS.Application.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-02-11T10:19:18.843Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

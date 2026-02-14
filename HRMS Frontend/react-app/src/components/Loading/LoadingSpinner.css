@@ -1,0 +1,23 @@
+/* src/components/LoadingSpinner/LoadingSpinner.css */
+.ls-container { display: inline-flex; align-items:center; justify-content:center; }
+.ls-svg { display:block; }
+
+.ls-ring-bg { opacity: 0.9; }
+
+.ls-arc {
+  stroke-dasharray: 125;
+  stroke-dashoffset: 80;
+  transform-origin: 50% 50%;
+  animation: ls-arc-rotate 1.1s linear infinite, ls-arc-dash 1.6s ease-in-out infinite;
+  filter: drop-shadow(0 2px 6px rgba(37,99,235,0.14));
+}
+
+/* rotate whole arc */
+@keyframes ls-arc-rotate { 100% { transform: rotate(360deg); } }
+
+/* dash movement for lively motion */
+@keyframes ls-arc-dash {
+  0% { stroke-dashoffset: 125; }
+  50% { stroke-dashoffset: 35; }
+  100% { stroke-dashoffset: 125; }
+}

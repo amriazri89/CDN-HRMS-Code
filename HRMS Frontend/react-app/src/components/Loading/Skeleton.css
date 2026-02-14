@@ -1,0 +1,22 @@
+/* src/components/Skeleton/Skeleton.css */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, rgba(0,0,0,0.04), rgba(0,0,0,0.03));
+  border-radius: 6px;
+}
+
+/* shimmer */
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.5), rgba(255,255,255,0));
+  animation: shimmer 1.1s linear infinite;
+}
+
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+
+.skeleton--circle { border-radius: 50%; }
+.skeleton--text { height: 12px; border-radius: 4px; }

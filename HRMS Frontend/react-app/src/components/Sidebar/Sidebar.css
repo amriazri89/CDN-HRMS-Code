@@ -1,0 +1,160 @@
+/* src/components/Sidebar.css */
+
+/* reset box model for predictable sizing inside sidebar */
+.sidebar,
+.sidebar * {
+  box-sizing: border-box;
+}
+
+/* Sidebar container */
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background-color: #a9a726;
+  color: #0c0c0c;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  position: fixed;   /* keeps it on the left */
+  top: 0;
+  left: 0;
+  z-index: 50;
+  gap: 18px;
+  overflow: auto;
+}
+
+/* Logo / brand area */
+.sidebar-logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+/* nav list container fills remaining height so footer sits at bottom */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  margin-top: 10px;
+}
+
+/* ul reset */
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* each item */
+.sidebar-nav li {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* link styling (Link renders <a>) */
+.sidebar-nav li a {
+  display: block;
+  padding: 10px 14px;
+  color: #d8d8dc;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.98rem;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+
+/* hover state */
+.sidebar-nav li a:hover {
+  background: rgba(216, 29, 29, 0.04);
+  color:black;
+  transform: translateX(4px);
+}
+
+/* active item: your Sidebar.jsx sets className="active" on the li */
+.sidebar-nav li.active a {
+  background: #1a4b58; /* blue highlight */
+  color: #fff;
+  transform: none;
+}
+
+/* optional small icon inside links */
+.sidebar-nav li a .icon {
+  margin-right: 10px;
+  display: inline-flex;
+  width: 18px;
+  justify-content: center;
+}
+
+/* footer (logout area) pinned to bottom */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+/* logout button (if you use <button> or <a>) */
+.logout-btn,
+.sidebar-footer button {
+  width: 100%;
+  background: transparent;
+  color: #ffdede;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.18s ease, color 0.18s ease;
+  text-align: center;
+}
+
+.logout-btn:hover,
+.sidebar-footer button:hover {
+  background: rgba(212, 10, 10, 0.06);
+  color: #fff;
+}
+
+/* small-screen responsive: collapse sidebar into top bar */
+@media (max-width: 880px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .sidebar-logo {
+    flex: 0 0 auto;
+    margin-right: 12px;
+    margin-top: 300px;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  .sidebar-nav ul {
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .sidebar-nav li a {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+
+  .sidebar-footer {
+    display: none; /* hide logout in compact view (or show as icon) */
+  }
+  .sidebar a:hover {
+  color: red; /* Change to red */
+}
+
+}

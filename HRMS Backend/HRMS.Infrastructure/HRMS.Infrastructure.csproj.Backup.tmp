@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HRMS.Domain\HRMS.Domain.csproj" />
+	 <ProjectReference Include="..\HRMS.Application\HRMS.Application.csproj" />
+
+  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Dapper" Version="2.1.35" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
+	</ItemGroup>
+</Project>

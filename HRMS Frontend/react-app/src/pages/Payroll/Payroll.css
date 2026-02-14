@@ -1,0 +1,575 @@
+/* ================= PAYROLL PAGE ================= */
+
+.payroll-page {
+  padding: 32px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+/* ================= HEADER ================= */
+
+.payroll-header {
+  margin-bottom: 32px;
+}
+
+.payroll-header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.payroll-header-icon {
+  font-size: 48px;
+  color: #16a34a;
+}
+
+.payroll-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 4px 0;
+}
+
+.payroll-header p {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ================= CONTAINER ================= */
+
+.payroll-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ================= FORM CARD ================= */
+
+.payroll-form-card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.card-icon {
+  font-size: 24px;
+  color: #2563eb;
+}
+
+.card-header h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+
+/* ================= FORM ================= */
+
+.payroll-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #000000;
+}
+
+.label-icon {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.select-input,
+.date-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: white;
+  color: #000000;
+  box-sizing: border-box;
+}
+
+.select-input:focus,
+.date-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.select-input:disabled,
+.date-input:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* ================= EMPLOYEE INFO BOX ================= */
+
+.employee-info-box {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.employee-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.info-label {
+  font-weight: 500;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.info-value {
+  font-weight: 600;
+}
+
+.birthday-icon {
+  color: #fbbf24;
+  font-size: 16px;
+}
+
+/* ================= DATE RANGE ================= */
+
+.date-range-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.period-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #eff6ff;
+  border-left: 4px solid #2563eb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #1e40af;
+}
+
+.period-icon {
+  font-size: 18px;
+  color: #2563eb;
+}
+
+/* ================= ERROR MESSAGE ================= */
+
+.error-message {
+  padding: 12px 16px;
+  background: #fee2e2;
+  border-left: 4px solid #dc2626;
+  border-radius: 8px;
+  color: #991b1b;
+  font-size: 0.9rem;
+}
+
+/* ================= FORM ACTIONS ================= */
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-calculate {
+  flex: 1;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.btn-calculate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+}
+
+.btn-calculate:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-reset {
+  background: #e5e7eb;
+  color: #000000;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-reset:hover {
+  background: #d1d5db;
+}
+
+.btn-reset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ================= RESULT CARD ================= */
+
+.payroll-result-card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.result-icon {
+  font-size: 24px;
+  color: #16a34a;
+}
+
+.result-header h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+
+/* ================= RESULT CONTENT ================= */
+
+.result-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.result-section {
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+.result-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 12px 0;
+}
+
+.result-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.result-detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 0.9rem;
+  color: #000000;
+  font-weight: 600;
+}
+
+/* ================= SALARY BREAKDOWN ================= */
+
+.salary-breakdown {
+  background: #eff6ff;
+  border-left: 4px solid #2563eb;
+}
+
+.breakdown-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.breakdown-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #1e40af;
+}
+
+/* ================= TOTAL AMOUNT ================= */
+
+.result-total {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: white;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.3);
+}
+
+.total-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.total-amount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 8px 0;
+}
+
+.total-currency {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* ================= RESULT ACTIONS ================= */
+
+.result-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-print,
+.btn-calculate-another {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-print {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-print:hover {
+  background: #1d4ed8;
+}
+
+.btn-calculate-another {
+  background: #f3f4f6;
+  color: #000000;
+}
+
+.btn-calculate-another:hover {
+  background: #e5e7eb;
+}
+
+/* ================= INFO CARD ================= */
+
+.info-card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.info-icon {
+  font-size: 24px;
+  color: #f59e0b;
+}
+
+.info-header h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+
+.info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.info-item:hover {
+  background: #f3f4f6;
+  transform: translateX(4px);
+}
+
+.info-number {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.info-text h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 8px 0;
+}
+
+.info-text p {
+  font-size: 0.9rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1024px) {
+  .payroll-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .payroll-page {
+    padding: 16px;
+  }
+
+  .payroll-header-content {
+    padding: 16px;
+  }
+
+  .payroll-header-icon {
+    font-size: 36px;
+  }
+
+  .payroll-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .date-range-group {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .result-actions {
+    flex-direction: column;
+  }
+
+  .total-amount {
+    font-size: 2rem;
+  }
+}
+
+/* ================= PRINT STYLES ================= */
+
+@media print {
+  .payroll-header,
+  .payroll-form-card,
+  .info-card,
+  .result-actions {
+    display: none;
+  }
+
+  .payroll-container {
+    grid-template-columns: 1fr;
+  }
+
+  .payroll-result-card {
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
+  }
+}
