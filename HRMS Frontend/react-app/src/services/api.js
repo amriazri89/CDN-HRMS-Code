@@ -1,5 +1,5 @@
 import axios from "axios";
-import routes from "../../routes";
+import routes from "../routes";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
