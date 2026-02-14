@@ -6,7 +6,7 @@ import UserService from "../../services/UserService.js";
 
 const Login = () => {
     useEffect(() => {
-      document.title = "Etiqa Login Portal"; // set tab name
+      document.title = "CDN Login Portal"; // set tab name
     }, []);
   
 

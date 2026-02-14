@@ -1,5 +1,4 @@
 import axios from "axios";
-import routes from "../routes";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -10,7 +9,8 @@ const api = axios.create({
   },
 });
 
-// Add JWT token
+
+// 🔹 Add JWT token to every request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -22,18 +22,18 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle 401
+// 🔹 Handle 401 errors (expired token)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.clear();
-      if (window.location.pathname !== ROUTES.LOGIN) {
-        window.location.href = ROUTES.LOGIN;
+      if (window.location.pathname !== "/etiqa/hrms/login") {
+        window.location.href = "/etiqa/hrms/login";
       }
     }
     return Promise.reject(error);
   }
 );
 
-export default api;
+export default api; 

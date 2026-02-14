@@ -1,5 +1,5 @@
 // Centralized routing configuration
-export const BASE_PATH = "/etiqa/hrms";
+export const BASE_PATH = "/cdn/hrms";
 
 export const ROUTES = {
   LOGIN: `${BASE_PATH}/login`,
