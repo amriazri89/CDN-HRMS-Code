@@ -1,0 +1,24 @@
+# Visual Studio / Build
+*.obj
+*.exe
+*.dll
+*.pdb
+*.cache
+*.suo
+*.user
+*.vs
+bin/
+obj/
+
+# Rider IDE
+.idea/
+
+# NuGet
+*.nupkg
+*.snupkg
+project.lock.json
+*.nuget.props
+*.nuget.targets
+
+# Others
+*.log
