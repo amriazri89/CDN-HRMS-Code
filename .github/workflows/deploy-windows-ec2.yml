@@ -35,51 +35,62 @@ jobs:
         EC2_HOST: ${{ secrets.EC2_HOST }}
         EC2_USER: ${{ secrets.EC2_USER }}
         EC2_PASS: ${{ secrets.EC2_PASS }}
-      run: |
-        # Verify secrets exist
-        if ([string]::IsNullOrEmpty($env:EC2_PASS)) {
-            Write-Error "EC2_PASS secret is not set or is empty!"
-            exit 1
-        }
-        
-        Write-Host "✅ Secrets verified. Connecting to EC2..."
-        
-        # Create credential
-        $secpasswd = ConvertTo-SecureString $env:EC2_PASS -AsPlainText -Force
-        $cred = New-Object System.Management.Automation.PSCredential ($env:EC2_USER, $secpasswd)
-        
-        # Create PS Session
-        Write-Host "📡 Creating remote session to $env:EC2_HOST..."
-        $session = New-PSSession -ComputerName $env:EC2_HOST -Credential $cred
-        
-        # Stop service
-        Write-Host "⏹️ Stopping HRMS service..."
-        Invoke-Command -Session $session -ScriptBlock {
-            & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" stop HRMS
-        }
-        
-        # Copy files to EC2
-        Write-Host "📂 Copying published files to EC2..."
-        Copy-Item -Path "publish\*" -Destination "C:\Users\Administrator\Documents\Projects\PublishedApp\Publish" -ToSession $session -Recurse -Force
-        
-        # Start service
-        Write-Host "▶️ Starting HRMS service..."
-        Invoke-Command -Session $session -ScriptBlock {
-            & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" start HRMS
-        }
-        
-        # Verify service started
-        Write-Host "🔍 Verifying service status..."
-        Invoke-Command -Session $session -ScriptBlock {
-            $service = Get-Service -Name HRMS
-            if ($service.Status -eq "Running") {
-                Write-Host "✅ HRMS service is running!"
-            } else {
-                Write-Error "❌ HRMS service failed to start. Status: $($service.Status)"
-                exit 1
-            }
-        }
-        
-        # Clean up
-        Remove-PSSession $session
-        Write-Host "🎉 Deployment completed successfully!"
+        run: |
+          # Method 1: Direct assignment
+          $pass = '${{ secrets.EC2_PASS }}'
+          
+          # Method 2: Check length (without revealing value)
+          Write-Host "Password length: $($pass.Length)"
+          
+          if ($pass.Length -eq 0) {
+              Write-Error "Password is empty!"
+              
+              Write-Host "Troubleshooting steps:"
+              Write-Host "1. Go to Settings → Secrets → Actions"
+              Write-Host "2. Verify EC2_PASS exists"
+              Write-Host "3. Delete and re-create the secret"
+              Write-Host "4. Make sure it's a Repository secret"
+              
+              exit 1
+          }
+          
+          Write-Host "✅ Password loaded successfully"
+          # Create credential
+          $secpasswd = ConvertTo-SecureString $env:EC2_PASS -AsPlainText -Force
+          $cred = New-Object System.Management.Automation.PSCredential ($env:EC2_USER, $secpasswd)
+          
+          # Create PS Session
+          Write-Host "📡 Creating remote session to $env:EC2_HOST..."
+          $session = New-PSSession -ComputerName $env:EC2_HOST -Credential $cred
+          
+          # Stop service
+          Write-Host "⏹️ Stopping HRMS service..."
+          Invoke-Command -Session $session -ScriptBlock {
+              & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" stop HRMS
+          }
+          
+          # Copy files to EC2
+          Write-Host "📂 Copying published files to EC2..."
+          Copy-Item -Path "publish\*" -Destination "C:\Users\Administrator\Documents\Projects\PublishedApp\Publish" -ToSession $session -Recurse -Force
+          
+          # Start service
+          Write-Host "▶️ Starting HRMS service..."
+          Invoke-Command -Session $session -ScriptBlock {
+              & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" start HRMS
+          }
+          
+          # Verify service started
+          Write-Host "🔍 Verifying service status..."
+          Invoke-Command -Session $session -ScriptBlock {
+              $service = Get-Service -Name HRMS
+              if ($service.Status -eq "Running") {
+                  Write-Host "✅ HRMS service is running!"
+              } else {
+                  Write-Error "❌ HRMS service failed to start. Status: $($service.Status)"
+                  exit 1
+              }
+          }
+          
+          # Clean up
+          Remove-PSSession $session
+          Write-Host "🎉 Deployment completed successfully!"
