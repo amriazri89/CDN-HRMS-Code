@@ -8,78 +8,60 @@ on:
 jobs:
   build-and-deploy:
     runs-on: windows-latest
+    environment: "CI/CD - Deploy HRMS to Windows EC2"  # ✅ uses your environment
 
     steps:
-    # ========== BUILD PHASE ==========
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      # ========== BUILD PHASE ==========
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Setup .NET 10
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '10.0.x'
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '10.0.x'
 
-    - name: Restore Dependencies
-      run: dotnet restore "HRMS Backend/HRMS.API/HRMS.API.csproj"
+      - name: Restore Dependencies
+        run: dotnet restore "HRMS Backend/HRMS.API/HRMS.API.csproj"
 
-    - name: Build Project
-      run: dotnet build "HRMS Backend/HRMS.API/HRMS.API.csproj" --configuration Release
+      - name: Build Project
+        run: dotnet build "HRMS Backend/HRMS.API/HRMS.API.csproj" --configuration Release
 
-    - name: Publish Project
-      run: dotnet publish "HRMS Backend/HRMS.API/HRMS.API.csproj" -c Release -o publish
+      - name: Publish Project
+        run: dotnet publish "HRMS Backend/HRMS.API/HRMS.API.csproj" -c Release -o publish
 
-    # ========== DEPLOY PHASE ==========
-    - name: Deploy to Windows EC2
-      shell: pwsh
-      env:
-        EC2_HOST: ${{ secrets.EC2_HOST }}
-        EC2_USER: ${{ secrets.EC2_USER }}
-        EC2_PASS: ${{ secrets.EC2_PASS }}
+      # ========== DEPLOY PHASE ==========
+      - name: Deploy to Windows EC2
+        shell: pwsh
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_PASS: ${{ secrets.EC2_PASS }}
         run: |
-          # Method 1: Direct assignment
-          $pass = '${{ secrets.EC2_PASS }}'
-          
-          # Method 2: Check length (without revealing value)
-          Write-Host "Password length: $($pass.Length)"
-          
-          if ($pass.Length -eq 0) {
-              Write-Error "Password is empty!"
-              
-              Write-Host "Troubleshooting steps:"
-              Write-Host "1. Go to Settings → Secrets → Actions"
-              Write-Host "2. Verify EC2_PASS exists"
-              Write-Host "3. Delete and re-create the secret"
-              Write-Host "4. Make sure it's a Repository secret"
-              
-              exit 1
-          }
-          
-          Write-Host "✅ Password loaded successfully"
-          # Create credential
+          # ✅ Create credential
           $secpasswd = ConvertTo-SecureString $env:EC2_PASS -AsPlainText -Force
           $cred = New-Object System.Management.Automation.PSCredential ($env:EC2_USER, $secpasswd)
           
-          # Create PS Session
-          Write-Host "📡 Creating remote session to $env:EC2_HOST..."
+          # ✅ Create remote session
+          Write-Host "📡 Connecting to EC2 $env:EC2_HOST..."
           $session = New-PSSession -ComputerName $env:EC2_HOST -Credential $cred
           
-          # Stop service
+          # ✅ Stop HRMS service
           Write-Host "⏹️ Stopping HRMS service..."
           Invoke-Command -Session $session -ScriptBlock {
               & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" stop HRMS
           }
-          
-          # Copy files to EC2
+
+          # ✅ Copy published files
           Write-Host "📂 Copying published files to EC2..."
           Copy-Item -Path "publish\*" -Destination "C:\Users\Administrator\Documents\Projects\PublishedApp\Publish" -ToSession $session -Recurse -Force
           
-          # Start service
+          # ✅ Start HRMS service
           Write-Host "▶️ Starting HRMS service..."
           Invoke-Command -Session $session -ScriptBlock {
               & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" start HRMS
           }
-          
-          # Verify service started
+
+          # ✅ Verify service is running
           Write-Host "🔍 Verifying service status..."
           Invoke-Command -Session $session -ScriptBlock {
               $service = Get-Service -Name HRMS
@@ -90,7 +72,7 @@ jobs:
                   exit 1
               }
           }
-          
-          # Clean up
+
+          # ✅ Cleanup
           Remove-PSSession $session
           Write-Host "🎉 Deployment completed successfully!"
