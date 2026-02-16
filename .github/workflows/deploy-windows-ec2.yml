@@ -1,4 +1,3 @@
-# Example: add a comment in your HRMS.API project
 name: CI/CD - HRMS
 
 on:
@@ -28,19 +27,19 @@ jobs:
     - name: Publish
       run: dotnet publish "HRMS Backend/HRMS.API/HRMS.API.csproj" -c Release -o publish
 
-    - name: Deploy to EC2 via PowerShell Remoting
-      uses: appleboy/ssh-action@v0.1.9
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        password: ${{ secrets.EC2_PASS }}
-        port: 5985
-        script: |
-          # Stop HRMS service
+    - name: Deploy to Windows EC2 via PowerShell Remoting
+      shell: pwsh
+      run: |
+        $secpasswd = ConvertTo-SecureString "${{ secrets.EC2_PASS }}" -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential ("${{ secrets.EC2_USER }}", $secpasswd)
+        
+        Invoke-Command -ComputerName ${{ secrets.EC2_HOST }} -Credential $cred -ScriptBlock {
+          Write-Host "Stopping HRMS service..."
           & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" stop HRMS
-          
-          # Copy new files
-          Copy-Item -Path ./publish/* -Destination "C:\Users\Administrator\Documents\Projects\PublishedApp\Publish" -Recurse -Force
-          
-          # Restart HRMS service
+
+          Write-Host "Copying new published files..."
+          Copy-Item -Path "C:\GitHub\Actions\publish\*" -Destination "C:\Users\Administrator\Documents\Projects\PublishedApp\Publish" -Recurse -Force
+
+          Write-Host "Starting HRMS service..."
           & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" start HRMS
+        }
