@@ -1,4 +1,4 @@
-name: CI/CD - HRMS
+name: CI/CD - Deploy HRMS to Windows EC2
 
 on:
   push:
@@ -6,14 +6,15 @@ on:
       - main
 
 jobs:
-  build-deploy:
+  build-and-deploy:
     runs-on: windows-latest
 
     steps:
+    # ========== BUILD PHASE ==========
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Setup .NET
+    - name: Setup .NET 10
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '10.0.x'
@@ -21,22 +22,64 @@ jobs:
     - name: Restore Dependencies
       run: dotnet restore "HRMS Backend/HRMS.API/HRMS.API.csproj"
 
-    - name: Build
+    - name: Build Project
       run: dotnet build "HRMS Backend/HRMS.API/HRMS.API.csproj" --configuration Release
 
-    - name: Publish
+    - name: Publish Project
       run: dotnet publish "HRMS Backend/HRMS.API/HRMS.API.csproj" -c Release -o publish
-    - name: Restart HRMS Service on EC2
+
+    # ========== DEPLOY PHASE ==========
+    - name: Deploy to Windows EC2
       shell: pwsh
+      env:
+        EC2_HOST: ${{ secrets.EC2_HOST }}
+        EC2_USER: ${{ secrets.EC2_USER }}
+        EC2_PASS: ${{ secrets.EC2_PASS }}
       run: |
-        # Make sure secret is passed as string
-        $secpasswd = ConvertTo-SecureString "${{ secrets.EC2_PASS }}" -AsPlainText -Force
-        $cred = New-Object System.Management.Automation.PSCredential ("${{ secrets.EC2_USER }}", $secpasswd)
-
-        Invoke-Command -ComputerName ${{ secrets.EC2_HOST }} -Credential $cred -ScriptBlock {
-            Write-Host "Stopping HRMS service..."
+        # Verify secrets exist
+        if ([string]::IsNullOrEmpty($env:EC2_PASS)) {
+            Write-Error "EC2_PASS secret is not set or is empty!"
+            exit 1
+        }
+        
+        Write-Host "✅ Secrets verified. Connecting to EC2..."
+        
+        # Create credential
+        $secpasswd = ConvertTo-SecureString $env:EC2_PASS -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential ($env:EC2_USER, $secpasswd)
+        
+        # Create PS Session
+        Write-Host "📡 Creating remote session to $env:EC2_HOST..."
+        $session = New-PSSession -ComputerName $env:EC2_HOST -Credential $cred
+        
+        # Stop service
+        Write-Host "⏹️ Stopping HRMS service..."
+        Invoke-Command -Session $session -ScriptBlock {
             & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" stop HRMS
-
-            Write-Host "Starting HRMS service..."
+        }
+        
+        # Copy files to EC2
+        Write-Host "📂 Copying published files to EC2..."
+        Copy-Item -Path "publish\*" -Destination "C:\Users\Administrator\Documents\Projects\PublishedApp\Publish" -ToSession $session -Recurse -Force
+        
+        # Start service
+        Write-Host "▶️ Starting HRMS service..."
+        Invoke-Command -Session $session -ScriptBlock {
             & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" start HRMS
         }
+        
+        # Verify service started
+        Write-Host "🔍 Verifying service status..."
+        Invoke-Command -Session $session -ScriptBlock {
+            $service = Get-Service -Name HRMS
+            if ($service.Status -eq "Running") {
+                Write-Host "✅ HRMS service is running!"
+            } else {
+                Write-Error "❌ HRMS service failed to start. Status: $($service.Status)"
+                exit 1
+            }
+        }
+        
+        # Clean up
+        Remove-PSSession $session
+        Write-Host "🎉 Deployment completed successfully!"

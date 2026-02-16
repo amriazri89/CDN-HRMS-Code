@@ -5,5 +5,16 @@
       "use": "@vercel/static-build",
       "config": { "distDir": "build" }
     }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "upgrade-insecure-requests"
+        }
+      ]
+    }
   ]
 }

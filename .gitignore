@@ -22,3 +22,7 @@ project.lock.json
 
 # Others
 *.log
+
+# Environment variables
+.env.local
+.env.*.local

@@ -1,8 +1,10 @@
 import axios from "axios";
 import ROUTES from "../routes";
 
-// 🔹 Use relative path for proxy (calls Vercel serverless function)
-const API_URL = "/api"; // Vercel function will forward to EC2 backend
+// ✅ USE ENVIRONMENT VARIABLE
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+console.log("🔗 API URL:", API_URL); // Debug log
 
 const api = axios.create({
   baseURL: API_URL,

@@ -66,13 +66,16 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowViteApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+        policy.WithOrigins(
+            "http://localhost:5173",
+            "https://localhost:5173",
+            "https://etiqa.assessment.vercel.app"  
+        )
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
     });
 });
-
 var app = builder.Build();
 
 app.UseCors("AllowViteApp");
