@@ -10,46 +10,36 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    # 1. Checkout repository
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    # 2. Setup .NET 10 SDK
-    - name: Setup .NET 10
+    - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '10.0.x'
 
-    # 3. Restore dependencies
     - name: Restore Dependencies
       run: dotnet restore "HRMS Backend/HRMS.API/HRMS.API.csproj"
 
-    # 4. Build project
-    - name: Build Project
+    - name: Build
       run: dotnet build "HRMS Backend/HRMS.API/HRMS.API.csproj" --configuration Release
 
-    # 5. Publish project to temp folder
-    - name: Publish Project
-      run: dotnet publish "HRMS Backend/HRMS.API/HRMS.API.csproj" -c Release -o ./publish
+    - name: Publish
+      run: dotnet publish "HRMS Backend/HRMS.API/HRMS.API.csproj" -c Release -o publish
 
-    # 6. Copy files to EC2
-    - name: Copy files to EC2
-      uses: appleboy/scp-action@v0.1.4
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        password: ${{ secrets.EC2_PASSWORD }}
-        source: "publish/*"
-        target: "C:/Projects/PublishedApp"
-
-    # 7. Restart HRMS service on EC2
-    - name: Restart HRMS Service
+    - name: Deploy to EC2 via PowerShell Remoting
       uses: appleboy/ssh-action@v0.1.9
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
-        password: ${{ secrets.EC2_PASSWORD }}
+        password: ${{ secrets.EC2_PASS }}
         port: 5985
         script: |
+          # Stop HRMS service
           & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" stop HRMS
+          
+          # Copy new files
+          Copy-Item -Path ./publish/* -Destination "C:\Users\Administrator\Documents\Projects\PublishedApp\Publish" -Recurse -Force
+          
+          # Restart HRMS service
           & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" start HRMS
