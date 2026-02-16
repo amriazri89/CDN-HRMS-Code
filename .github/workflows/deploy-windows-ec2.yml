@@ -1,0 +1,39 @@
+name: CI/CD .NET Core to Windows EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'  # your .NET version
+
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release
+
+    - name: Publish
+      run: dotnet publish -c Release -o ./publish
+
+    - name: Copy to EC2 via WinRM
+      uses: appleboy/ssh-action@v0.1.9
+      with:
+        host: "ec2-35-172-146-76.compute-1.amazonaws.com"
+        username: "Administrator"
+        password: "&d@?47p6Pp%KvA=)Nn=5&m2WqybVql)V"
+        port: 5985   # default WinRM HTTP port
+        source: "./publish/*"
+        target: "C:/Projects/PublishedApp"
+        strip_components: 0

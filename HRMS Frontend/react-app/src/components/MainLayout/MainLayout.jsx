@@ -5,7 +5,7 @@ import Navbar from "../Navbar/Navbar.jsx";
 import LoadingOverlay from "../Loading/LoadingOverlay";
 import Skeleton from "../Loading/Skeleton";
 import "./MainLayout.css";
-import "../../styles/style.css";
+import "../../styles/styles.scss";
 /**
  * props:
  *  - children

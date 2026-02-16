@@ -1,0 +1,139 @@
+// =============================================
+// VARIABLES.SCSS - Complete Variable Definitions
+// Place this in: src/styles/variables.scss
+// =============================================
+
+// =============================================
+// COLORS
+// =============================================
+
+// Primary colors
+$color-primary: #c23638;
+$color-primary-light: lighten($color-primary, 10%);
+$color-primary-dark: darken($color-primary, 10%);
+
+// Neutral colors
+$color-white: #ffffff;
+$color-black: #000000;
+
+// Gray scale
+$color-gray-50: #f9fafb;
+$color-gray-100: #f3f4f6;
+$color-gray-200: #e5e7eb;
+$color-gray-300: #d1d5db;
+$color-gray-400: #9ca3af;
+$color-gray-500: #6b7280;
+$color-gray-600: #4b5563;
+$color-gray-700: #374151;
+$color-gray-800: #1f2937;
+$color-gray-900: #111827;
+
+// State colors
+$color-success: #28a745;
+$color-danger: #dc3545;
+$color-warning: #ffc107;
+$color-info: #17a2b8;
+
+// Link colors
+$color-link: #1a73e8;
+$color-link-hover: #ff0000;
+
+// =============================================
+// SPACING
+// =============================================
+
+$spacing-xs: 5px;
+$spacing-sm: 10px;
+$spacing-md: 15px;
+$spacing-lg: 20px;
+$spacing-xl: 30px;
+
+// =============================================
+// TYPOGRAPHY
+// =============================================
+
+// Font families
+$font-family-primary: Arial, sans-serif;
+
+// Font sizes
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.25rem;
+$font-size-xl: 1.5rem;
+
+// Font weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+
+$color-background: $color-gray-50;
+$color-text-dark: $color-gray-900;
+
+$sidebar-width: 250px;
+$color-sidebar-bg: $color-gray-800;
+$color-sidebar-text: $color-white;
+
+$color-navbar-bg: $color-gray-700;
+$color-navbar-border: $color-gray-700;
+
+$color-hover-light: rgba(0, 0, 0, 0.03);
+// =============================================
+// BORDERS
+// =============================================
+
+// Border radius
+$border-radius-base: 4px;
+$border-radius-md: 6px;
+$border-radius-lg: 8px;
+$border-radius-xl: 12px;
+$border-radius-pill: 9999px;
+$border-radius-round: 50%;
+
+// Border colors
+$border-color-light: #e5e7eb;
+$border-color-base: #d1d5db;
+$border-color-dark: #9ca3af;
+
+// =============================================
+// SHADOWS
+// =============================================
+
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+// =============================================
+// TRANSITIONS
+// =============================================
+
+$transition-fast: all 0.15s ease;
+$transition-base: all 0.2s ease;
+$transition-default: all 0.3s ease;
+$transition-slow: all 0.5s ease;
+
+// Specific transitions
+$transition-color: color 0.2s ease;
+$transition-background: background-color 0.2s ease;
+$transition-border: border-color 0.2s ease;
+
+// =============================================
+// Z-INDEX
+// =============================================
+
+$z-index-dropdown: 1000;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+
+// =============================================
+// BREAKPOINTS
+// =============================================
+
+$breakpoint-mobile: 768px;
+$breakpoint-tablet: 1024px;
+$breakpoint-desktop: 1200px;

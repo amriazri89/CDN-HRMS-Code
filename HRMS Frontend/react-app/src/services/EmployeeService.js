@@ -1,7 +1,53 @@
 import api from "./api";
 
 export default class EmployeeService {
-  // Get all employees
+  // ========== SERVER-SIDE PAGINATION (FIXED) ==========
+  static async getPaged(
+    pageNumber = 1,
+    pageSize = 10,
+    includeArchived = false,
+  ) {
+    try {
+      console.log("🔍 getPaged called:", {
+        pageNumber,
+        pageSize,
+        includeArchived,
+      }); // DEBUG
+
+      const res = await api.get(`/Employees/paged`, {
+        params: {
+          pageNumber: pageNumber,
+          pageSize: pageSize,
+          sortBy: "Name",
+          sortDescending: false,
+          searchTerm: "",
+          includeArchived: includeArchived, // ✅ Send to backend
+        },
+      });
+
+      console.log("✅ Response:", res.data); // DEBUG
+
+      const paginationHeader = res.headers["x-pagination"];
+      const pagination = paginationHeader ? JSON.parse(paginationHeader) : null;
+
+      return {
+        data: res.data.items || res.data, // Backend returns PagedResult with .items
+        pagination: pagination || {
+          totalCount: res.data.totalCount || 0,
+          pageSize: res.data.pageSize || pageSize,
+          pageNumber: res.data.pageNumber || pageNumber,
+          totalPages: res.data.totalPages || 1,
+        },
+      };
+    } catch (err) {
+      console.error("❌ getPaged error:", err.response?.data);
+      throw new Error(
+        err.response?.data?.message || "Failed to fetch employees",
+      );
+    }
+  }
+
+  // Get all employees (NO PAGINATION - for dropdown/select)
   static async getAll(includeArchived = false) {
     try {
       const res = await api.get(
@@ -64,7 +110,6 @@ export default class EmployeeService {
       console.error("❌ Update failed:", err);
       console.error("❌ Status:", err.response?.status);
       console.error("❌ Response data:", err.response?.data);
-      console.error("❌ Request data:", err.config?.data);
 
       throw new Error(
         err.response?.data?.message || "Failed to update employee",

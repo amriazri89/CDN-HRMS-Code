@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import EmployeeService from "../../services/EmployeeService";
 import EmploymentRecordService from "../../services/EmploymentRecordService";
 import MainLayout from "../../components/MainLayout/MainLayout";
+import Pagination from "../../components/Pagination/Pagination";
 import {
   FaEdit,
   FaTrash,
@@ -25,9 +26,19 @@ const daysOfWeek = [
 ];
 
 const Employee = () => {
+  // ========== PAGINATION STATE ==========
   const [employees, setEmployees] = useState([]);
-  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // ========== SEARCH STATE ==========
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearchMode, setIsSearchMode] = useState(false);
+
+  // ========== MODAL STATE ==========
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEmploymentModalOpen, setIsEmploymentModalOpen] = useState(false);
@@ -36,6 +47,7 @@ const Employee = () => {
   const [selectedEmployeeForEmployment, setSelectedEmployeeForEmployment] = useState(null);
   const [viewingEmployeeRecords, setViewingEmployeeRecords] = useState(null);
 
+  // ========== FORM STATE ==========
   const [addForm, setAddForm] = useState({
     name: "",
     nationalNumber: "",
@@ -74,55 +86,79 @@ const Employee = () => {
   const [loading, setLoading] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
 
+  // ========== EFFECTS ==========
   useEffect(() => {
     document.title = "HRMS - Employees";
     fetchEmployees();
-  }, [showArchived]);
+  }, [showArchived, pageNumber, pageSize]);
 
   // Auto-search with debouncing
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      handleSearch(searchQuery);
-    }, 300); // 300ms delay after user stops typing
+      if (searchQuery.trim()) {
+        handleSearch(searchQuery);
+      } else {
+        setIsSearchMode(false);
+        setSearchResults([]);
+      }
+    }, 300);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchQuery, employees]);
+  }, [searchQuery]);
 
+  // ========== FETCH EMPLOYEES (SERVER-SIDE PAGINATION) ==========
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      const data = await EmployeeService.getAll(showArchived);
-      setEmployees(Array.isArray(data) ? data : []);
-      setFilteredEmployees(Array.isArray(data) ? data : []);
+      const result = await EmployeeService.getPaged(pageNumber, pageSize, showArchived);
+      
+      setEmployees(Array.isArray(result.data) ? result.data : []);
+      setTotalCount(result.pagination.totalCount);
+      setTotalPages(result.pagination.totalPages);
     } catch (err) {
       console.error("❌ Fetch failed:", err);
       alert("Failed to load employees: " + err.message);
       setEmployees([]);
-      setFilteredEmployees([]);
+      setTotalCount(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
   };
 
-  // Auto-search function (wildcard search)
-  const handleSearch = (query) => {
+  // ========== PAGINATION HANDLERS ==========
+  const handlePageChange = (newPageNumber) => {
+    setPageNumber(newPageNumber);
+    setSearchQuery("");
+    setIsSearchMode(false);
+  };
+
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setPageNumber(1);
+    setSearchQuery("");
+    setIsSearchMode(false);
+  };
+
+  // ========== SEARCH (SEARCHES ALL DATA) ==========
+  const handleSearch = async (query) => {
     if (!query.trim()) {
-      // If search is empty, show all employees
-      setFilteredEmployees(employees);
+      setIsSearchMode(false);
+      setSearchResults([]);
       return;
     }
 
-    const searchTerm = query.toLowerCase().trim();
-    
-    const filtered = employees.filter((emp) => {
-      const employeeNumber = (emp.employeeNumber || "").toLowerCase();
-      const name = (emp.name || "").toLowerCase();
-      
-      // Wildcard search: matches anywhere in the string
-      return employeeNumber.includes(searchTerm) || name.includes(searchTerm);
-    });
-
-    setFilteredEmployees(filtered);
+    try {
+      setLoading(true);
+      setIsSearchMode(true);
+      const results = await EmployeeService.search(query);
+      setSearchResults(Array.isArray(results) ? results : []);
+    } catch (err) {
+      console.error("Search failed:", err);
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSearchChange = (e) => {
@@ -131,8 +167,12 @@ const Employee = () => {
 
   const clearSearch = () => {
     setSearchQuery("");
-    setFilteredEmployees(employees);
+    setIsSearchMode(false);
+    setSearchResults([]);
   };
+
+  // Get display data (search results or paginated employees)
+  const displayedEmployees = isSearchMode ? searchResults : employees;
 
   // ========== VIEW EMPLOYMENT RECORDS ==========
   const openViewEmploymentModal = async (employee) => {
@@ -455,9 +495,7 @@ const Employee = () => {
       setLoading(true);
       await EmployeeService.archive(id);
       alert("✅ Employee archived successfully!");
-      if (!showArchived) {
-        await fetchEmployees();
-      }
+      await fetchEmployees();
     } catch (err) {
       alert("❌ " + err.message);
     } finally {
@@ -471,9 +509,7 @@ const Employee = () => {
       setLoading(true);
       await EmployeeService.unarchive(id);
       alert("✅ Employee unarchived successfully!");
-      if (showArchived) {
-        await fetchEmployees();
-      }
+      await fetchEmployees();
     } catch (err) {
       alert("❌ " + err.message);
     } finally {
@@ -516,7 +552,10 @@ const Employee = () => {
             </button>
             <button
               className="btn-secondary"
-              onClick={() => setShowArchived(!showArchived)}
+              onClick={() => {
+                setShowArchived(!showArchived);
+                setPageNumber(1);
+              }}
               disabled={loading}
             >
               {showArchived ? "Active Only" : "Show Archived"}
@@ -542,12 +581,6 @@ const Employee = () => {
               </button>
             )}
           </div>
-          {searchQuery && (
-            <div className="search-results-info">
-              Found {filteredEmployees.length} employee{filteredEmployees.length !== 1 ? 's' : ''} 
-              {searchQuery && ` matching "${searchQuery}"`}
-            </div>
-          )}
         </div>
 
         {loading && <p className="loading-text">⏳ Loading...</p>}
@@ -565,19 +598,19 @@ const Employee = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredEmployees.length === 0 ? (
+            {displayedEmployees.length === 0 ? (
               <tr>
                 <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
                   {loading 
                     ? "Loading..." 
-                    : searchQuery 
+                    : isSearchMode 
                       ? `No employees found matching "${searchQuery}"`
                       : "No employees found"
                   }
                 </td>
               </tr>
             ) : (
-              filteredEmployees.map((emp) => (
+              displayedEmployees.map((emp) => (
                 <tr key={emp.employeeId}>
                   <td>{emp.employeeNumber}</td>
                   <td>{emp.name}</td>
@@ -637,8 +670,34 @@ const Employee = () => {
           </tbody>
         </table>
 
-        {/* ALL MODALS - Same as before, keeping them unchanged */}
-        {/* ... (keeping all your existing modal code) ... */}
+        {/* ========== PAGINATION ========== */}
+        {!isSearchMode && !loading && displayedEmployees.length > 0 && (
+          <Pagination
+            pageNumber={pageNumber}
+            totalPages={totalPages}
+            totalCount={totalCount}
+            pageSize={pageSize}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
+        )}
+
+        {/* Show results count when searching */}
+        {isSearchMode && (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '20px', 
+            color: '#6b7280',
+            fontStyle: 'italic',
+            background: 'white',
+            borderRadius: '8px',
+            marginTop: '20px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
+          }}>
+            Found {displayedEmployees.length} result{displayedEmployees.length !== 1 ? 's' : ''} 
+            {searchQuery && ` matching "${searchQuery}"`}
+          </div>
+        )}
 
         {/* ========== ADD MODAL ========== */}
         {isAddModalOpen && (
@@ -769,8 +828,9 @@ const Employee = () => {
                 <div className="form-row">
                   <input type="number" name="dailyRate" value={employmentForm.dailyRate} onChange={handleEmploymentChange} placeholder="Daily Rate (MYR) *" step="0.01" min="0" required />
                   <input type="date" name="startDate" value={employmentForm.startDate} onChange={handleEmploymentChange} required />
-                  <input type="date" name="endDate" value={employmentForm.endDate} onChange={handleEmploymentChange} placeholder="End Date (Optional)" />
                 </div>
+                <input type="date" name="endDate" value={employmentForm.endDate} onChange={handleEmploymentChange} placeholder="End Date (Optional)" />
+                
                 <div className="working-days-section">
                   <h4>Working Days * (Select at least one)</h4>
                   <div className="working-days-grid-clean">

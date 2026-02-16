@@ -1,4 +1,5 @@
-﻿using HRMS.Domain;
+﻿using HRMS.Domain.Entities;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

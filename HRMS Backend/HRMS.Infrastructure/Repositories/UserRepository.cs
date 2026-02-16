@@ -1,5 +1,5 @@
 ﻿using HRMS.Application.Interfaces;
-using HRMS.Domain;
+using HRMS.Domain.Entities;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;

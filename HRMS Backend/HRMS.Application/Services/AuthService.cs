@@ -1,5 +1,5 @@
 ﻿using HRMS.Application.Interfaces;
-using HRMS.Domain;
+using HRMS.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;

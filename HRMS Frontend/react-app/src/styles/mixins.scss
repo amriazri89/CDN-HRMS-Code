@@ -1,0 +1,261 @@
+// =============================================
+// MIXINS.SCSS - Complete Mixin Definitions
+// Place this in: src/styles/mixins.scss
+// =============================================
+
+// =============================================
+// LAYOUT MIXINS
+// =============================================
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+@mixin reset-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin grid($columns: 3, $gap: 20px) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+}
+
+// =============================================
+// RESET MIXINS
+// =============================================
+
+@mixin reset-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+@mixin reset-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+// =============================================
+// INTERACTION MIXINS
+// =============================================
+
+@mixin hover-transition($property: all, $duration: 0.3s) {
+  transition: $property $duration ease;
+  
+  &:hover {
+    @content;
+  }
+}
+
+@mixin disabled-state {
+  &:disabled,
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    @content;
+  }
+}
+
+// =============================================
+// VISUAL MIXINS
+// =============================================
+
+@mixin shadow($level: 1) {
+  @if $level == 1 {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  } @else if $level == 2 {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  } @else if $level == 3 {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  } @else if $level == 4 {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  } @else if $level == 5 {
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@mixin card($padding: 20px, $bg: #ffffff, $shadow: 1) {
+  background: $bg;
+  padding: $padding;
+  border-radius: 8px;
+  @include shadow($shadow);
+}
+
+@mixin gradient($start-color, $end-color, $direction: to bottom) {
+  background: linear-gradient($direction, $start-color, $end-color);
+}
+
+// =============================================
+// TEXT MIXINS
+// =============================================
+
+@mixin placeholder {
+  &::placeholder {
+    @content;
+  }
+  
+  &::-webkit-input-placeholder {
+    @content;
+  }
+  
+  &::-moz-placeholder {
+    @content;
+  }
+  
+  &:-ms-input-placeholder {
+    @content;
+  }
+}
+
+// =============================================
+// RESPONSIVE MIXINS
+// =============================================
+
+@mixin responsive($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (max-width: 768px) {
+      @content;
+    }
+  } @else if $breakpoint == tablet {
+    @media (max-width: 1024px) {
+      @content;
+    }
+  } @else if $breakpoint == desktop {
+    @media (min-width: 1025px) {
+      @content;
+    }
+  } @else if $breakpoint == lg {
+    @media (max-width: 1200px) {
+      @content;
+    }
+  }
+}
+
+// =============================================
+// ANIMATION MIXINS
+// =============================================
+
+@mixin slide-up($duration: 0.3s) {
+  animation: slideUp $duration ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@mixin pulse($duration: 2s) {
+  animation: pulse $duration infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+// =============================================
+// SCROLLBAR MIXINS
+// =============================================
+
+@mixin custom-scrollbar($size: 8px, $thumb-color: #888, $track-color: #f1f1f1) {
+  &::-webkit-scrollbar {
+    width: $size;
+    height: $size;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: $size / 2;
+    
+    &:hover {
+      background: darken($thumb-color, 10%);
+    }
+  }
+}
+
+// =============================================
+// BUTTON MIXINS
+// =============================================
+
+@mixin button-variant($bg-color, $text-color: #ffffff) {
+  display: inline-block;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 00;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: $bg-color;
+  color: $text-color;
+
+  
+  @include hover-transition {
+    background: darken($bg-color, 10%);
+    // transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba($bg-color, 0.3);
+  }
+  
+  &:disabled {
+    @include disabled-state;
+  }
+}
+
+// =============================================
+// INPUT MIXINS
+// =============================================
+
+@mixin input-base {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  
+  @include disabled-state {
+    background: #f3f4f6;
+  }
+  
+  @include placeholder {
+    color: #9ca3af;
+  }
+}

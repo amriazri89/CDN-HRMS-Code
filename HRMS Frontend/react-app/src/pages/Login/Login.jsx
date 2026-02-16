@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./Login.css";
+import "./Login.scss";
 import aclogo from "../../assets/cdn-logo.jpg";
 import UserService from "../../services/UserService.js";
 import ROUTES from "../../routes";
@@ -106,7 +106,7 @@ const Login = () => {
                 value={formData.username}
                 onChange={handleChange}
                 required
-                placeholder="username"
+                placeholder="Username"
               />
               <label>Username</label>
             </div>
@@ -118,7 +118,7 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                placeholder="password"
+                placeholder="Password"
               />
               <label>Password</label>
             </div>
@@ -127,7 +127,7 @@ const Login = () => {
           </form>
 
           {message && (
-            <p className={`form-message ${messageType}`}>{message}</p>
+            <span className={`form-message ${messageType}`}>{message}</span>
           )}
         </div>
       </div>

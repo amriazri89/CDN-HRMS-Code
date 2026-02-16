@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using HRMS.Application.Interfaces;
-using HRMS.Domain;
+using HRMS.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;

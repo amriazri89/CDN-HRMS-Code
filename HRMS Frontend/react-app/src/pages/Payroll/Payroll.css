@@ -158,10 +158,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  color: #e5e7eb;
 }
 
 .info-value {
   font-weight: 600;
+  color: #dcd0d3;
 }
 
 .birthday-icon {

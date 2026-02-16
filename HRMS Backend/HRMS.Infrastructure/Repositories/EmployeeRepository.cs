@@ -1,5 +1,7 @@
 ﻿using HRMS.Application.Interfaces;
-using HRMS.Domain;
+using HRMS.Domain.Entities;
+using HRMS.Domain.Common;
+
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +23,63 @@ namespace HRMS.Infrastructure.Repositories
         }
 
         private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
+
+        // ============================================
+        // UPDATED EmployeeRepository.cs - GetPagedAsync
+        // Add this to your EmployeeRepository.cs
+        // ============================================
+
+        public async Task<PagedResult<Employee>> GetPagedAsync(PaginationParams paginationParams)
+        {
+            using var connection = CreateConnection();
+
+            // Build dynamic SQL
+            var whereClauses = new List<string>();
+            var parameters = new DynamicParameters();
+
+            // Handle search term
+            if (!string.IsNullOrEmpty(paginationParams.SearchTerm))
+            {
+                whereClauses.Add("(Name LIKE @SearchTerm OR EmployeeNumber LIKE @SearchTerm)");
+                parameters.Add("SearchTerm", $"%{paginationParams.SearchTerm}%");
+            }
+
+            // Handle includeArchived (ADD THIS)
+            if (!paginationParams.IncludeArchived)
+            {
+                whereClauses.Add("IsArchived = 0");
+            }
+
+            var whereClause = whereClauses.Any() ? "WHERE " + string.Join(" AND ", whereClauses) : "";
+
+            // Get total count
+            var countSql = $"SELECT COUNT(*) FROM Employees {whereClause}";
+            var totalCount = await connection.ExecuteScalarAsync<int>(countSql, parameters);
+
+            // Get paged data
+            var orderBy = paginationParams.SortDescending ? "DESC" : "ASC";
+            var offset = (paginationParams.PageNumber - 1) * paginationParams.PageSize;
+
+            var sql = $@"
+        SELECT * FROM Employees 
+        {whereClause}
+        ORDER BY {paginationParams.SortBy} {orderBy}
+        OFFSET @Offset ROWS
+        FETCH NEXT @PageSize ROWS ONLY";
+
+            parameters.Add("Offset", offset);
+            parameters.Add("PageSize", paginationParams.PageSize);
+
+            var employees = await connection.QueryAsync<Employee>(sql, parameters);
+
+            return new PagedResult<Employee>
+            {
+                Items = employees,
+                PageNumber = paginationParams.PageNumber,
+                PageSize = paginationParams.PageSize,
+                TotalCount = totalCount
+            };
+        }
 
         public async Task<Guid> CreateAsync(Employee employee)
         {

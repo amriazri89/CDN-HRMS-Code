@@ -1,5 +1,5 @@
 ﻿using HRMS.Application.Interfaces;
-using HRMS.Domain;
+using HRMS.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
