@@ -1,4 +1,4 @@
-name: CI/CD .NET Core to Windows EC2
+name: CI/CD - HRMS
 
 on:
   push:
@@ -6,34 +6,50 @@ on:
       - main
 
 jobs:
-  build:
+  build-deploy:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout Repo
+    # 1. Checkout repository
+    - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Setup .NET
+    # 2. Setup .NET 10 SDK
+    - name: Setup .NET 10
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'  # your .NET version
+        dotnet-version: '10.0.x'
 
+    # 3. Restore dependencies
     - name: Restore Dependencies
-      run: dotnet restore
+      run: dotnet restore "HRMS Backend/HRMS.API/HRMS.API.csproj"
 
-    - name: Build
-      run: dotnet build --configuration Release
+    # 4. Build project
+    - name: Build Project
+      run: dotnet build "HRMS Backend/HRMS.API/HRMS.API.csproj" --configuration Release
 
-    - name: Publish
-      run: dotnet publish -c Release -o ./publish
+    # 5. Publish project to temp folder
+    - name: Publish Project
+      run: dotnet publish "HRMS Backend/HRMS.API/HRMS.API.csproj" -c Release -o ./publish
 
-    - name: Copy to EC2 via WinRM
+    # 6. Copy files to EC2
+    - name: Copy files to EC2
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        password: ${{ secrets.EC2_PASSWORD }}
+        source: "publish/*"
+        target: "C:/Projects/PublishedApp"
+
+    # 7. Restart HRMS service on EC2
+    - name: Restart HRMS Service
       uses: appleboy/ssh-action@v0.1.9
       with:
-        host: "ec2-35-172-146-76.compute-1.amazonaws.com"
-        username: "Administrator"
-        password: "&d@?47p6Pp%KvA=)Nn=5&m2WqybVql)V"
-        port: 5985   # default WinRM HTTP port
-        source: "./publish/*"
-        target: "C:/Projects/PublishedApp"
-        strip_components: 0
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        password: ${{ secrets.EC2_PASSWORD }}
+        port: 5985
+        script: |
+          & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" stop HRMS
+          & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" start HRMS
