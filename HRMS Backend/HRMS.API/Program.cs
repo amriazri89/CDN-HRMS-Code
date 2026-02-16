@@ -13,7 +13,11 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
+    options.HttpsPort = 5001;
+});
 // ========== MEDIATR - Registers all Commands/Queries/Handlers ==========
 builder.Services.AddMediatR(cfg =>
 {
