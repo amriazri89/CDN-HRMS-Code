@@ -26,20 +26,17 @@ jobs:
 
     - name: Publish
       run: dotnet publish "HRMS Backend/HRMS.API/HRMS.API.csproj" -c Release -o publish
-
-    - name: Deploy to Windows EC2 via PowerShell Remoting
+    - name: Restart HRMS Service on EC2
       shell: pwsh
       run: |
+        # Make sure secret is passed as string
         $secpasswd = ConvertTo-SecureString "${{ secrets.EC2_PASS }}" -AsPlainText -Force
         $cred = New-Object System.Management.Automation.PSCredential ("${{ secrets.EC2_USER }}", $secpasswd)
-        
+
         Invoke-Command -ComputerName ${{ secrets.EC2_HOST }} -Credential $cred -ScriptBlock {
-          Write-Host "Stopping HRMS service..."
-          & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" stop HRMS
+            Write-Host "Stopping HRMS service..."
+            & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" stop HRMS
 
-          Write-Host "Copying new published files..."
-          Copy-Item -Path "C:\GitHub\Actions\publish\*" -Destination "C:\Users\Administrator\Documents\Projects\PublishedApp\Publish" -Recurse -Force
-
-          Write-Host "Starting HRMS service..."
-          & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" start HRMS
+            Write-Host "Starting HRMS service..."
+            & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" start HRMS
         }

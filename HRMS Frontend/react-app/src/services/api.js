@@ -1,7 +1,8 @@
 import axios from "axios";
 import ROUTES from "../routes";
 
-const API_URL = "http://ec2-35-172-146-76.compute-1.amazonaws.com:5000/api";
+// 🔹 Use relative path for proxy (calls Vercel serverless function)
+const API_URL = "/api"; // Vercel function will forward to EC2 backend
 
 const api = axios.create({
   baseURL: API_URL,
@@ -9,7 +10,6 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
 
 // 🔹 Add JWT token to every request
 api.interceptors.request.use(
@@ -37,4 +37,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api; 
+export default api;
