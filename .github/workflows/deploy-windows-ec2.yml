@@ -1,3 +1,4 @@
+# Example: add a comment in your HRMS.API project
 name: CI/CD - HRMS
 
 on:
