@@ -26,6 +26,9 @@ jobs:
       - name: Build Project
         run: dotnet build "HRMS Backend/HRMS.API/HRMS.API.csproj" --configuration Release
 
+      - name: Run Unit & Integration Tests
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
       - name: Publish Project
         run: dotnet publish "HRMS Backend/HRMS.API/HRMS.API.csproj" -c Release -o publish
 
