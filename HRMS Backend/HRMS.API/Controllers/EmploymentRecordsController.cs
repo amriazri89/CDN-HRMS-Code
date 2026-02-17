@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using MediatR;
+using FluentValidation;                                              // ← FIX: ValidationException lives here
 using HRMS.Application.Commands.CreateEmploymentRecord;
 using HRMS.Application.Commands.UpdateEmploymentRecord;
 using HRMS.Application.Commands.DeleteEmploymentRecord;
+using HRMS.Application.Commands.ActivateEmploymentRecord;
+using HRMS.Application.Commands.DeactivateEmploymentRecord;
 using HRMS.Application.Queries.GetEmploymentRecordById;
 using HRMS.Application.Queries.GetEmploymentRecordsByEmployeeId;
+using HRMS.Application.Queries.GetActiveEmploymentRecordByEmployeeId;
 
 namespace HRMS.API.Controllers;
 
@@ -26,28 +30,51 @@ public class EmploymentRecordsController : ControllerBase
     }
 
     // ─────────────────────────────────────────────────────
-    // GET api/employmentrecords/byemployee/{employeeId}
-    // Get all employment records for a specific employee
+    // GET api/employmentrecords/employee/{employeeId}
+    // Get all employment records for an employee
     // ─────────────────────────────────────────────────────
-    [HttpGet("byemployee/{employeeId:guid}")]
+    [HttpGet("employee/{employeeId:guid}")]
     public async Task<IActionResult> GetByEmployee(Guid employeeId)
     {
-        var query = new GetEmploymentRecordsByEmployeeIdQuery { EmployeeId = employeeId };
-        var records = await _mediator.Send(query);
+        var records = await _mediator.Send(
+            new GetEmploymentRecordsByEmployeeIdQuery { EmployeeId = employeeId });
         return Ok(records);
     }
 
     // ─────────────────────────────────────────────────────
+    // GET api/employmentrecords/employee/{employeeId}/active
+    // Get the active employment record for an employee
+    // ─────────────────────────────────────────────────────
+    [HttpGet("employee/{employeeId:guid}/active")]
+    public async Task<IActionResult> GetActiveByEmployee(Guid employeeId)
+    {
+        try
+        {
+            var record = await _mediator.Send(
+                new GetActiveEmploymentRecordByEmployeeIdQuery { EmployeeId = employeeId });
+
+            if (record == null)
+                return NotFound(new { message = "No active employment record found" });
+
+            return Ok(record);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+    }
+
+    // ─────────────────────────────────────────────────────
     // GET api/employmentrecords/{id}
-    // Get single employment record by ID
+    // Get a single employment record by ID
     // ─────────────────────────────────────────────────────
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
         try
         {
-            var query = new GetEmploymentRecordByIdQuery { EmploymentRecordId = id };
-            var record = await _mediator.Send(query);
+            var record = await _mediator.Send(
+                new GetEmploymentRecordByIdQuery { EmploymentRecordId = id });
             return Ok(record);
         }
         catch (KeyNotFoundException ex)
@@ -59,7 +86,7 @@ public class EmploymentRecordsController : ControllerBase
 
     // ─────────────────────────────────────────────────────
     // POST api/employmentrecords
-    // Create a new employment record (with working days & skills)
+    // Create a new employment record
     // ─────────────────────────────────────────────────────
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateEmploymentRecordCommand command)
@@ -72,7 +99,7 @@ public class EmploymentRecordsController : ControllerBase
                 new { id = record.EmploymentRecordId },
                 record);
         }
-        catch (ValidationException ex)
+        catch (ValidationException ex)                              // ← now resolves via FluentValidation
         {
             return BadRequest(new { errors = ex.Errors.Select(e => e.ErrorMessage) });
         }
@@ -80,7 +107,7 @@ public class EmploymentRecordsController : ControllerBase
 
     // ─────────────────────────────────────────────────────
     // PUT api/employmentrecords/{id}
-    // Update an existing employment record
+    // Update an employment record
     // ─────────────────────────────────────────────────────
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEmploymentRecordCommand command)
@@ -97,7 +124,7 @@ public class EmploymentRecordsController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
-        catch (ValidationException ex)
+        catch (ValidationException ex)                              // ← now resolves via FluentValidation
         {
             return BadRequest(new { errors = ex.Errors.Select(e => e.ErrorMessage) });
         }
@@ -112,9 +139,44 @@ public class EmploymentRecordsController : ControllerBase
     {
         try
         {
-            var command = new DeleteEmploymentRecordCommand { EmploymentRecordId = id };
-            await _mediator.Send(command);
+            await _mediator.Send(new DeleteEmploymentRecordCommand { EmploymentRecordId = id });
             return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+    }
+
+    // ─────────────────────────────────────────────────────
+    // POST api/employmentrecords/{id}/activate
+    // Activate a record (deactivates all others for this employee)
+    // ─────────────────────────────────────────────────────
+    [HttpPost("{id:guid}/activate")]
+    public async Task<IActionResult> Activate(Guid id)
+    {
+        try
+        {
+            await _mediator.Send(new ActivateEmploymentRecordCommand { EmploymentRecordId = id });
+            return Ok(new { message = "Employment record activated successfully" });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+    }
+
+    // ─────────────────────────────────────────────────────
+    // POST api/employmentrecords/{id}/deactivate
+    // Deactivate a record
+    // ─────────────────────────────────────────────────────
+    [HttpPost("{id:guid}/deactivate")]
+    public async Task<IActionResult> Deactivate(Guid id)
+    {
+        try
+        {
+            await _mediator.Send(new DeactivateEmploymentRecordCommand { EmploymentRecordId = id });
+            return Ok(new { message = "Employment record deactivated successfully" });
         }
         catch (KeyNotFoundException ex)
         {
