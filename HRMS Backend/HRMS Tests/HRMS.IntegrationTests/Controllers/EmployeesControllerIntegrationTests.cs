@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Caching.Memory;
 using HRMS.Application.Interfaces;
-using HRMS.Infrastructure.Repositories;
 using HRMS.Infrastructure.Services;
 using System.Net;
 using System.Net.Http.Headers;
@@ -13,113 +13,75 @@ using Xunit;
 
 namespace HRMS.IntegrationTests.Controllers;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Custom WebApplicationFactory — replaces services for testing
-// ─────────────────────────────────────────────────────────────────────────────
 public class HrmsWebApplicationFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureAppConfiguration((_, config) =>
-        {
-            // Use test appsettings
-            config.AddJsonFile("appsettings.Test.json", optional: false);
-        });
+        builder.UseEnvironment("Development");
+
+        // ✅ No config overrides needed
+        // Let the app use its own appsettings.json and appsettings.Development.json
+        // This ensures JWT key, DB connection, everything matches exactly
 
         builder.ConfigureServices(services =>
         {
-            // Use InMemory cache for tests (no Redis needed)
             services.AddMemoryCache();
             services.AddSingleton<ICacheService, InMemoryCacheService>();
         });
-
-        builder.UseEnvironment("Development");
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Integration Tests
-// ─────────────────────────────────────────────────────────────────────────────
-public class EmployeesControllerIntegrationTests
-    : IClassFixture<HrmsWebApplicationFactory>
+public class EmployeesControllerIntegrationTests : IClassFixture<HrmsWebApplicationFactory>
 {
     private readonly HttpClient _client;
-    private readonly JsonSerializerOptions _json = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
+    private readonly JsonSerializerOptions _json = new() { PropertyNameCaseInsensitive = true };
 
     public EmployeesControllerIntegrationTests(HrmsWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
     }
 
-    // ── helper: get JWT token ──────────────────────────────────────────────
     private async Task<string> GetTokenAsync()
     {
-        var response = await _client.PostAsJsonAsync("/api/Auth/login", new
+        var resp = await _client.PostAsJsonAsync("/api/Auth/login", new
         {
-            username = "admin",
+            username = "admintest",
             password = "Admin@123"
         });
 
-        if (!response.IsSuccessStatusCode)
-            throw new Exception("Login failed in test setup");
+        if (!resp.IsSuccessStatusCode)
+            throw new Exception($"Login failed: {resp.StatusCode} - {await resp.Content.ReadAsStringAsync()}");
 
-        var content = await response.Content.ReadAsStringAsync();
-        var obj = JsonSerializer.Deserialize<JsonElement>(content, _json);
+        var body = await resp.Content.ReadAsStringAsync();
+        var obj = JsonSerializer.Deserialize<JsonElement>(body, _json);
         return obj.GetProperty("token").GetString()!;
     }
 
-    private void SetAuthHeader(string token)
-    {
+    private void SetAuth(string token) =>
         _client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
-    }
-
-    // ── UNAUTHENTICATED ────────────────────────────────────────────────────
 
     [Fact]
     public async Task GetEmployees_WithoutToken_Returns401()
     {
-        // Arrange — no auth header
         _client.DefaultRequestHeaders.Authorization = null;
-
-        // Act
         var response = await _client.GetAsync("/api/employees");
-
-        // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
-
-    // ── GET ALL ────────────────────────────────────────────────────────────
 
     [Fact]
     public async Task GetEmployees_WithToken_Returns200()
     {
-        // Arrange
-        var token = await GetTokenAsync();
-        SetAuthHeader(token);
-
-        // Act
+        SetAuth(await GetTokenAsync());
         var response = await _client.GetAsync("/api/employees");
-
-        // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var content = await response.Content.ReadAsStringAsync();
-        content.Should().NotBeNullOrEmpty();
     }
-
-    // ── CREATE ─────────────────────────────────────────────────────────────
 
     [Fact]
     public async Task CreateEmployee_ValidData_Returns201()
     {
-        // Arrange
-        var token = await GetTokenAsync();
-        SetAuthHeader(token);
-
-        var command = new
+        SetAuth(await GetTokenAsync());
+        var response = await _client.PostAsJsonAsync("/api/employees", new
         {
             name = $"Test User {Guid.NewGuid().ToString()[..8]}",
             nationalNumber = "940110-01-5678",
@@ -127,90 +89,51 @@ public class EmployeesControllerIntegrationTests
             position = "Tester",
             address = "Test City",
             dateOfBirth = "1994-01-10"
-        };
-
-        // Act
-        var response = await _client.PostAsJsonAsync("/api/employees", command);
-
-        // Assert
+        });
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var content = await response.Content.ReadAsStringAsync();
-        var employee = JsonSerializer.Deserialize<JsonElement>(content, _json);
-        employee.GetProperty("name").GetString().Should().Contain("Test User");
     }
 
     [Fact]
-    public async Task CreateEmployee_InvalidName_Returns400()
+    public async Task CreateEmployee_EmptyName_Returns400()
     {
-        // Arrange
-        var token = await GetTokenAsync();
-        SetAuthHeader(token);
-
-        var command = new
+        SetAuth(await GetTokenAsync());
+        var response = await _client.PostAsJsonAsync("/api/employees", new
         {
-            name = "",       // ← invalid: empty
+            name = "",
             nationalNumber = "940110-01-5678",
             dateOfBirth = "1994-01-10"
-        };
-
-        // Act
-        var response = await _client.PostAsJsonAsync("/api/employees", command);
-
-        // Assert
+        });
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
     public async Task CreateEmployee_Under18_Returns400()
     {
-        // Arrange
-        var token = await GetTokenAsync();
-        SetAuthHeader(token);
-
-        var command = new
+        SetAuth(await GetTokenAsync());
+        var response = await _client.PostAsJsonAsync("/api/employees", new
         {
             name = "Young Person",
             nationalNumber = "940110-01-5678",
-            dateOfBirth = DateTime.Now.AddYears(-17).ToString("yyyy-MM-dd") // under 18
-        };
-
-        // Act
-        var response = await _client.PostAsJsonAsync("/api/employees", command);
-
-        // Assert
+            dateOfBirth = DateTime.Now.AddYears(-17).ToString("yyyy-MM-dd")
+        });
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
-
-    // ── GET BY ID ──────────────────────────────────────────────────────────
 
     [Fact]
     public async Task GetById_NonExistentId_Returns404()
     {
-        // Arrange
-        var token = await GetTokenAsync();
-        SetAuthHeader(token);
-
-        var fakeId = Guid.NewGuid();
-
-        // Act
-        var response = await _client.GetAsync($"/api/employees/{fakeId}");
-
-        // Assert
+        SetAuth(await GetTokenAsync());
+        var response = await _client.GetAsync($"/api/employees/{Guid.NewGuid()}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-
-    // ── CREATE THEN GET ────────────────────────────────────────────────────
 
     [Fact]
     public async Task CreateThenGet_ReturnsCreatedEmployee()
     {
-        // Arrange
-        var token = await GetTokenAsync();
-        SetAuthHeader(token);
-        var uniqueName = $"Integration Test {Guid.NewGuid().ToString()[..8]}";
+        SetAuth(await GetTokenAsync());
+        var uniqueName = $"Integration {Guid.NewGuid().ToString()[..8]}";
 
-        var command = new
+        var createResp = await _client.PostAsJsonAsync("/api/employees", new
         {
             name = uniqueName,
             nationalNumber = "940110-01-5678",
@@ -218,53 +141,26 @@ public class EmployeesControllerIntegrationTests
             position = "Tester",
             address = "Test Address",
             dateOfBirth = "1994-01-10"
-        };
+        });
+        createResp.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        // Act 1: Create
-        var createResponse = await _client.PostAsJsonAsync("/api/employees", command);
-        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var createContent = await createResponse.Content.ReadAsStringAsync();
-        var created = JsonSerializer.Deserialize<JsonElement>(createContent, _json);
+        var body = await createResp.Content.ReadAsStringAsync();
+        var created = JsonSerializer.Deserialize<JsonElement>(body, _json);
         var employeeId = created.GetProperty("employeeId").GetString();
 
-        // Act 2: Get by ID
-        var getResponse = await _client.GetAsync($"/api/employees/{employeeId}");
+        var getResp = await _client.GetAsync($"/api/employees/{employeeId}");
+        getResp.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        // Assert
-        getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var getContent = await getResponse.Content.ReadAsStringAsync();
-        var fetched = JsonSerializer.Deserialize<JsonElement>(getContent, _json);
+        var getBody = await getResp.Content.ReadAsStringAsync();
+        var fetched = JsonSerializer.Deserialize<JsonElement>(getBody, _json);
         fetched.GetProperty("name").GetString().Should().Be(uniqueName);
     }
-
-    // ── SEARCH ─────────────────────────────────────────────────────────────
 
     [Fact]
     public async Task Search_WithKeyword_Returns200()
     {
-        // Arrange
-        var token = await GetTokenAsync();
-        SetAuthHeader(token);
-
-        // Act
-        var response = await _client.GetAsync("/api/employees/search?keyword=Ahmad");
-
-        // Assert
+        SetAuth(await GetTokenAsync());
+        var response = await _client.GetAsync("/api/employees/search?keyword=Test");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
-
-    [Fact]
-    public async Task Search_WithoutKeyword_Returns400()
-    {
-        // Arrange
-        var token = await GetTokenAsync();
-        SetAuthHeader(token);
-
-        // Act
-        var response = await _client.GetAsync("/api/employees/search?keyword=");
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }

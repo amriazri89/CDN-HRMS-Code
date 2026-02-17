@@ -7,14 +7,10 @@ using Xunit;
 
 namespace HRMS.IntegrationTests.Controllers;
 
-public class EmploymentRecordsControllerIntegrationTests
-    : IClassFixture<HrmsWebApplicationFactory>
+public class EmploymentRecordsControllerIntegrationTests : IClassFixture<HrmsWebApplicationFactory>
 {
     private readonly HttpClient _client;
-    private readonly JsonSerializerOptions _json = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
+    private readonly JsonSerializerOptions _json = new() { PropertyNameCaseInsensitive = true };
 
     public EmploymentRecordsControllerIntegrationTests(HrmsWebApplicationFactory factory)
     {
@@ -23,42 +19,35 @@ public class EmploymentRecordsControllerIntegrationTests
 
     private async Task<string> GetTokenAsync()
     {
-        var response = await _client.PostAsJsonAsync("/api/Auth/login", new
+        var resp = await _client.PostAsJsonAsync("/api/Auth/login", new
         {
             username = "admin",
             password = "Admin@123"
         });
-
-        var content = await response.Content.ReadAsStringAsync();
-        var obj = JsonSerializer.Deserialize<JsonElement>(content, _json);
+        var body = await resp.Content.ReadAsStringAsync();
+        var obj = JsonSerializer.Deserialize<JsonElement>(body, _json);
         return obj.GetProperty("token").GetString()!;
     }
 
-    private void SetAuthHeader(string token) =>
+    private void SetAuth(string token) =>
         _client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
-    // helper: create an employee and return its ID
-    private async Task<string> CreateEmployeeAsync(string token)
+    private async Task<string> CreateEmployeeAsync()
     {
-        SetAuthHeader(token);
-
-        var response = await _client.PostAsJsonAsync("/api/employees", new
+        var resp = await _client.PostAsJsonAsync("/api/employees", new
         {
-            name = $"Test Emp {Guid.NewGuid().ToString()[..6]}",
+            name = $"Emp {Guid.NewGuid().ToString()[..6]}",
             nationalNumber = "940110-01-5678",
             contactNumber = "+60123456789",
             position = "Tester",
             address = "Test City",
             dateOfBirth = "1994-01-10"
         });
-
-        var content = await response.Content.ReadAsStringAsync();
-        var employee = JsonSerializer.Deserialize<JsonElement>(content, _json);
-        return employee.GetProperty("employeeId").GetString()!;
+        var body = await resp.Content.ReadAsStringAsync();
+        var emp = JsonSerializer.Deserialize<JsonElement>(body, _json);
+        return emp.GetProperty("employeeId").GetString()!;
     }
-
-    // ── GET ────────────────────────────────────────────────────────────────
 
     [Fact]
     public async Task GetByEmployee_WithoutToken_Returns401()
@@ -71,25 +60,19 @@ public class EmploymentRecordsControllerIntegrationTests
     [Fact]
     public async Task GetByEmployee_ValidToken_Returns200()
     {
-        var token = await GetTokenAsync();
-        SetAuthHeader(token);
-
-        var employeeId = await CreateEmployeeAsync(token);
+        SetAuth(await GetTokenAsync());
+        var employeeId = await CreateEmployeeAsync();
         var response = await _client.GetAsync($"/api/employmentrecords/employee/{employeeId}");
-
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
-
-    // ── CREATE ─────────────────────────────────────────────────────────────
 
     [Fact]
     public async Task CreateRecord_ValidData_Returns201()
     {
-        var token = await GetTokenAsync();
-        var employeeId = await CreateEmployeeAsync(token);
-        SetAuthHeader(token);
+        SetAuth(await GetTokenAsync());
+        var employeeId = await CreateEmployeeAsync();
 
-        var command = new
+        var response = await _client.PostAsJsonAsync("/api/employmentrecords", new
         {
             employeeId = employeeId,
             employmentType = "Full-Time",
@@ -97,49 +80,40 @@ public class EmploymentRecordsControllerIntegrationTests
             startDate = "2024-01-15",
             dailyRate = 250.00,
             isActive = true,
-            workingDays = new[] { 1, 2, 3, 4, 5 },  // Mon-Fri
+            workingDays = new[] { 1, 2, 3, 4, 5 },
             skillSets = new[] { "C#", "React", "SQL" }
-        };
-
-        var response = await _client.PostAsJsonAsync("/api/employmentrecords", command);
+        });
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     [Fact]
-    public async Task CreateRecord_InvalidDailyRate_Returns400()
+    public async Task CreateRecord_NegativeDailyRate_Returns400()
     {
-        var token = await GetTokenAsync();
-        var employeeId = await CreateEmployeeAsync(token);
-        SetAuthHeader(token);
+        SetAuth(await GetTokenAsync());
+        var employeeId = await CreateEmployeeAsync();
 
-        var command = new
+        var response = await _client.PostAsJsonAsync("/api/employmentrecords", new
         {
             employeeId = employeeId,
             employmentType = "Full-Time",
             position = "Engineer",
             startDate = "2024-01-15",
-            dailyRate = -100,          // ← invalid: negative
+            dailyRate = -100,
             isActive = true,
             workingDays = new[] { 1, 2, 3, 4, 5 }
-        };
-
-        var response = await _client.PostAsJsonAsync("/api/employmentrecords", command);
+        });
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
-    // ── CREATE THEN GET ────────────────────────────────────────────────────
-
     [Fact]
-    public async Task CreateThenGet_ReturnsCreatedRecord()
+    public async Task CreateThenGet_ReturnsRecord()
     {
-        var token = await GetTokenAsync();
-        var employeeId = await CreateEmployeeAsync(token);
-        SetAuthHeader(token);
+        SetAuth(await GetTokenAsync());
+        var employeeId = await CreateEmployeeAsync();
 
-        // Create
-        var createResponse = await _client.PostAsJsonAsync("/api/employmentrecords", new
+        var createResp = await _client.PostAsJsonAsync("/api/employmentrecords", new
         {
             employeeId = employeeId,
             employmentType = "Contract",
@@ -150,18 +124,13 @@ public class EmploymentRecordsControllerIntegrationTests
             workingDays = new[] { 1, 2, 3, 4, 5 },
             skillSets = new[] { "C#", "Azure" }
         });
+        createResp.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+        var getResp = await _client.GetAsync($"/api/employmentrecords/employee/{employeeId}");
+        getResp.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        // Get
-        var getResponse = await _client.GetAsync(
-            $"/api/employmentrecords/employee/{employeeId}");
-
-        getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        var content = await getResponse.Content.ReadAsStringAsync();
+        var content = await getResp.Content.ReadAsStringAsync();
         var records = JsonSerializer.Deserialize<JsonElement>(content, _json);
-
         records.GetArrayLength().Should().BeGreaterThan(0);
     }
 }
