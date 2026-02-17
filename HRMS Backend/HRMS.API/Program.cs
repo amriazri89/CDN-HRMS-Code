@@ -2,6 +2,7 @@
 using HRMS.Application.Services;
 using HRMS.Application.Behaviors;
 using HRMS.Infrastructure.Repositories;
+using HRMS.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MediatR;
@@ -11,19 +12,13 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // ========== KESTREL CONFIG ==========
-// ✅ FIX: Do NOT put Kestrel config here if using appsettings.json
-// Let appsettings.Development.json / appsettings.Production.json handle it
-// Program.cs only forces HTTP in Development as safety net
-
 if (builder.Environment.IsDevelopment())
 {
-    // Force HTTP only locally — overrides anything in appsettings
     builder.WebHost.UseUrls("http://0.0.0.0:5000");
     Console.WriteLine("⚡ Development mode → HTTP only on port 5000");
 }
 else
 {
-    // Production → read from appsettings.Production.json (Kestrel section)
     Console.WriteLine("🔒 Production mode → reading Kestrel config from appsettings.Production.json");
 }
 
@@ -44,8 +39,23 @@ builder.Services.AddValidatorsFromAssembly(HRMS.Application.AssemblyReference.As
 // ========== VALIDATION BEHAVIOR ==========
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
+// ========== CACHING (No Docker / No Redis needed!) ==========
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ICacheService, InMemoryCacheService>();
+
 // ========== DAPPER REPOSITORIES ==========
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+// Register real EmployeeRepository first (concrete class)
+builder.Services.AddScoped<EmployeeRepository>();
+
+// Then wrap it with CachedEmployeeRepository (Decorator Pattern)
+builder.Services.AddScoped<IEmployeeRepository>(sp =>
+    new CachedEmployeeRepository(
+        sp.GetRequiredService<EmployeeRepository>(),
+        sp.GetRequiredService<ICacheService>(),
+        sp.GetRequiredService<ILogger<CachedEmployeeRepository>>()
+    ));
+
+// Other repositories (no caching needed for these)
 builder.Services.AddScoped<IEmploymentRecordRepository, EmploymentRecordRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
@@ -110,7 +120,6 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    // ✅ Only redirect to HTTPS in production
     app.UseHttpsRedirection();
 }
 
