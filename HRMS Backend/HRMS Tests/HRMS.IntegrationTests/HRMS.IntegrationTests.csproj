@@ -1,34 +1,37 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
-	<!--
-    From: HRMS Backend\HRMS Tests\HRMS.IntegrationTests\
-    To:   HRMS Backend\HRMS.API\
-    Path: ..\..\ goes to HRMS Backend\ then into each project folder
-  -->
-
 	<ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk"                    Version="17.8.0" />
-		<PackageReference Include="xunit"                                     Version="2.6.2"  />
-		<PackageReference Include="xunit.runner.visualstudio"                 Version="2.5.4"  />
-		<PackageReference Include="FluentAssertions"                          Version="6.12.0" />
-		<PackageReference Include="Moq"                                       Version="4.20.70"/>
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"          Version="8.0.0"  />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory"       Version="9.0.0"  />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0"  />
+		<!-- Test SDK -->
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+
+		<!-- xUnit -->
+		<PackageReference Include="xunit" Version="2.6.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.0" />
+
+		<!-- FluentAssertions & Moq -->
+		<PackageReference Include="FluentAssertions" Version="6.12.0" />
+		<PackageReference Include="Moq" Version="4.20.70" />
+
+		<!-- ASP.NET Core testing -->
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.3" />
+
+		<!-- Dependencies to align versions with API projects -->
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.11" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="$(MSBuildThisFileDirectory)..\..\HRMS.API\HRMS.API.csproj"                       />
-		<ProjectReference Include="$(MSBuildThisFileDirectory)..\..\HRMS.Application\HRMS.Application.csproj"       />
+		<ProjectReference Include="$(MSBuildThisFileDirectory)..\..\HRMS.API\HRMS.API.csproj" />
+		<ProjectReference Include="$(MSBuildThisFileDirectory)..\..\HRMS.Application\HRMS.Application.csproj" />
 		<ProjectReference Include="$(MSBuildThisFileDirectory)..\..\HRMS.Infrastructure\HRMS.Infrastructure.csproj" />
-		<ProjectReference Include="$(MSBuildThisFileDirectory)..\..\HRMS.Domain\HRMS.Domain.csproj"                 />
+		<ProjectReference Include="$(MSBuildThisFileDirectory)..\..\HRMS.Domain\HRMS.Domain.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
