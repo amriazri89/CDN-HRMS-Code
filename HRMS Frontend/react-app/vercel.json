@@ -5,6 +5,8 @@
       "use": "@vercel/static-build",
       "config": { "distDir": "build" }
     }
+
+    
   ],
   "headers": [
     {
