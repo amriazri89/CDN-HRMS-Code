@@ -27,10 +27,10 @@ jobs:
         run: dotnet build "HRMS Backend/HRMS.API/HRMS.API.csproj" --configuration Release
 
       - name: Run Unit Tests
-        run: dotnet test "HRMS Tests/HRMS.UnitTests" --no-build --no-restore --logger "console;verbosity=detailed"
+        run: dotnet test "HRMS Tests/HRMS.UnitTests" --no-build --no-restore
 
       - name: Run Integration Tests
-        run: dotnet test "HRMS Tests/HRMS.IntegrationTests" --no-build --no-restore --logger "console;verbosity=detailed
+        run: dotnet test "HRMS Tests/HRMS.IntegrationTests" --no-build --no-restore
 
       - name: Publish Project
         run: dotnet publish "HRMS Backend/HRMS.API/HRMS.API.csproj" -c Release -o publish
