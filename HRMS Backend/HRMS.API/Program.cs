@@ -51,14 +51,30 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBeh
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<ICacheService, InMemoryCacheService>();
 
-// ========== REPOSITORIES ==========
+// ========== REPOSITORIES ========== 
 builder.Services.AddScoped<EmployeeRepository>();
-builder.Services.AddScoped<IEmployeeRepository>(sp =>
-    new CachedEmployeeRepository(
-        sp.GetRequiredService<EmployeeRepository>(),
-        sp.GetRequiredService<ICacheService>(),
-        sp.GetRequiredService<ILogger<CachedEmployeeRepository>>()
-    ));
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();// ✅ Caching is disabled for now to ensure data consistency during development and testing
+
+//this is cahing make crud effect more longer
+//builder.Services.AddScoped<IEmployeeRepository>(sp =>
+//    new CachedEmployeeRepository(
+//        sp.GetRequiredService<EmployeeRepository>(),
+//        sp.GetRequiredService<ICacheService>(),
+//        sp.GetRequiredService<ILogger<CachedEmployeeRepository>>()
+//    ));
+
+/*
+When caching makes sense:
+
+-High traffic apps with thousands of users
+-Data that rarely changes (e.g. company settings, roles)
+-Expensive queries that take long to run
+
+When it doesn't make sense (your case):
+
+-Small app with few users
+-Data changes frequently (CRUD operations)
+-The bug it causes is worse than the performance gain */
 
 builder.Services.AddScoped<IEmploymentRecordRepository, EmploymentRecordRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

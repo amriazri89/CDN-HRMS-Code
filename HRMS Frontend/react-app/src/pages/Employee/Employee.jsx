@@ -19,7 +19,7 @@ const daysOfWeek = [
   { name: "Saturday", value: 6 },
 ];
 
-// ========== HELPER: Parse API errors into { message, fields } ==========
+// ========== HELPER: Parse API errors ==========
 const parseApiError = (err) => {
   const data = err.response?.data;
   if (!data) return { message: err.message, fields: [] };
@@ -34,7 +34,7 @@ const parseApiError = (err) => {
   };
 };
 
-// ========== ERROR BOX COMPONENT ==========
+// ========== ERROR BOX ==========
 const ErrorBox = ({ error, onClose }) => {
   if (!error) return null;
   return (
@@ -51,7 +51,7 @@ const ErrorBox = ({ error, onClose }) => {
       <p style={{ color: "#dc2626", fontWeight: "600", margin: "0 0 6px 0" }}>
         ❌ {error.message}
       </p>
-      {error.fields && error.fields.length > 0 && (
+      {error.fields?.length > 0 && (
         <ul style={{ margin: 0, paddingLeft: "18px" }}>
           {error.fields.map((f, i) => (
             <li key={i} style={{ color: "#b91c1c", fontSize: "14px" }}>
@@ -64,20 +64,34 @@ const ErrorBox = ({ error, onClose }) => {
   );
 };
 
+// ========== TOAST ==========
+const Toast = ({ message, type }) => {
+  if (!message) return null;
+  const bg = type === "success" ? "#22c55e" : "#ef4444";
+  return (
+    <div style={{
+      position: "fixed", top: "20px", right: "20px", zIndex: 9999,
+      background: bg, color: "white", padding: "12px 20px",
+      borderRadius: "8px", fontSize: "14px", fontWeight: "600",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+      maxWidth: "350px",
+    }}>
+      {message}
+    </div>
+  );
+};
+
 const Employee = () => {
-  // ========== PAGINATION STATE ==========
   const [employees, setEmployees] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  // ========== SEARCH STATE ==========
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearchMode, setIsSearchMode] = useState(false);
 
-  // ========== MODAL STATE ==========
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEmploymentModalOpen, setIsEmploymentModalOpen] = useState(false);
@@ -86,12 +100,18 @@ const Employee = () => {
   const [selectedEmployeeForEmployment, setSelectedEmployeeForEmployment] = useState(null);
   const [viewingEmployeeRecords, setViewingEmployeeRecords] = useState(null);
 
-  // ========== ERROR STATE (one per modal) ==========
   const [addError, setAddError] = useState(null);
   const [editError, setEditError] = useState(null);
   const [employmentError, setEmploymentError] = useState(null);
 
-  // ========== FORM STATE ==========
+  // ========== TOAST STATE ==========
+  const [toast, setToast] = useState({ message: "", type: "success" });
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast({ message: "", type: "success" }), 3000);
+  };
+
   const [addForm, setAddForm] = useState({
     name: "", nationalNumber: "", contactNumber: "", position: "",
     address: "", dateOfBirth: "", employmentType: "Permanent",
@@ -112,7 +132,6 @@ const Employee = () => {
   const [loading, setLoading] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
 
-  // ========== EFFECTS ==========
   useEffect(() => {
     document.title = "HRMS - Employees";
     fetchEmployees();
@@ -126,7 +145,6 @@ const Employee = () => {
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
-  // ========== FETCH ==========
   const fetchEmployees = async () => {
     try {
       setLoading(true);
@@ -144,11 +162,9 @@ const Employee = () => {
     }
   };
 
-  // ========== PAGINATION ==========
   const handlePageChange = (n) => { setPageNumber(n); setSearchQuery(""); setIsSearchMode(false); };
   const handlePageSizeChange = (s) => { setPageSize(s); setPageNumber(1); setSearchQuery(""); setIsSearchMode(false); };
 
-  // ========== SEARCH ==========
   const handleSearch = async (query) => {
     if (!query.trim()) { setIsSearchMode(false); setSearchResults([]); return; }
     try {
@@ -175,7 +191,7 @@ const Employee = () => {
       setViewingEmployeeRecords({ ...employee, employmentRecords: records });
       setIsViewEmploymentModalOpen(true);
     } catch (err) {
-      alert("Failed to load employment records: " + err.message);
+      showToast("Failed to load employment records", "error");
     } finally {
       setLoading(false);
     }
@@ -188,11 +204,11 @@ const Employee = () => {
     try {
       setLoading(true);
       await EmploymentRecordService.activate(recordId);
-      alert("✅ Activated!");
       const records = await EmploymentRecordService.getByEmployeeId(viewingEmployeeRecords.employeeId);
       setViewingEmployeeRecords({ ...viewingEmployeeRecords, employmentRecords: records });
+      showToast("Employment record activated!");
     } catch (err) {
-      alert("❌ " + parseApiError(err).message);
+      showToast(parseApiError(err).message, "error");
     } finally {
       setLoading(false);
     }
@@ -203,19 +219,17 @@ const Employee = () => {
     try {
       setLoading(true);
       await EmploymentRecordService.delete(recordId);
-      alert("✅ Deleted!");
       const records = await EmploymentRecordService.getByEmployeeId(viewingEmployeeRecords.employeeId);
       setViewingEmployeeRecords({ ...viewingEmployeeRecords, employmentRecords: records });
+      showToast("Employment record deleted!");
     } catch (err) {
-      alert("❌ " + parseApiError(err).message);
+      showToast(parseApiError(err).message, "error");
     } finally {
       setLoading(false);
     }
   };
 
   // ========== ADD EMPLOYEE ==========
-  // CreateEmployeeCommand: Name, NationalNumber, ContactNumber, Position, Address, DateOfBirth
-  // No ID needed — server generates EmployeeId
   const openAddModal = () => {
     setAddForm({
       name: "", nationalNumber: "", contactNumber: "", position: "",
@@ -239,7 +253,7 @@ const Employee = () => {
   const addSkillToAdd = () => {
     const skill = skillInput.trim();
     if (!skill) return;
-    if (addForm.skillSets.includes(skill)) { alert("Already added"); return; }
+    if (addForm.skillSets.includes(skill)) return;
     setAddForm((p) => ({ ...p, skillSets: [...p.skillSets, skill] }));
     setSkillInput("");
   };
@@ -249,7 +263,6 @@ const Employee = () => {
   const handleAddSubmit = async (e) => {
     e.preventDefault();
     setAddError(null);
-
     if (!addForm.name || !addForm.nationalNumber || !addForm.dateOfBirth) {
       setAddError({ message: "Please fill in all required fields", fields: [] });
       return;
@@ -258,11 +271,8 @@ const Employee = () => {
       setAddError({ message: "Please enter daily rate and select at least one working day", fields: [] });
       return;
     }
-
     try {
       setLoading(true);
-
-      // Matches CreateEmployeeCommand — no ID
       const employeePayload = {
         name: addForm.name.trim(),
         nationalNumber: addForm.nationalNumber.trim(),
@@ -272,8 +282,6 @@ const Employee = () => {
         dateOfBirth: addForm.dateOfBirth,
       };
       const createdEmployee = await EmployeeService.create(employeePayload);
-
-      // Matches CreateEmploymentRecordCommand — no employmentRecordId, server generates it
       const employmentPayload = {
         employeeId: createdEmployee.employeeId,
         employmentType: addForm.employmentType,
@@ -286,12 +294,10 @@ const Employee = () => {
         skillSets: addForm.skillSets,
       };
       await EmploymentRecordService.create(employmentPayload);
-
-      alert(`✅ Employee created!\nEmployee Number: ${createdEmployee.employeeNumber}`);
       closeAddModal();
-      await fetchEmployees();
+      await fetchEmployees(); // ← refresh list immediately
+      showToast(`Employee ${createdEmployee.employeeNumber} created!`);
     } catch (err) {
-      console.error("Creation failed:", err);
       setAddError(parseApiError(err));
     } finally {
       setLoading(false);
@@ -299,7 +305,6 @@ const Employee = () => {
   };
 
   // ========== EDIT EMPLOYEE ==========
-  // UpdateEmployeeCommand: EmployeeId, Name, NationalNumber, ContactNumber, Position, Address, DateOfBirth
   const openEditModal = (employee) => {
     setEditingEmployee(employee);
     setEditForm({
@@ -321,8 +326,6 @@ const Employee = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setEditError(null);
-
-    // Matches UpdateEmployeeCommand exactly
     const payload = {
       employeeId: editForm.employeeId,
       name: editForm.name.trim(),
@@ -332,15 +335,13 @@ const Employee = () => {
       address: editForm.address.trim(),
       dateOfBirth: editForm.dateOfBirth,
     };
-
     try {
       setLoading(true);
       await EmployeeService.update(editingEmployee.employeeId, payload);
-      alert("✅ Employee updated successfully!");
       closeEditModal();
-      await fetchEmployees();
+      await fetchEmployees(); // ← refresh list immediately
+      showToast("Employee updated!");
     } catch (err) {
-      console.error("Update failed:", err);
       setEditError(parseApiError(err));
     } finally {
       setLoading(false);
@@ -348,9 +349,6 @@ const Employee = () => {
   };
 
   // ========== ADD EMPLOYMENT RECORD ==========
-  // CreateEmploymentRecordCommand: EmployeeId, EmploymentType, Position,
-  //   StartDate, EndDate, DailyRate, IsActive, WorkingDays, SkillSets
-  // No employmentRecordId — server generates it
   const openEmploymentModal = (employee) => {
     setSelectedEmployeeForEmployment(employee);
     setEmploymentForm({
@@ -378,7 +376,7 @@ const Employee = () => {
   const addSkillToEmployment = () => {
     const skill = skillInput.trim();
     if (!skill) return;
-    if (employmentForm.skillSets.includes(skill)) { alert("Already added"); return; }
+    if (employmentForm.skillSets.includes(skill)) return;
     setEmploymentForm((p) => ({ ...p, skillSets: [...p.skillSets, skill] }));
     setSkillInput("");
   };
@@ -388,13 +386,10 @@ const Employee = () => {
   const handleEmploymentSubmit = async (e) => {
     e.preventDefault();
     setEmploymentError(null);
-
     if (!employmentForm.dailyRate || employmentForm.workingDays.length === 0) {
       setEmploymentError({ message: "Please enter daily rate and select at least one working day", fields: [] });
       return;
     }
-
-    // Matches CreateEmploymentRecordCommand — no employmentRecordId
     const payload = {
       employeeId: selectedEmployeeForEmployment.employeeId,
       employmentType: employmentForm.employmentType,
@@ -406,31 +401,31 @@ const Employee = () => {
       workingDays: employmentForm.workingDays,
       skillSets: employmentForm.skillSets,
     };
-
     try {
       setLoading(true);
       await EmploymentRecordService.create(payload);
-      alert("✅ Employment record created!");
       closeEmploymentModal();
-      await fetchEmployees();
+      await fetchEmployees(); // ← refresh list immediately
+      showToast("Employment record created!");
     } catch (err) {
-      console.error("Employment record creation failed:", err);
       setEmploymentError(parseApiError(err));
     } finally {
       setLoading(false);
     }
   };
 
-  // ========== OTHER ACTIONS ==========
+  // ========== DELETE / ARCHIVE / UNARCHIVE ==========
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this employee?")) return;
     try {
       setLoading(true);
       await EmployeeService.delete(id);
-      alert("✅ Deleted!");
-      await fetchEmployees();
+      // Immediately remove from local state — no need to wait for refetch
+      setEmployees((prev) => prev.filter((emp) => emp.employeeId !== id));
+      setSearchResults((prev) => prev.filter((emp) => emp.employeeId !== id));
+      showToast("Employee deleted!");
     } catch (err) {
-      alert("❌ " + parseApiError(err).message);
+      showToast(parseApiError(err).message, "error");
     } finally {
       setLoading(false);
     }
@@ -441,10 +436,10 @@ const Employee = () => {
     try {
       setLoading(true);
       await EmployeeService.archive(id);
-      alert("✅ Archived!");
-      await fetchEmployees();
+      await fetchEmployees(); // ← refresh so archived employee disappears from active list
+      showToast("Employee archived!");
     } catch (err) {
-      alert("❌ " + parseApiError(err).message);
+      showToast(parseApiError(err).message, "error");
     } finally {
       setLoading(false);
     }
@@ -455,10 +450,10 @@ const Employee = () => {
     try {
       setLoading(true);
       await EmployeeService.unarchive(id);
-      alert("✅ Unarchived!");
-      await fetchEmployees();
+      await fetchEmployees(); // ← refresh list immediately
+      showToast("Employee unarchived!");
     } catch (err) {
-      alert("❌ " + parseApiError(err).message);
+      showToast(parseApiError(err).message, "error");
     } finally {
       setLoading(false);
     }
@@ -471,9 +466,9 @@ const Employee = () => {
     try {
       setLoading(true);
       const result = await EmployeeService.calculateSalary(employee.employeeId, start, end);
-      alert(`💰 Salary\n\nEmployee: ${employee.name}\nPeriod: ${start} to ${end}\n\nTake Home: ${result.currency} ${result.takeHomePay.toFixed(2)}`);
+      showToast(`${employee.name}: MYR ${result.takeHomePay.toFixed(2)}`);
     } catch (err) {
-      alert("❌ " + parseApiError(err).message);
+      showToast(parseApiError(err).message, "error");
     } finally {
       setLoading(false);
     }
@@ -481,6 +476,9 @@ const Employee = () => {
 
   return (
     <MainLayout>
+      {/* ========== TOAST ========== */}
+      <Toast message={toast.message} type={toast.type} />
+
       <div className="employee-page">
         <div className="employee-header">
           <div>
