@@ -11,7 +11,7 @@
 
 **Developed by:** Amri Azri  
 **Company:** Complete Developer Network (CDN)  
-**Live Demo:** [https://cdnhrms-ten.vercel.app](https://cdnhrms-ten.vercel.app)
+**Live Demo:** [https://cdnhrms.vercel.app/cdn/hrms/login](https://cdnhrms.vercel.app/cdn/hrms/login) 
 
 ---
 
@@ -144,7 +144,7 @@ If calculated Sep 1-10:           RM 900.00 ✅
 
 | Service | URL | Status |
 |---------|-----|--------|
-| **Frontend** | [https://cdnhrms-ten.vercel.app](https://cdnhrms-ten.vercel.app) | 🟢 Live |
+| **Frontend** | [https://cdnhrms.vercel.app/cdn/hrms/login](https://cdnhrms.vercel.app/cdn/hrms/login) | 🟢 Live |
 | **Backend API** | `https://ec2-35-172-146-76.compute-1.amazonaws.com:5001/api` | 🟢 Live |
 
 ### 🔑 Test Credentials
