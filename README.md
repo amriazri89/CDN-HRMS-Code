@@ -229,9 +229,9 @@ NSSM                Windows Service Manager
 │                 APPLICATION LAYER                       │
 │                 (HRMS.Application)                      │
 │  • Commands/ (CQRS Write)                               │
-│    └── CreateEmployee, UpdateEmployee, etc.            │
+│    └── CreateEmployee, UpdateEmployee, etc.             │
 │  • Queries/ (CQRS Read)                                 │
-│    └── GetEmployees, GetById, CalculateSalary          │
+│    └── GetEmployees, GetById, CalculateSalary           │
 │  • Validators/ (FluentValidation)                       │
 │  • Behaviors/ (MediatR Pipeline)                        │
 │  • Services/ (AuthService, PayrollService)              │
@@ -382,7 +382,7 @@ FETCH NEXT @PageSize ROWS ONLY
 
 ## 📸 Initial Diagram
 
-(img/diagram.jpg)
+![Initial Diagram](img/diagram.jpg)
 
 ### Base URL
 ```
