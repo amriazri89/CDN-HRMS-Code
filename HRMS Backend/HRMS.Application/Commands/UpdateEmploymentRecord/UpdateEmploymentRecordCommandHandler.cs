@@ -1,59 +1,64 @@
-using MediatR;
+﻿using MediatR;
 using HRMS.Domain.Entities;
 using HRMS.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace HRMS.Application.Commands.UpdateEmploymentRecord;
+namespace HRMS.Application.Commands.CreateEmploymentRecord;
 
-public class UpdateEmploymentRecordCommandHandler
-    : IRequestHandler<UpdateEmploymentRecordCommand, EmploymentRecord>
+public class CreateEmploymentRecordCommandHandler
+    : IRequestHandler<CreateEmploymentRecordCommand, EmploymentRecord>
 {
     private readonly IEmploymentRecordRepository _repository;
-    private readonly ILogger<UpdateEmploymentRecordCommandHandler> _logger;
+    private readonly ILogger<CreateEmploymentRecordCommandHandler> _logger;
 
-    public UpdateEmploymentRecordCommandHandler(
+    public CreateEmploymentRecordCommandHandler(
         IEmploymentRecordRepository repository,
-        ILogger<UpdateEmploymentRecordCommandHandler> logger)
+        ILogger<CreateEmploymentRecordCommandHandler> logger)
     {
         _repository = repository;
         _logger = logger;
     }
 
     public async Task<EmploymentRecord> Handle(
-        UpdateEmploymentRecordCommand request,
+        CreateEmploymentRecordCommand request,
         CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Updating employment record {RecordId}", request.EmploymentRecordId);
+        _logger.LogInformation("Creating employment record for Employee {EmployeeId}", request.EmployeeId);
 
-        var existing = await _repository.GetByIdAsync(request.EmploymentRecordId);
-        if (existing == null)
-            throw new KeyNotFoundException($"Employment record {request.EmploymentRecordId} not found");
+        // ✅ Generate the parent ID first
+        var employmentRecordId = Guid.NewGuid();
 
-        existing.EmploymentType = request.EmploymentType;
-        existing.Position = request.Position;
-        existing.StartDate = request.StartDate;
-        existing.EndDate = request.EndDate;
-        existing.DailyRate = request.DailyRate;
-        existing.IsActive = request.IsActive;
-
-        existing.WorkingDays = request.WorkingDays.Select(day => new EmployeeWorkingDay
+        var record = new EmploymentRecord
         {
-            EmployeeWorkingDayId = Guid.NewGuid(),
-            EmploymentRecordId = existing.EmploymentRecordId,
-            DayOfWeek = day
-        }).ToList();
+            EmploymentRecordId = employmentRecordId,  // ← Set parent ID
+            EmployeeId = request.EmployeeId,
+            EmploymentType = request.EmploymentType,
+            Position = request.Position,
+            StartDate = request.StartDate,
+            EndDate = request.EndDate,
+            DailyRate = request.DailyRate,
+            IsActive = request.IsActive,
 
-        existing.SkillSets = request.SkillSets.Select(skill => new EmployeeSkillSet
-        {
-            EmployeeSkillSetId = Guid.NewGuid(),
-            EmploymentRecordId = existing.EmploymentRecordId,
-            SkillName = skill
-        }).ToList();
+            // ✅ FIX - Set EmploymentRecordId on each child BEFORE saving
+            WorkingDays = request.WorkingDays.Select(day => new EmployeeWorkingDay
+            {
+                EmployeeWorkingDayId = Guid.NewGuid(),
+                EmploymentRecordId = employmentRecordId,  // ← SET PARENT ID!
+                DayOfWeek = day
+            }).ToList(),
 
-        await _repository.UpdateAsync(existing);
+            SkillSets = request.SkillSets.Select(skill => new EmployeeSkillSet
+            {
+                EmployeeSkillSetId = Guid.NewGuid(),
+                EmploymentRecordId = employmentRecordId,  // ← SET PARENT ID!
+                SkillName = skill
+            }).ToList()
+        };
 
-        _logger.LogInformation("Employment record updated: {RecordId}", existing.EmploymentRecordId);
+        var created = await _repository.CreateAsync(record);
 
-        return await _repository.GetByIdAsync(existing.EmploymentRecordId);
+        _logger.LogInformation("Employment record created: {RecordId}", created.EmploymentRecordId);
+
+        return created;
     }
 }
