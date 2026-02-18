@@ -82,7 +82,7 @@ Take-Home Pay: RM 800.00 ✅
 | 5 | CRUD Operations | ✅ | Create, Read, Update, Delete, Archive/Unarchive |
 | 6 | Wildcard Search | ✅ | Search by employee number & name |
 | 7 | Payroll Calculation | ✅ | 2× daily rate + birthday bonus logic |
-| 8 | Unit Tests | ✅ | unit tests covering handlers, validators, repositories |
+| 8 | Unit Tests | ✅ | 50 unit tests covering handlers, validators, repositories |
 | 9 | ReactJs Frontend | ✅ | React 18 + Vite |
 | 10 | Routing | ✅ | React Router v6 with centralized routes |
 | 11 | Route Protection | ✅ | JWT-based authentication guards |
@@ -102,7 +102,7 @@ Take-Home Pay: RM 800.00 ✅
 | **Endpoint Security** | ✅ | JWT authentication + role-based authorization |
 | **Pagination** | ✅ | Server-side with X-Pagination header |
 | **Error Handling** | ✅ | FluentValidation + global exception middleware |
-| **Testing Strategy** | ✅ | 102 tests (100 unit + 2 integration) |
+| **Testing Strategy** | ✅ | 63 tests (50 unit + 13 integration) |
 | **CI/CD Pipeline** | ✅ | GitHub Actions with automated deployment |
 | **Design Patterns** | ✅ | CQRS + MediatR + Repository Pattern |
 | **FluentValidation** | ✅ | Declarative validation rules |
