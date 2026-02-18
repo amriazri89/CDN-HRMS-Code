@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   
   // ========== YOUR EC2 BACKEND ==========
   // Using HTTP on port 5000 (no certificate issues)
-  const backendUrl = `http://ec2-35-172-146-76.compute-1.amazonaws.com:5000/api/${path}`;
+  const backendUrl = `https://ec2-35-172-146-76.compute-1.amazonaws.com:5001/api/${path}`;
   
   console.log(`🔄 Proxying: ${req.method} ${backendUrl}`);
 

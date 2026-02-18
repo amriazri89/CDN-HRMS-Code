@@ -88,7 +88,7 @@ export default class EmployeeService {
     try {
       const res = await api.post("/Employees", employeeData);
       return res.data;
-    } catch (err) {
+    } catch (err) { 
       throw new Error(
         err.response?.data?.message || "Failed to create employee",
       );

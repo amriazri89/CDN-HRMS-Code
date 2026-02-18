@@ -112,6 +112,7 @@ builder.Services.AddCors(options =>
         )
         .AllowAnyMethod()
         .AllowAnyHeader()
+        .WithExposedHeaders("X-Pagination")
         .AllowCredentials();
     });
 });

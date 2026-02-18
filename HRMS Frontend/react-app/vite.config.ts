@@ -6,12 +6,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': {
-        target: 'http://ec2-35-172-146-76.compute-1.amazonaws.com:5000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api')
-      }
+    '/api': {
+      target: 'https://ec2-35-172-146-76.compute-1.amazonaws.com:5001',
+      changeOrigin: true,
+      secure: false
     }
+  }
   },
   build: {
     outDir: 'build', 

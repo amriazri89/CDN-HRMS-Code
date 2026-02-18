@@ -1,10 +1,24 @@
 // src/config/api.js
-// OR wherever you define your API URL
+import axios from "axios";
 
-// ❌ OLD - Direct connection with certificate issues
-// const API_URL = "https://ec2-35-172-146-76.compute-1.amazonaws.com:5001/api";
+// Base URL (Vercel proxy or Vite proxy)
+const API_BASE = "/api";
 
-// ✅ NEW - Proxied through Vercel serverless function
-const API_URL = "/api";
+// Create axios instance
+const api = axios.create({
+  baseURL: API_BASE,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-export default API_URL;
+// Automatically attach JWT token
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default api;
