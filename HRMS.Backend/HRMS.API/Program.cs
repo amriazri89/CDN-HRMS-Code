@@ -28,7 +28,7 @@ else
             listenOptions.UseHttps("C:\\certs\\api.pfx", "hrms");
         });
     });
-    Console.WriteLine("🔒 Production mode → HTTP:5000 + HTTPS:5001")
+    Console.WriteLine("🔒 Production mode → HTTP:5000 + HTTPS:5001");
 }
 
 // ========== SERVICES ==========
