@@ -43,7 +43,7 @@ The CDN HRMS Payroll System is a comprehensive employee management solution desi
 - ✅ Intelligent Payroll Calculation (2× daily rate + birthday bonus)
 - ✅ Wildcard Search (by employee number and name)
 - ✅ JWT Authentication & Authorization
-- ✅ Comprehensive Testing (100 unit tests + 2 integration tests)
+- ✅ Comprehensive Testing (50 unit tests + 13 integration tests)
 - ✅ CI/CD Pipeline with GitHub Actions
 - ✅ Production Deployment on AWS EC2 + Vercel
 
@@ -82,7 +82,7 @@ Take-Home Pay: RM 800.00 ✅
 | 5 | CRUD Operations | ✅ | Create, Read, Update, Delete, Archive/Unarchive |
 | 6 | Wildcard Search | ✅ | Search by employee number & name |
 | 7 | Payroll Calculation | ✅ | 2× daily rate + birthday bonus logic |
-| 8 | Unit Tests | ✅ | 100 unit tests covering handlers, validators, repositories |
+| 8 | Unit Tests | ✅ | unit tests covering handlers, validators, repositories |
 | 9 | ReactJs Frontend | ✅ | React 18 + Vite |
 | 10 | Routing | ✅ | React Router v6 with centralized routes |
 | 11 | Route Protection | ✅ | JWT-based authentication guards |
@@ -1466,9 +1466,9 @@ GitHub Push → Build → Test → Publish → Deploy EC2 → Restart Service
 
 ### 3. Limited Integration Tests
 
-**Current:** Only 2 integration tests
+**Current:** Only 2 passed over 13 integration tests
 
-**Reason:** Focus on unit test coverage (100 tests)
+**Reason:** Focus on unit test coverage (100% passed tests)
 
 **Impact:** Full end-to-end flows not completely covered
 
@@ -1882,8 +1882,8 @@ CDN-HRMS-Code/
 │   ├── HRMS.Infrastructure/         # Repositories (Dapper)
 │   ├── HRMS.Domain/                 # Entities (DTOs), Interfaces
 │   └── HRMS.Tests/
-│       ├── HRMS.UnitTests/          # 100 unit tests
-│       └── HRMS.IntegrationTests/   # 2 integration tests
+│       ├── HRMS.UnitTests/          # 50 unit tests
+│       └── HRMS.IntegrationTests/   # 13 integration tests
 │
 ├── HRMS.Frontend/
 │   └── react-app/
