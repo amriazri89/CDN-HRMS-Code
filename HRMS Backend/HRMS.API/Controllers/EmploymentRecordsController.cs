@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using MediatR;
-using FluentValidation;                                              // ← FIX: ValidationException lives here
+using FluentValidation;
 using HRMS.Application.Commands.CreateEmploymentRecord;
 using HRMS.Application.Commands.UpdateEmploymentRecord;
 using HRMS.Application.Commands.DeleteEmploymentRecord;
@@ -29,22 +29,24 @@ public class EmploymentRecordsController : ControllerBase
         _logger = logger;
     }
 
-    // ─────────────────────────────────────────────────────
     // GET api/employmentrecords/employee/{employeeId}
-    // Get all employment records for an employee
-    // ─────────────────────────────────────────────────────
     [HttpGet("employee/{employeeId:guid}")]
     public async Task<IActionResult> GetByEmployee(Guid employeeId)
     {
-        var records = await _mediator.Send(
-            new GetEmploymentRecordsByEmployeeIdQuery { EmployeeId = employeeId });
-        return Ok(records);
+        try
+        {
+            var records = await _mediator.Send(
+                new GetEmploymentRecordsByEmployeeIdQuery { EmployeeId = employeeId });
+            return Ok(records);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching employment records for employee {EmployeeId}", employeeId);
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
-    // ─────────────────────────────────────────────────────
     // GET api/employmentrecords/employee/{employeeId}/active
-    // Get the active employment record for an employee
-    // ─────────────────────────────────────────────────────
     [HttpGet("employee/{employeeId:guid}/active")]
     public async Task<IActionResult> GetActiveByEmployee(Guid employeeId)
     {
@@ -62,12 +64,14 @@ public class EmploymentRecordsController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching active employment record for employee {EmployeeId}", employeeId);
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
-    // ─────────────────────────────────────────────────────
     // GET api/employmentrecords/{id}
-    // Get a single employment record by ID
-    // ─────────────────────────────────────────────────────
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -82,12 +86,14 @@ public class EmploymentRecordsController : ControllerBase
             _logger.LogWarning(ex.Message);
             return NotFound(new { message = ex.Message });
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching employment record {Id}", id);
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
-    // ─────────────────────────────────────────────────────
     // POST api/employmentrecords
-    // Create a new employment record
-    // ─────────────────────────────────────────────────────
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateEmploymentRecordCommand command)
     {
@@ -99,16 +105,26 @@ public class EmploymentRecordsController : ControllerBase
                 new { id = record.EmploymentRecordId },
                 record);
         }
-        catch (ValidationException ex)                              // ← now resolves via FluentValidation
+        catch (ValidationException ex)
         {
-            return BadRequest(new { errors = ex.Errors.Select(e => e.ErrorMessage) });
+            return BadRequest(new
+            {
+                message = "Validation failed",
+                errors = ex.Errors.Select(e => new
+                {
+                    propertyName = e.PropertyName,
+                    errorMessage = e.ErrorMessage
+                })
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating employment record");
+            return StatusCode(500, new { message = ex.Message });
         }
     }
 
-    // ─────────────────────────────────────────────────────
     // PUT api/employmentrecords/{id}
-    // Update an employment record
-    // ─────────────────────────────────────────────────────
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEmploymentRecordCommand command)
     {
@@ -124,16 +140,26 @@ public class EmploymentRecordsController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
-        catch (ValidationException ex)                              // ← now resolves via FluentValidation
+        catch (ValidationException ex)
         {
-            return BadRequest(new { errors = ex.Errors.Select(e => e.ErrorMessage) });
+            return BadRequest(new
+            {
+                message = "Validation failed",
+                errors = ex.Errors.Select(e => new
+                {
+                    propertyName = e.PropertyName,
+                    errorMessage = e.ErrorMessage
+                })
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating employment record {Id}", id);
+            return StatusCode(500, new { message = ex.Message });
         }
     }
 
-    // ─────────────────────────────────────────────────────
     // DELETE api/employmentrecords/{id}
-    // Delete an employment record
-    // ─────────────────────────────────────────────────────
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -146,12 +172,14 @@ public class EmploymentRecordsController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting employment record {Id}", id);
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
-    // ─────────────────────────────────────────────────────
     // POST api/employmentrecords/{id}/activate
-    // Activate a record (deactivates all others for this employee)
-    // ─────────────────────────────────────────────────────
     [HttpPost("{id:guid}/activate")]
     public async Task<IActionResult> Activate(Guid id)
     {
@@ -164,12 +192,14 @@ public class EmploymentRecordsController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error activating employment record {Id}", id);
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
-    // ─────────────────────────────────────────────────────
     // POST api/employmentrecords/{id}/deactivate
-    // Deactivate a record
-    // ─────────────────────────────────────────────────────
     [HttpPost("{id:guid}/deactivate")]
     public async Task<IActionResult> Deactivate(Guid id)
     {
@@ -181,6 +211,11 @@ public class EmploymentRecordsController : ControllerBase
         catch (KeyNotFoundException ex)
         {
             return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deactivating employment record {Id}", id);
+            return StatusCode(500, new { message = ex.Message });
         }
     }
 }

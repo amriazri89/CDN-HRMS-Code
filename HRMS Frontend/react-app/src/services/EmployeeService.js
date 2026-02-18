@@ -1,37 +1,25 @@
 import api from "../config/api";
 
 export default class EmployeeService {
-  // ========== SERVER-SIDE PAGINATION (FIXED) ==========
-  static async getPaged(
-    pageNumber = 1,
-    pageSize = 10,
-    includeArchived = false,
-  ) {
+  // ========== SERVER-SIDE PAGINATION ==========
+  static async getPaged(pageNumber = 1, pageSize = 10, includeArchived = false) {
     try {
-      console.log("🔍 getPaged called:", {
-        pageNumber,
-        pageSize,
-        includeArchived,
-      }); // DEBUG
-
       const res = await api.get(`/Employees/paged`, {
         params: {
-          pageNumber: pageNumber,
-          pageSize: pageSize,
+          pageNumber,
+          pageSize,
           sortBy: "Name",
           sortDescending: false,
           searchTerm: "",
-          includeArchived: includeArchived, // ✅ Send to backend
+          includeArchived,
         },
       });
-
-      console.log("✅ Response:", res.data); // DEBUG
 
       const paginationHeader = res.headers["x-pagination"];
       const pagination = paginationHeader ? JSON.parse(paginationHeader) : null;
 
       return {
-        data: res.data.items || res.data, // Backend returns PagedResult with .items
+        data: res.data.items || res.data,
         pagination: pagination || {
           totalCount: res.data.totalCount || 0,
           pageSize: res.data.pageSize || pageSize,
@@ -40,24 +28,17 @@ export default class EmployeeService {
         },
       };
     } catch (err) {
-      console.error("❌ getPaged error:", err.response?.data);
-      throw new Error(
-        err.response?.data?.message || "Failed to fetch employees",
-      );
+      throw err; // ✅ keep full Axios error
     }
   }
 
-  // Get all employees (NO PAGINATION - for dropdown/select)
+  // Get all employees
   static async getAll(includeArchived = false) {
     try {
-      const res = await api.get(
-        `/Employees?includeArchived=${includeArchived}`,
-      );
+      const res = await api.get(`/Employees?includeArchived=${includeArchived}`);
       return res.data;
     } catch (err) {
-      throw new Error(
-        err.response?.data?.message || "Failed to fetch employees",
-      );
+      throw err; // ✅
     }
   }
 
@@ -67,9 +48,7 @@ export default class EmployeeService {
       const res = await api.get(`/Employees/${id}`);
       return res.data;
     } catch (err) {
-      throw new Error(
-        err.response?.data?.message || "Failed to fetch employee",
-      );
+      throw err; // ✅
     }
   }
 
@@ -79,7 +58,7 @@ export default class EmployeeService {
       const res = await api.get(`/Employees/search?keyword=${keyword}`);
       return res.data;
     } catch (err) {
-      throw new Error(err.response?.data?.message || "Search failed");
+      throw err; // ✅
     }
   }
 
@@ -88,32 +67,18 @@ export default class EmployeeService {
     try {
       const res = await api.post("/Employees", employeeData);
       return res.data;
-    } catch (err) { 
-      throw new Error(
-        err.response?.data?.message || "Failed to create employee",
-      );
+    } catch (err) {
+      throw err; // ✅
     }
   }
 
   // Update employee
   static async update(id, employeeData) {
     try {
-      console.log("🔹 EmployeeService.update called");
-      console.log("🔹 Employee ID:", id);
-      console.log("🔹 Data:", employeeData);
-
       const res = await api.put(`/Employees/${id}`, employeeData);
-
-      console.log("✅ Update successful:", res.data);
       return res.data;
     } catch (err) {
-      console.error("❌ Update failed:", err);
-      console.error("❌ Status:", err.response?.status);
-      console.error("❌ Response data:", err.response?.data);
-
-      throw new Error(
-        err.response?.data?.message || "Failed to update employee",
-      );
+      throw err; // ✅ this is the key fix — keeps err.response intact
     }
   }
 
@@ -123,9 +88,7 @@ export default class EmployeeService {
       await api.delete(`/Employees/${id}`);
       return true;
     } catch (err) {
-      throw new Error(
-        err.response?.data?.message || "Failed to delete employee",
-      );
+      throw err; // ✅
     }
   }
 
@@ -135,9 +98,7 @@ export default class EmployeeService {
       const res = await api.post(`/Employees/${id}/archive`);
       return res.data;
     } catch (err) {
-      throw new Error(
-        err.response?.data?.message || "Failed to archive employee",
-      );
+      throw err; // ✅
     }
   }
 
@@ -147,9 +108,7 @@ export default class EmployeeService {
       const res = await api.post(`/Employees/${id}/unarchive`);
       return res.data;
     } catch (err) {
-      throw new Error(
-        err.response?.data?.message || "Failed to unarchive employee",
-      );
+      throw err; // ✅
     }
   }
 
@@ -157,13 +116,11 @@ export default class EmployeeService {
   static async calculateSalary(id, startDate, endDate) {
     try {
       const res = await api.post(
-        `/Employees/${id}/calculate-salary?startDate=${startDate}&endDate=${endDate}`,
+        `/Employees/${id}/calculate-salary?startDate=${startDate}&endDate=${endDate}`
       );
       return res.data;
     } catch (err) {
-      throw new Error(
-        err.response?.data?.message || "Failed to calculate salary",
-      );
+      throw err; // ✅
     }
   }
 }

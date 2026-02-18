@@ -9,7 +9,6 @@ using MediatR;
 using FluentValidation;
 using System.Text;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // ========== KESTREL CONFIG ==========
@@ -20,7 +19,15 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    Console.WriteLine("🔒 Production mode → reading Kestrel config from appsettings.Production.json");
+    // Production: Use HTTPS with self-signed cert
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ListenAnyIP(5001, listenOptions =>
+        {
+            listenOptions.UseHttps("C:\\certs\\api.pfx", "hrms");
+        });
+    });
+    Console.WriteLine("🔒 Production mode → Kestrel HTTPS on port 5001");
 }
 
 // ========== SERVICES ==========
@@ -40,15 +47,12 @@ builder.Services.AddValidatorsFromAssembly(HRMS.Application.AssemblyReference.As
 // ========== VALIDATION BEHAVIOR ==========
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-// ========== CACHING (No Docker / No Redis needed!) ==========
+// ========== CACHING ==========
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<ICacheService, InMemoryCacheService>();
 
-// ========== DAPPER REPOSITORIES ==========
-// Register real EmployeeRepository first (concrete class)
+// ========== REPOSITORIES ==========
 builder.Services.AddScoped<EmployeeRepository>();
-
-// Then wrap it with CachedEmployeeRepository (Decorator Pattern)
 builder.Services.AddScoped<IEmployeeRepository>(sp =>
     new CachedEmployeeRepository(
         sp.GetRequiredService<EmployeeRepository>(),
@@ -56,7 +60,6 @@ builder.Services.AddScoped<IEmployeeRepository>(sp =>
         sp.GetRequiredService<ILogger<CachedEmployeeRepository>>()
     ));
 
-// Other repositories (no caching needed for these)
 builder.Services.AddScoped<IEmploymentRecordRepository, EmploymentRecordRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
@@ -64,7 +67,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPayrollService, PayrollService>();
 
-// ========== JWT CONFIGURATION ==========
+// ========== JWT ==========
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "YourSuperSecretKeyThatIsAtLeast32CharactersLong!";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "HRMSApi";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "HRMSClient";
@@ -93,27 +96,17 @@ builder.Services.AddAuthorization();
 // ========== CORS ==========
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowViteApp", policy =>
+    options.AddPolicy("AllowVercel", policy =>
     {
-        policy.WithOrigins(
-            // Local development
-            "http://localhost:5173",
-            "https://localhost:5173",
-            "http://127.0.0.1:5173",
-            // Vercel deployments
-            "https://cdnhrms-ten.vercel.app"
-        )
-        .SetIsOriginAllowed(origin =>
-            // Also allow any Vercel preview URL
-            new Uri(origin).Host.EndsWith("vercel.app") ||
-            // Allow any localhost port for development
-            new Uri(origin).Host == "localhost" ||
-            new Uri(origin).Host == "127.0.0.1"
-        )
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .WithExposedHeaders("X-Pagination")
-        .AllowCredentials();
+        policy
+            .SetIsOriginAllowed(origin =>
+                new Uri(origin).Host.EndsWith("vercel.app") ||
+                new Uri(origin).Host == "localhost" ||
+                new Uri(origin).Host == "127.0.0.1"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -121,8 +114,11 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.MapGet("/", () => "HRMS API is running...");
-app.UseCors("AllowViteApp");
 
+// ✅ CORS MUST come first
+app.UseCors("AllowVercel");
+
+// Swagger for dev only
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -138,3 +134,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+public partial class Program { }

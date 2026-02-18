@@ -9,8 +9,16 @@ const AuthService = {
     });
 
     if (response.data.token) {
+      // store token
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("username", username);
+
+      // store full user object for later
+      const user = {
+        username: response.data.username || username,
+        email: response.data.email || null,
+        id: response.data.id || null,
+      };
+      localStorage.setItem("user", JSON.stringify(user));
     }
 
     return response.data;
@@ -18,7 +26,7 @@ const AuthService = {
 
   logout: () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("username");
+    localStorage.removeItem("user");
   },
 
   isAuthenticated: () => {
@@ -26,7 +34,8 @@ const AuthService = {
   },
 
   getCurrentUser: () => {
-    return localStorage.getItem("username");
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
   },
 };
 

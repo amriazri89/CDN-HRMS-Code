@@ -4,14 +4,8 @@ import EmploymentRecordService from "../../services/EmploymentRecordService";
 import MainLayout from "../../components/MainLayout/MainLayout";
 import Pagination from "../../components/Pagination/Pagination";
 import {
-  FaEdit,
-  FaTrash,
-  FaArchive,
-  FaUndo,
-  FaMoneyBillWave,
-  FaBriefcase,
-  FaList,
-  FaSearch,
+  FaEdit, FaTrash, FaArchive, FaUndo,
+  FaMoneyBillWave, FaBriefcase, FaList, FaSearch,
 } from "react-icons/fa";
 import "./Employee.css";
 
@@ -24,6 +18,51 @@ const daysOfWeek = [
   { name: "Friday", value: 5 },
   { name: "Saturday", value: 6 },
 ];
+
+// ========== HELPER: Parse API errors into { message, fields } ==========
+const parseApiError = (err) => {
+  const data = err.response?.data;
+  if (!data) return { message: err.message, fields: [] };
+  return {
+    message: data.message || data.Message || "Something went wrong",
+    fields: Array.isArray(data.errors)
+      ? data.errors.map((e) => ({
+          property: e.propertyName || e.PropertyName || "",
+          error: e.errorMessage || e.ErrorMessage || "",
+        }))
+      : [],
+  };
+};
+
+// ========== ERROR BOX COMPONENT ==========
+const ErrorBox = ({ error, onClose }) => {
+  if (!error) return null;
+  return (
+    <div style={{
+      background: "#fef2f2", border: "1px solid #fca5a5",
+      borderRadius: "8px", padding: "12px 16px",
+      marginBottom: "16px", position: "relative",
+    }}>
+      <button onClick={onClose} style={{
+        position: "absolute", top: "8px", right: "12px",
+        background: "none", border: "none", fontSize: "16px",
+        cursor: "pointer", color: "#ef4444",
+      }}>×</button>
+      <p style={{ color: "#dc2626", fontWeight: "600", margin: "0 0 6px 0" }}>
+        ❌ {error.message}
+      </p>
+      {error.fields && error.fields.length > 0 && (
+        <ul style={{ margin: 0, paddingLeft: "18px" }}>
+          {error.fields.map((f, i) => (
+            <li key={i} style={{ color: "#b91c1c", fontSize: "14px" }}>
+              <strong>{f.property}:</strong> {f.error}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
 
 const Employee = () => {
   // ========== PAGINATION STATE ==========
@@ -47,39 +86,26 @@ const Employee = () => {
   const [selectedEmployeeForEmployment, setSelectedEmployeeForEmployment] = useState(null);
   const [viewingEmployeeRecords, setViewingEmployeeRecords] = useState(null);
 
+  // ========== ERROR STATE (one per modal) ==========
+  const [addError, setAddError] = useState(null);
+  const [editError, setEditError] = useState(null);
+  const [employmentError, setEmploymentError] = useState(null);
+
   // ========== FORM STATE ==========
   const [addForm, setAddForm] = useState({
-    name: "",
-    nationalNumber: "",
-    contactNumber: "",
-    position: "",
-    address: "",
-    dateOfBirth: "",
-    employmentType: "Permanent",
-    dailyRate: "",
-    startDate: "",
-    endDate: "",
-    workingDays: [],
-    skillSets: [],
+    name: "", nationalNumber: "", contactNumber: "", position: "",
+    address: "", dateOfBirth: "", employmentType: "Permanent",
+    dailyRate: "", startDate: "", endDate: "", workingDays: [], skillSets: [],
   });
 
   const [editForm, setEditForm] = useState({
-    name: "",
-    nationalNumber: "",
-    contactNumber: "",
-    position: "",
-    address: "",
-    dateOfBirth: "",
+    employeeId: "", name: "", nationalNumber: "", contactNumber: "",
+    position: "", address: "", dateOfBirth: "",
   });
 
   const [employmentForm, setEmploymentForm] = useState({
-    employmentType: "Permanent",
-    position: "",
-    dailyRate: "",
-    startDate: "",
-    endDate: "",
-    workingDays: [],
-    skillSets: [],
+    employmentType: "Permanent", position: "", dailyRate: "",
+    startDate: "", endDate: "", workingDays: [], skillSets: [],
   });
 
   const [skillInput, setSkillInput] = useState("");
@@ -92,32 +118,24 @@ const Employee = () => {
     fetchEmployees();
   }, [showArchived, pageNumber, pageSize]);
 
-  // Auto-search with debouncing
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      if (searchQuery.trim()) {
-        handleSearch(searchQuery);
-      } else {
-        setIsSearchMode(false);
-        setSearchResults([]);
-      }
+      if (searchQuery.trim()) handleSearch(searchQuery);
+      else { setIsSearchMode(false); setSearchResults([]); }
     }, 300);
-
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
-  // ========== FETCH EMPLOYEES (SERVER-SIDE PAGINATION) ==========
+  // ========== FETCH ==========
   const fetchEmployees = async () => {
     try {
       setLoading(true);
       const result = await EmployeeService.getPaged(pageNumber, pageSize, showArchived);
-      
       setEmployees(Array.isArray(result.data) ? result.data : []);
-      setTotalCount(result.pagination.totalCount);
-      setTotalPages(result.pagination.totalPages);
+      setTotalCount(result.pagination.TotalCount);
+      setTotalPages(result.pagination.TotalPages);
     } catch (err) {
-      console.error("❌ Fetch failed:", err);
-      alert("Failed to load employees: " + err.message);
+      console.error("Fetch failed:", err);
       setEmployees([]);
       setTotalCount(0);
       setTotalPages(1);
@@ -126,52 +144,27 @@ const Employee = () => {
     }
   };
 
-  // ========== PAGINATION HANDLERS ==========
-  const handlePageChange = (newPageNumber) => {
-    setPageNumber(newPageNumber);
-    setSearchQuery("");
-    setIsSearchMode(false);
-  };
+  // ========== PAGINATION ==========
+  const handlePageChange = (n) => { setPageNumber(n); setSearchQuery(""); setIsSearchMode(false); };
+  const handlePageSizeChange = (s) => { setPageSize(s); setPageNumber(1); setSearchQuery(""); setIsSearchMode(false); };
 
-  const handlePageSizeChange = (newPageSize) => {
-    setPageSize(newPageSize);
-    setPageNumber(1);
-    setSearchQuery("");
-    setIsSearchMode(false);
-  };
-
-  // ========== SEARCH (SEARCHES ALL DATA) ==========
+  // ========== SEARCH ==========
   const handleSearch = async (query) => {
-    if (!query.trim()) {
-      setIsSearchMode(false);
-      setSearchResults([]);
-      return;
-    }
-
+    if (!query.trim()) { setIsSearchMode(false); setSearchResults([]); return; }
     try {
       setLoading(true);
       setIsSearchMode(true);
       const results = await EmployeeService.search(query);
       setSearchResults(Array.isArray(results) ? results : []);
     } catch (err) {
-      console.error("Search failed:", err);
       setSearchResults([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-    setIsSearchMode(false);
-    setSearchResults([]);
-  };
-
-  // Get display data (search results or paginated employees)
+  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+  const clearSearch = () => { setSearchQuery(""); setIsSearchMode(false); setSearchResults([]); };
   const displayedEmployees = isSearchMode ? searchResults : employees;
 
   // ========== VIEW EMPLOYMENT RECORDS ==========
@@ -182,126 +175,94 @@ const Employee = () => {
       setViewingEmployeeRecords({ ...employee, employmentRecords: records });
       setIsViewEmploymentModalOpen(true);
     } catch (err) {
-      console.error("❌ Failed to load employment records:", err);
       alert("Failed to load employment records: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const closeViewEmploymentModal = () => {
-    setIsViewEmploymentModalOpen(false);
-    setViewingEmployeeRecords(null);
-  };
+  const closeViewEmploymentModal = () => { setIsViewEmploymentModalOpen(false); setViewingEmployeeRecords(null); };
 
   const handleActivateRecord = async (recordId) => {
-    if (!window.confirm("Activate this employment record? This will deactivate all other records.")) return;
-    
+    if (!window.confirm("Activate this record? This will deactivate all others.")) return;
     try {
       setLoading(true);
       await EmploymentRecordService.activate(recordId);
-      alert("✅ Employment record activated successfully!");
-      
+      alert("✅ Activated!");
       const records = await EmploymentRecordService.getByEmployeeId(viewingEmployeeRecords.employeeId);
       setViewingEmployeeRecords({ ...viewingEmployeeRecords, employmentRecords: records });
     } catch (err) {
-      alert("❌ " + err.message);
+      alert("❌ " + parseApiError(err).message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteRecord = async (recordId) => {
-    if (!window.confirm("Delete this employment record? This action cannot be undone.")) return;
-    
+    if (!window.confirm("Delete this record? Cannot be undone.")) return;
     try {
       setLoading(true);
       await EmploymentRecordService.delete(recordId);
-      alert("✅ Employment record deleted successfully!");
-      
+      alert("✅ Deleted!");
       const records = await EmploymentRecordService.getByEmployeeId(viewingEmployeeRecords.employeeId);
       setViewingEmployeeRecords({ ...viewingEmployeeRecords, employmentRecords: records });
     } catch (err) {
-      alert("❌ " + err.message);
+      alert("❌ " + parseApiError(err).message);
     } finally {
       setLoading(false);
     }
   };
 
-  // ========== ADD NEW EMPLOYEE ==========
+  // ========== ADD EMPLOYEE ==========
+  // CreateEmployeeCommand: Name, NationalNumber, ContactNumber, Position, Address, DateOfBirth
+  // No ID needed — server generates EmployeeId
   const openAddModal = () => {
     setAddForm({
-      name: "",
-      nationalNumber: "",
-      contactNumber: "",
-      position: "",
-      address: "",
-      dateOfBirth: "",
-      employmentType: "Permanent",
-      dailyRate: "",
-      startDate: new Date().toISOString().split("T")[0],
-      endDate: "",
-      workingDays: [],
-      skillSets: [],
+      name: "", nationalNumber: "", contactNumber: "", position: "",
+      address: "", dateOfBirth: "", employmentType: "Permanent",
+      dailyRate: "", startDate: new Date().toISOString().split("T")[0],
+      endDate: "", workingDays: [], skillSets: [],
     });
+    setAddError(null);
     setSkillInput("");
     setIsAddModalOpen(true);
   };
 
-  const closeAddModal = () => {
-    setIsAddModalOpen(false);
-  };
+  const closeAddModal = () => { setIsAddModalOpen(false); setAddError(null); };
+  const handleAddChange = (e) => setAddForm({ ...addForm, [e.target.name]: e.target.value });
 
-  const handleAddChange = (e) => {
-    setAddForm({ ...addForm, [e.target.name]: e.target.value });
-  };
-
-  const toggleAddWorkingDay = (dayValue) => {
-    setAddForm((prev) => ({
-      ...prev,
-      workingDays: prev.workingDays.includes(dayValue)
-        ? prev.workingDays.filter((d) => d !== dayValue)
-        : [...prev.workingDays, dayValue],
-    }));
-  };
+  const toggleAddWorkingDay = (v) => setAddForm((p) => ({
+    ...p,
+    workingDays: p.workingDays.includes(v) ? p.workingDays.filter((d) => d !== v) : [...p.workingDays, v],
+  }));
 
   const addSkillToAdd = () => {
     const skill = skillInput.trim();
     if (!skill) return;
-    if (addForm.skillSets.includes(skill)) {
-      alert("This skill is already added");
-      return;
-    }
-    setAddForm((prev) => ({
-      ...prev,
-      skillSets: [...prev.skillSets, skill],
-    }));
+    if (addForm.skillSets.includes(skill)) { alert("Already added"); return; }
+    setAddForm((p) => ({ ...p, skillSets: [...p.skillSets, skill] }));
     setSkillInput("");
   };
 
-  const removeSkillFromAdd = (skill) => {
-    setAddForm((prev) => ({
-      ...prev,
-      skillSets: prev.skillSets.filter((s) => s !== skill),
-    }));
-  };
+  const removeSkillFromAdd = (s) => setAddForm((p) => ({ ...p, skillSets: p.skillSets.filter((x) => x !== s) }));
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
+    setAddError(null);
 
     if (!addForm.name || !addForm.nationalNumber || !addForm.dateOfBirth) {
-      alert("Please fill in all required employee fields");
+      setAddError({ message: "Please fill in all required fields", fields: [] });
       return;
     }
-
     if (!addForm.dailyRate || addForm.workingDays.length === 0) {
-      alert("Please enter daily rate and select at least one working day");
+      setAddError({ message: "Please enter daily rate and select at least one working day", fields: [] });
       return;
     }
 
     try {
       setLoading(true);
 
+      // Matches CreateEmployeeCommand — no ID
       const employeePayload = {
         name: addForm.name.trim(),
         nationalNumber: addForm.nationalNumber.trim(),
@@ -310,37 +271,39 @@ const Employee = () => {
         address: addForm.address.trim(),
         dateOfBirth: addForm.dateOfBirth,
       };
-
       const createdEmployee = await EmployeeService.create(employeePayload);
 
+      // Matches CreateEmploymentRecordCommand — no employmentRecordId, server generates it
       const employmentPayload = {
         employeeId: createdEmployee.employeeId,
         employmentType: addForm.employmentType,
-        position: addForm.position || "",
+        position: addForm.position.trim() || "",
         startDate: addForm.startDate,
         endDate: addForm.endDate || null,
         dailyRate: parseFloat(addForm.dailyRate),
+        isActive: true,
         workingDays: addForm.workingDays,
         skillSets: addForm.skillSets,
       };
-
       await EmploymentRecordService.create(employmentPayload);
 
-      alert(`✅ Employee created successfully!\nEmployee Number: ${createdEmployee.employeeNumber}`);
+      alert(`✅ Employee created!\nEmployee Number: ${createdEmployee.employeeNumber}`);
       closeAddModal();
       await fetchEmployees();
     } catch (err) {
-      console.error("❌ Creation failed:", err);
-      alert("❌ Failed to create employee:\n" + err.message);
+      console.error("Creation failed:", err);
+      setAddError(parseApiError(err));
     } finally {
       setLoading(false);
     }
   };
 
   // ========== EDIT EMPLOYEE ==========
+  // UpdateEmployeeCommand: EmployeeId, Name, NationalNumber, ContactNumber, Position, Address, DateOfBirth
   const openEditModal = (employee) => {
     setEditingEmployee(employee);
     setEditForm({
+      employeeId: employee.employeeId,
       name: employee.name || "",
       nationalNumber: employee.nationalNumber || "",
       contactNumber: employee.contactNumber || "",
@@ -348,22 +311,20 @@ const Employee = () => {
       address: employee.address || "",
       dateOfBirth: employee.dateOfBirth?.split("T")[0] || "",
     });
+    setEditError(null);
     setIsEditModalOpen(true);
   };
 
-  const closeEditModal = () => {
-    setIsEditModalOpen(false);
-    setEditingEmployee(null);
-  };
-
-  const handleEditChange = (e) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
-  };
+  const closeEditModal = () => { setIsEditModalOpen(false); setEditingEmployee(null); setEditError(null); };
+  const handleEditChange = (e) => setEditForm({ ...editForm, [e.target.name]: e.target.value });
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    setEditError(null);
 
+    // Matches UpdateEmployeeCommand exactly
     const payload = {
+      employeeId: editForm.employeeId,
       name: editForm.name.trim(),
       nationalNumber: editForm.nationalNumber.trim(),
       contactNumber: editForm.contactNumber.trim(),
@@ -379,14 +340,17 @@ const Employee = () => {
       closeEditModal();
       await fetchEmployees();
     } catch (err) {
-      console.error("❌ Update failed:", err);
-      alert("❌ Failed to update employee:\n" + err.message);
+      console.error("Update failed:", err);
+      setEditError(parseApiError(err));
     } finally {
       setLoading(false);
     }
   };
 
   // ========== ADD EMPLOYMENT RECORD ==========
+  // CreateEmploymentRecordCommand: EmployeeId, EmploymentType, Position,
+  //   StartDate, EndDate, DailyRate, IsActive, WorkingDays, SkillSets
+  // No employmentRecordId — server generates it
   const openEmploymentModal = (employee) => {
     setSelectedEmployeeForEmployment(employee);
     setEmploymentForm({
@@ -398,57 +362,39 @@ const Employee = () => {
       workingDays: [],
       skillSets: [],
     });
+    setEmploymentError(null);
     setSkillInput("");
     setIsEmploymentModalOpen(true);
   };
 
-  const closeEmploymentModal = () => {
-    setIsEmploymentModalOpen(false);
-    setSelectedEmployeeForEmployment(null);
-  };
+  const closeEmploymentModal = () => { setIsEmploymentModalOpen(false); setSelectedEmployeeForEmployment(null); setEmploymentError(null); };
+  const handleEmploymentChange = (e) => setEmploymentForm({ ...employmentForm, [e.target.name]: e.target.value });
 
-  const handleEmploymentChange = (e) => {
-    setEmploymentForm({ ...employmentForm, [e.target.name]: e.target.value });
-  };
-
-  const toggleEmploymentWorkingDay = (dayValue) => {
-    setEmploymentForm((prev) => ({
-      ...prev,
-      workingDays: prev.workingDays.includes(dayValue)
-        ? prev.workingDays.filter((d) => d !== dayValue)
-        : [...prev.workingDays, dayValue],
-    }));
-  };
+  const toggleEmploymentWorkingDay = (v) => setEmploymentForm((p) => ({
+    ...p,
+    workingDays: p.workingDays.includes(v) ? p.workingDays.filter((d) => d !== v) : [...p.workingDays, v],
+  }));
 
   const addSkillToEmployment = () => {
     const skill = skillInput.trim();
     if (!skill) return;
-    if (employmentForm.skillSets.includes(skill)) {
-      alert("This skill is already added");
-      return;
-    }
-    setEmploymentForm((prev) => ({
-      ...prev,
-      skillSets: [...prev.skillSets, skill],
-    }));
+    if (employmentForm.skillSets.includes(skill)) { alert("Already added"); return; }
+    setEmploymentForm((p) => ({ ...p, skillSets: [...p.skillSets, skill] }));
     setSkillInput("");
   };
 
-  const removeSkillFromEmployment = (skill) => {
-    setEmploymentForm((prev) => ({
-      ...prev,
-      skillSets: prev.skillSets.filter((s) => s !== skill),
-    }));
-  };
+  const removeSkillFromEmployment = (s) => setEmploymentForm((p) => ({ ...p, skillSets: p.skillSets.filter((x) => x !== s) }));
 
   const handleEmploymentSubmit = async (e) => {
     e.preventDefault();
+    setEmploymentError(null);
 
     if (!employmentForm.dailyRate || employmentForm.workingDays.length === 0) {
-      alert("Please enter daily rate and select at least one working day");
+      setEmploymentError({ message: "Please enter daily rate and select at least one working day", fields: [] });
       return;
     }
 
+    // Matches CreateEmploymentRecordCommand — no employmentRecordId
     const payload = {
       employeeId: selectedEmployeeForEmployment.employeeId,
       employmentType: employmentForm.employmentType,
@@ -456,6 +402,7 @@ const Employee = () => {
       startDate: employmentForm.startDate,
       endDate: employmentForm.endDate || null,
       dailyRate: parseFloat(employmentForm.dailyRate),
+      isActive: true,
       workingDays: employmentForm.workingDays,
       skillSets: employmentForm.skillSets,
     };
@@ -463,12 +410,12 @@ const Employee = () => {
     try {
       setLoading(true);
       await EmploymentRecordService.create(payload);
-      alert("✅ Employment record created successfully!");
+      alert("✅ Employment record created!");
       closeEmploymentModal();
       await fetchEmployees();
     } catch (err) {
-      console.error("❌ Employment record creation failed:", err);
-      alert("❌ Failed to create employment record:\n" + err.message);
+      console.error("Employment record creation failed:", err);
+      setEmploymentError(parseApiError(err));
     } finally {
       setLoading(false);
     }
@@ -476,14 +423,14 @@ const Employee = () => {
 
   // ========== OTHER ACTIONS ==========
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this employee?")) return;
+    if (!window.confirm("Delete this employee?")) return;
     try {
       setLoading(true);
       await EmployeeService.delete(id);
-      alert("✅ Employee deleted successfully!");
+      alert("✅ Deleted!");
       await fetchEmployees();
     } catch (err) {
-      alert("❌ " + err.message);
+      alert("❌ " + parseApiError(err).message);
     } finally {
       setLoading(false);
     }
@@ -494,10 +441,10 @@ const Employee = () => {
     try {
       setLoading(true);
       await EmployeeService.archive(id);
-      alert("✅ Employee archived successfully!");
+      alert("✅ Archived!");
       await fetchEmployees();
     } catch (err) {
-      alert("❌ " + err.message);
+      alert("❌ " + parseApiError(err).message);
     } finally {
       setLoading(false);
     }
@@ -508,10 +455,10 @@ const Employee = () => {
     try {
       setLoading(true);
       await EmployeeService.unarchive(id);
-      alert("✅ Employee unarchived successfully!");
+      alert("✅ Unarchived!");
       await fetchEmployees();
     } catch (err) {
-      alert("❌ " + err.message);
+      alert("❌ " + parseApiError(err).message);
     } finally {
       setLoading(false);
     }
@@ -521,18 +468,12 @@ const Employee = () => {
     const start = prompt("Start Date (YYYY-MM-DD):", "2025-02-01");
     const end = prompt("End Date (YYYY-MM-DD):", "2025-02-14");
     if (!start || !end) return;
-
     try {
       setLoading(true);
       const result = await EmployeeService.calculateSalary(employee.employeeId, start, end);
-      alert(
-        `💰 Salary Calculation\n\n` +
-          `Employee: ${employee.name}\n` +
-          `Period: ${start} to ${end}\n\n` +
-          `Take Home Pay: ${result.currency} ${result.takeHomePay.toFixed(2)}`
-      );
+      alert(`💰 Salary\n\nEmployee: ${employee.name}\nPeriod: ${start} to ${end}\n\nTake Home: ${result.currency} ${result.takeHomePay.toFixed(2)}`);
     } catch (err) {
-      alert("❌ " + err.message);
+      alert("❌ " + parseApiError(err).message);
     } finally {
       setLoading(false);
     }
@@ -547,39 +488,18 @@ const Employee = () => {
             <p>Manage employee records and employment details</p>
           </div>
           <div className="employee-header-actions">
-            <button className="btn-primary" onClick={openAddModal} disabled={loading}>
-              + Add Employee
-            </button>
-            <button
-              className="btn-secondary"
-              onClick={() => {
-                setShowArchived(!showArchived);
-                setPageNumber(1);
-              }}
-              disabled={loading}
-            >
+            <button className="btn-primary" onClick={openAddModal} disabled={loading}>+ Add Employee</button>
+            <button className="btn-secondary" onClick={() => { setShowArchived(!showArchived); setPageNumber(1); }} disabled={loading}>
               {showArchived ? "Active Only" : "Show Archived"}
             </button>
           </div>
         </div>
 
-        {/* ========== SEARCH BAR ========== */}
         <div className="search-container">
           <div className="search-input-wrapper">
             <FaSearch className="search-icon" />
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search by employee number or name..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              disabled={loading}
-            />
-            {searchQuery && (
-              <button className="clear-search-btn" onClick={clearSearch}>
-                ×
-              </button>
-            )}
+            <input type="text" className="search-input" placeholder="Search by employee number or name..." value={searchQuery} onChange={handleSearchChange} disabled={loading} />
+            {searchQuery && <button className="clear-search-btn" onClick={clearSearch}>×</button>}
           </div>
         </div>
 
@@ -588,114 +508,49 @@ const Employee = () => {
         <table className="employee-table">
           <thead>
             <tr>
-              <th>Employee No</th>
-              <th>Name</th>
-              <th>National ID</th>
-              <th>Contact</th>
-              <th>Position</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>Employee No</th><th>Name</th><th>National ID</th>
+              <th>Contact</th><th>Position</th><th>Status</th><th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {displayedEmployees.length === 0 ? (
-              <tr>
-                <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
-                  {loading 
-                    ? "Loading..." 
-                    : isSearchMode 
-                      ? `No employees found matching "${searchQuery}"`
-                      : "No employees found"
-                  }
+              <tr><td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
+                {loading ? "Loading..." : isSearchMode ? `No results for "${searchQuery}"` : "No employees found"}
+              </td></tr>
+            ) : displayedEmployees.map((emp) => (
+              <tr key={emp.employeeId}>
+                <td>{emp.employeeNumber}</td>
+                <td>{emp.name}</td>
+                <td>{emp.nationalNumber}</td>
+                <td>{emp.contactNumber || "-"}</td>
+                <td>{emp.position || "-"}</td>
+                <td><span className={emp.isArchived ? "badge-archived" : "badge-active"}>{emp.isArchived ? "Archived" : "Active"}</span></td>
+                <td className="action-buttons">
+                  {!emp.isArchived ? (
+                    <>
+                      <FaEdit className="action-icon edit-icon" onClick={() => openEditModal(emp)} title="Edit" />
+                      <FaList className="action-icon list-icon" onClick={() => openViewEmploymentModal(emp)} title="View Records" />
+                      <FaBriefcase className="action-icon employment-icon" onClick={() => openEmploymentModal(emp)} title="Add Record" />
+                      <FaMoneyBillWave className="action-icon salary-icon" onClick={() => handleCalculateSalary(emp)} title="Salary" />
+                      <FaArchive className="action-icon archive-icon" onClick={() => handleArchive(emp.employeeId)} title="Archive" />
+                      <FaTrash className="action-icon delete-icon" onClick={() => handleDelete(emp.employeeId)} title="Delete" />
+                    </>
+                  ) : (
+                    <FaUndo className="action-icon unarchive-icon" onClick={() => handleUnarchive(emp.employeeId)} title="Unarchive" />
+                  )}
                 </td>
               </tr>
-            ) : (
-              displayedEmployees.map((emp) => (
-                <tr key={emp.employeeId}>
-                  <td>{emp.employeeNumber}</td>
-                  <td>{emp.name}</td>
-                  <td>{emp.nationalNumber}</td>
-                  <td>{emp.contactNumber || "-"}</td>
-                  <td>{emp.position || "-"}</td>
-                  <td>
-                    <span className={emp.isArchived ? "badge-archived" : "badge-active"}>
-                      {emp.isArchived ? "Archived" : "Active"}
-                    </span>
-                  </td>
-                  <td className="action-buttons">
-                    {!emp.isArchived ? (
-                      <>
-                        <FaEdit
-                          className="action-icon edit-icon"
-                          onClick={() => openEditModal(emp)}
-                          title="Edit Basic Info"
-                        />
-                        <FaList
-                          className="action-icon list-icon"
-                          onClick={() => openViewEmploymentModal(emp)}
-                          title="View Employment Records"
-                        />
-                        <FaBriefcase
-                          className="action-icon employment-icon"
-                          onClick={() => openEmploymentModal(emp)}
-                          title="Add Employment Record"
-                        />
-                        <FaMoneyBillWave
-                          className="action-icon salary-icon"
-                          onClick={() => handleCalculateSalary(emp)}
-                          title="Calculate Salary"
-                        />
-                        <FaArchive
-                          className="action-icon archive-icon"
-                          onClick={() => handleArchive(emp.employeeId)}
-                          title="Archive"
-                        />
-                        <FaTrash
-                          className="action-icon delete-icon"
-                          onClick={() => handleDelete(emp.employeeId)}
-                          title="Delete"
-                        />
-                      </>
-                    ) : (
-                      <FaUndo
-                        className="action-icon unarchive-icon"
-                        onClick={() => handleUnarchive(emp.employeeId)}
-                        title="Unarchive"
-                      />
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
 
-        {/* ========== PAGINATION ========== */}
         {!isSearchMode && !loading && displayedEmployees.length > 0 && (
-          <Pagination
-            pageNumber={pageNumber}
-            totalPages={totalPages}
-            totalCount={totalCount}
-            pageSize={pageSize}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-          />
+          <Pagination pageNumber={pageNumber} totalPages={totalPages} totalCount={totalCount} pageSize={pageSize} onPageChange={handlePageChange} onPageSizeChange={handlePageSizeChange} />
         )}
 
-        {/* Show results count when searching */}
         {isSearchMode && (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '20px', 
-            color: '#6b7280',
-            fontStyle: 'italic',
-            background: 'white',
-            borderRadius: '8px',
-            marginTop: '20px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
-          }}>
-            Found {displayedEmployees.length} result{displayedEmployees.length !== 1 ? 's' : ''} 
-            {searchQuery && ` matching "${searchQuery}"`}
+          <div style={{ textAlign: "center", padding: "20px", color: "#6b7280", fontStyle: "italic", background: "white", borderRadius: "8px", marginTop: "20px" }}>
+            Found {displayedEmployees.length} result{displayedEmployees.length !== 1 ? "s" : ""}{searchQuery && ` for "${searchQuery}"`}
           </div>
         )}
 
@@ -707,8 +562,8 @@ const Employee = () => {
                 <h2>Add New Employee</h2>
                 <button className="x-btn" onClick={closeAddModal} disabled={loading}>×</button>
               </div>
-
               <form onSubmit={handleAddSubmit} className="modal-form">
+                <ErrorBox error={addError} onClose={() => setAddError(null)} />
                 <div className="form-section">
                   <h3>Employee Information</h3>
                   <div className="form-row">
@@ -717,14 +572,13 @@ const Employee = () => {
                   </div>
                   <div className="form-row">
                     <input type="text" name="contactNumber" value={addForm.contactNumber} onChange={handleAddChange} placeholder="Contact (+60123456789)" />
-                    <input type="text" name="position" value={addForm.position} onChange={handleAddChange} placeholder="Position (e.g., Developer)" />
+                    <input type="text" name="position" value={addForm.position} onChange={handleAddChange} placeholder="Position" />
                   </div>
                   <div className="form-row">
-                    <input type="text" name="address" value={addForm.address} onChange={handleAddChange} placeholder="Residential Address" />
-                    <input type="date" name="dateOfBirth" value={addForm.dateOfBirth} onChange={handleAddChange} placeholder="Date of Birth *" required />
+                    <input type="text" name="address" value={addForm.address} onChange={handleAddChange} placeholder="Address" />
+                    <input type="date" name="dateOfBirth" value={addForm.dateOfBirth} onChange={handleAddChange} required />
                   </div>
                 </div>
-
                 <div className="form-section">
                   <h3>Employment Details</h3>
                   <div className="form-row">
@@ -736,11 +590,10 @@ const Employee = () => {
                   </div>
                   <div className="form-row">
                     <input type="date" name="startDate" value={addForm.startDate} onChange={handleAddChange} required />
-                    <input type="date" name="endDate" value={addForm.endDate} onChange={handleAddChange} placeholder="End Date (Optional)" />
+                    <input type="date" name="endDate" value={addForm.endDate} onChange={handleAddChange} />
                   </div>
-
                   <div className="working-days-section">
-                    <h4>Working Days * (Select at least one)</h4>
+                    <h4>Working Days *</h4>
                     <div className="working-days-grid-clean">
                       {daysOfWeek.map((day) => (
                         <label key={day.value} className="checkbox-label">
@@ -750,30 +603,23 @@ const Employee = () => {
                       ))}
                     </div>
                   </div>
-
                   <div className="skills-section">
                     <h4>Skills</h4>
                     <div className="skill-input-group">
-                      <input type="text" value={skillInput} onChange={(e) => setSkillInput(e.target.value)} placeholder="Enter skill (e.g., C#, ReactJs)" onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addSkillToAdd())} />
+                      <input type="text" value={skillInput} onChange={(e) => setSkillInput(e.target.value)} placeholder="e.g., C#, ReactJs" onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addSkillToAdd())} />
                       <button type="button" onClick={addSkillToAdd} className="add-skill-btn">Add</button>
                     </div>
                     {addForm.skillSets.length > 0 && (
                       <div className="skills-list">
                         {addForm.skillSets.map((skill, idx) => (
-                          <span key={idx} className="skill-tag">
-                            {skill}
-                            <button type="button" onClick={() => removeSkillFromAdd(skill)} className="remove-skill-btn">×</button>
-                          </span>
+                          <span key={idx} className="skill-tag">{skill}<button type="button" onClick={() => removeSkillFromAdd(skill)} className="remove-skill-btn">×</button></span>
                         ))}
                       </div>
                     )}
                   </div>
                 </div>
-
                 <div className="modal-actions">
-                  <button type="submit" className="btn-primary" disabled={loading}>
-                    {loading ? "Creating..." : "Create Employee"}
-                  </button>
+                  <button type="submit" className="btn-primary" disabled={loading}>{loading ? "Creating..." : "Create Employee"}</button>
                   <button type="button" className="cancel-btn" onClick={closeAddModal}>Cancel</button>
                 </div>
               </form>
@@ -790,9 +636,11 @@ const Employee = () => {
                 <button className="x-btn" onClick={closeEditModal}>×</button>
               </div>
               <form onSubmit={handleEditSubmit} className="modal-form">
+                <ErrorBox error={editError} onClose={() => setEditError(null)} />
+                <input type="hidden" name="employeeId" value={editForm.employeeId} />
                 <input type="text" name="name" value={editForm.name} onChange={handleEditChange} placeholder="Full Name *" required />
-                <input type="text" name="nationalNumber" value={editForm.nationalNumber} onChange={handleEditChange} placeholder="National ID *" required />
-                <input type="text" name="contactNumber" value={editForm.contactNumber} onChange={handleEditChange} placeholder="Contact Number" />
+                <input type="text" name="nationalNumber" value={editForm.nationalNumber} onChange={handleEditChange} placeholder="National ID (YYMMDD-XX-XXXX) *" required />
+                <input type="text" name="contactNumber" value={editForm.contactNumber} onChange={handleEditChange} placeholder="Contact (+60123456789)" />
                 <input type="text" name="position" value={editForm.position} onChange={handleEditChange} placeholder="Position" />
                 <input type="text" name="address" value={editForm.address} onChange={handleEditChange} placeholder="Address" />
                 <input type="date" name="dateOfBirth" value={editForm.dateOfBirth} onChange={handleEditChange} required />
@@ -818,6 +666,7 @@ const Employee = () => {
                 <p><strong>Employee No:</strong> {selectedEmployeeForEmployment?.employeeNumber}</p>
               </div>
               <form onSubmit={handleEmploymentSubmit} className="modal-form">
+                <ErrorBox error={employmentError} onClose={() => setEmploymentError(null)} />
                 <div className="form-row">
                   <select name="employmentType" value={employmentForm.employmentType} onChange={handleEmploymentChange}>
                     <option value="Permanent">Permanent</option>
@@ -829,10 +678,9 @@ const Employee = () => {
                   <input type="number" name="dailyRate" value={employmentForm.dailyRate} onChange={handleEmploymentChange} placeholder="Daily Rate (MYR) *" step="0.01" min="0" required />
                   <input type="date" name="startDate" value={employmentForm.startDate} onChange={handleEmploymentChange} required />
                 </div>
-                <input type="date" name="endDate" value={employmentForm.endDate} onChange={handleEmploymentChange} placeholder="End Date (Optional)" />
-                
+                <input type="date" name="endDate" value={employmentForm.endDate} onChange={handleEmploymentChange} />
                 <div className="working-days-section">
-                  <h4>Working Days * (Select at least one)</h4>
+                  <h4>Working Days *</h4>
                   <div className="working-days-grid-clean">
                     {daysOfWeek.map((day) => (
                       <label key={day.value} className="checkbox-label">
@@ -851,10 +699,7 @@ const Employee = () => {
                   {employmentForm.skillSets.length > 0 && (
                     <div className="skills-list">
                       {employmentForm.skillSets.map((skill, idx) => (
-                        <span key={idx} className="skill-tag">
-                          {skill}
-                          <button type="button" onClick={() => removeSkillFromEmployment(skill)} className="remove-skill-btn">×</button>
-                        </span>
+                        <span key={idx} className="skill-tag">{skill}<button type="button" onClick={() => removeSkillFromEmployment(skill)} className="remove-skill-btn">×</button></span>
                       ))}
                     </div>
                   )}
@@ -881,37 +726,29 @@ const Employee = () => {
                 <p><strong>Employee No:</strong> {viewingEmployeeRecords.employeeNumber}</p>
               </div>
               <div className="employment-records-list">
-                {viewingEmployeeRecords.employmentRecords && viewingEmployeeRecords.employmentRecords.length > 0 ? (
+                {viewingEmployeeRecords.employmentRecords?.length > 0 ? (
                   viewingEmployeeRecords.employmentRecords.map((record, index) => (
                     <div key={index} className="employment-record-card">
                       <div className="record-header">
                         <h4>{record.employmentType} - {record.position}</h4>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <span className={record.isActive ? "badge-active" : "badge-archived"}>
-                            {record.isActive ? "Active" : "Inactive"}
-                          </span>
+                        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                          <span className={record.isActive ? "badge-active" : "badge-archived"}>{record.isActive ? "Active" : "Inactive"}</span>
                           {!record.isActive && (
-                            <button onClick={() => handleActivateRecord(record.employmentRecordId)} className="btn-primary" style={{ fontSize: '12px', padding: '4px 8px' }}>
-                              Activate
-                            </button>
+                            <button onClick={() => handleActivateRecord(record.employmentRecordId)} className="btn-primary" style={{ fontSize: "12px", padding: "4px 8px" }}>Activate</button>
                           )}
-                          <button onClick={() => handleDeleteRecord(record.employmentRecordId)} className="cancel-btn" style={{ fontSize: '12px', padding: '4px 8px' }}>
-                            Delete
-                          </button>
+                          <button onClick={() => handleDeleteRecord(record.employmentRecordId)} className="cancel-btn" style={{ fontSize: "12px", padding: "4px 8px" }}>Delete</button>
                         </div>
                       </div>
                       <div className="record-details">
                         <p><strong>Daily Rate:</strong> MYR {record.dailyRate?.toFixed(2)}</p>
                         <p><strong>Start Date:</strong> {new Date(record.startDate).toLocaleDateString()}</p>
                         {record.endDate && <p><strong>End Date:</strong> {new Date(record.endDate).toLocaleDateString()}</p>}
-                        <p><strong>Working Days:</strong> {record.workingDays?.map(wd => daysOfWeek[wd.dayOfWeek]?.name || wd.dayName).join(", ") || "None"}</p>
-                        {record.skillSets && record.skillSets.length > 0 && (
+                        <p><strong>Working Days:</strong> {record.workingDays?.map((wd) => daysOfWeek[wd.dayOfWeek]?.name || wd.dayName).join(", ") || "None"}</p>
+                        {record.skillSets?.length > 0 && (
                           <div className="record-skills">
                             <strong>Skills:</strong>
                             <div className="skills-list">
-                              {record.skillSets.map((skill, idx) => (
-                                <span key={idx} className="skill-tag">{skill.skillName}</span>
-                              ))}
+                              {record.skillSets.map((skill, idx) => <span key={idx} className="skill-tag">{skill.skillName}</span>)}
                             </div>
                           </div>
                         )}
@@ -919,7 +756,7 @@ const Employee = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="no-records">No employment records found for this employee.</p>
+                  <p className="no-records">No employment records found.</p>
                 )}
               </div>
               <div className="modal-actions">

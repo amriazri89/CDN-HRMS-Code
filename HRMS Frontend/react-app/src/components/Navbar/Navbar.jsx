@@ -2,42 +2,35 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
-import UserService from "../../services/AuthService"; // use logout helper
+import UserService from "../../services/AuthService";
 import "./Navbar.css";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState("");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Prefer the simple stored keys that your UserService actually sets
-    const name = localStorage.getItem("name");
-    const email = localStorage.getItem("userEmail");
-    const id = localStorage.getItem("userId");
-    console.log("Fetched user info:", { name, email, id });
-    if (name) setUserName(name);
-    else if (email) setUserName(email);
-    else if (id) setUserName(id);
-    else setUserName(""); // guest
+    const currentUser = UserService.getCurrentUser();
+    setUser(currentUser); // null if not logged in
+    console.log("Fetched user info:", currentUser);
   }, []);
 
-const handleLogout = () => {
-  UserService.logout();
-  setUserName("");
-  navigate("/etiqa/hrms/login", {
-    state: { message: "You have been logged out successfully." },
-  });
-};
-
+  const handleLogout = () => {
+    UserService.logout();
+    setUser(null);
+    navigate("/cdn/hrms/login", {
+      state: { message: "You have been logged out successfully." },
+    });
+  };
 
   return (
     <div className="navbar">
       <h2 className="navbar-title">Human Resource Management System [HRMS]</h2>
 
       <div className="nav-actions">
-        <div className="profile-wrapper" title={UserService.getCurrentUser(). username || "Profile"}>
+        <div className="profile-wrapper" title={user?.username || "Profile"}>
           <FaUserCircle className="nav-icon profile-icon" />
-          Welcome [ <span className="nav-name">{UserService.getCurrentUser(). username || "Guest"}</span> ]
+          Welcome [ <span className="nav-name">{user?.username || "Guest"}</span> ]
         </div>
 
         <FaSignOutAlt
