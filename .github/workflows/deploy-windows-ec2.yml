@@ -21,19 +21,19 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore Dependencies
-        run: dotnet restore "HRMS Backend/HRMS.API/HRMS.API.csproj"
+        run: dotnet restore "HRMS.Backend/HRMS.API/HRMS.API.csproj"
 
       - name: Build Project
-        run: dotnet build "HRMS Backend/HRMS.API/HRMS.API.csproj" --configuration Release
+        run: dotnet build "HRMS.Backend/HRMS.API/HRMS.API.csproj" --configuration Release
 
       - name: Run Unit Tests
-        run: dotnet test "HRMS Tests/HRMS.UnitTests/HRMS.UnitTests.csproj" --configuration Release 
+        run: dotnet test "HRMS.Tests/HRMS.UnitTests/HRMS.UnitTests.csproj" --configuration Release 
 
       - name: Run Integration Tests
-        run: dotnet test "HRMS Tests/HRMS.IntegrationTests/HRMS.IntegrationTests.csproj"  --configuration Release
+        run: dotnet test "HRMS.Tests/HRMS.IntegrationTests/HRMS.IntegrationTests.csproj"  --configuration Release
 
       - name: Publish Project
-        run: dotnet publish "HRMS Backend/HRMS.API/HRMS.API.csproj" -c Release -o publish
+        run: dotnet publish "HRMS.Backend/HRMS.API/HRMS.API.csproj" -c Release -o publish
 
       # ========== DEPLOY PHASE ==========
       - name: Deploy to Windows EC2
