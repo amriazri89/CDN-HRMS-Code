@@ -22,12 +22,13 @@ else
     // Production: Use HTTPS with self-signed cert
     builder.WebHost.ConfigureKestrel(options =>
     {
+        options.ListenAnyIP(5000); // ← add this for Vercel
         options.ListenAnyIP(5001, listenOptions =>
         {
             listenOptions.UseHttps("C:\\certs\\api.pfx", "hrms");
         });
     });
-    Console.WriteLine("🔒 Production mode → Kestrel HTTPS on port 5001");
+    Console.WriteLine("🔒 Production mode → HTTP:5000 + HTTPS:5001")
 }
 
 // ========== SERVICES ==========
