@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > **Assessment Submission for ETIQA IT (December 2025 Revision)**  
-> A production-ready HRMS with advanced payroll calculation, built with Clean Architecture, CQRS pattern, and comprehensive testing.
+> A production-ready HRMS with advanced payroll calculation, built with Clean Architecture, CQRS pattern, unit  and integration testing.
 
 **Developed by:** Amri Azri  
 **Company:** Complete Developer Network (CDN)  
@@ -20,7 +20,7 @@
 - [Assessment Requirements ✅](#-assessment-requirements-checklist)
 - [Live Demo & Credentials](#-live-demo)
 - [Setup Instructions](#-setup--installation)
-- [API Documentation](#-api-documentation)
+- [Diagram & API Documentation](#-api-documentation)
 - [Code Walkthrough](#-code-walkthrough-for-interview)
 - [Testing Strategy](#-testing-strategy)
 - [Deployment](#-deployment-architecture)
@@ -377,7 +377,12 @@ FETCH NEXT @PageSize ROWS ONLY
 
 ---
 
-## 📡 API Documentation
+## 📡 Diagram & API Documentation
+
+
+## 📸 Initial Diagram
+
+(img/diagram.jpg)
 
 ### Base URL
 ```
@@ -595,10 +600,10 @@ dotnet test
 dotnet test /p:CollectCoverage=true
 
 # Unit only
-dotnet test "HRMS Tests/HRMS.UnitTests"
+dotnet test "HRMS.Tests/HRMS.UnitTests"
 
 # Integration only
-dotnet test "HRMS Tests/HRMS.IntegrationTests"
+dotnet test "HRMS.Tests/HRMS.IntegrationTests"
 ```
 
 **Output:**
@@ -704,6 +709,112 @@ Password: Admin@123
 └─────────────────────────────────────────┘
 ```
 
+
+## 🗄️ Database Schema
+
+### Entity Relationship Diagram
+
+
+```
+              ┌─────────────────┐
+              │      User       │
+              ├─────────────────┤
+              │ UserId (PK)     │
+              │ Username        │
+              │ PasswordHash    │
+              │ CreatedAt       │
+              │ IsActive        │
+              └─────────────────┘
+
+              ┌─────────────────┐
+              │    Employees    │
+              ├─────────────────┤
+              │ EmployeeId (PK) │
+              │ EmployeeNumber  │
+              │ Name            │
+              │ NationalNumber  │
+              │ ContactNumber   │
+              │ Position        │
+              │ Address         │
+              │ DateOfBirth     │
+              │ DateCreated     │
+              │ IsArchived      │
+              └─────────────────┘
+                      ↓ 1:N
+              ┌─────────────────────┐
+              │ EmploymentRecords   │
+              ├─────────────────────┤
+              │ EmploymentRecordId  │
+              │ EmployeeId (FK)     │
+              │ EmploymentType      │
+              │ Position            │
+              │ StartDate           │
+              │ EndDate             │
+              │ DailyRate           │
+              │ IsActive            │
+              └─────────────────────┘
+              ↓ 1:N             ↓ 1:N
+┌─────────────────────┐     ┌─────────────────────┐
+│ EmployeeWorkingDays │     │ EmployeeSkillSets   │
+├─────────────────────┤     ├─────────────────────┤
+│ WorkingDayId (PK)   │     │ SkillSetId (PK)     │
+│ EmploymentRecordId  │     │ EmploymentRecordId  │
+│ DayOfWeek (0-6)     │     │ SkillName           │
+└─────────────────────┘     └─────────────────────┘
+```
+
+### SQL Schema
+
+```sql
+
+CREATE TABLE Employees (
+    EmployeeId UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    EmployeeNumber NVARCHAR(50) NOT NULL UNIQUE,
+    Name NVARCHAR(100) NOT NULL,
+    NationalNumber NVARCHAR(20) NOT NULL,
+    ContactNumber NVARCHAR(20),
+    Position NVARCHAR(100),
+    Address NVARCHAR(255),
+    DateOfBirth DATE NOT NULL,
+    DateCreated DATETIME2 DEFAULT GETUTCDATE(),
+    IsArchived BIT DEFAULT 0
+);
+
+CREATE TABLE EmploymentRecords (
+    EmploymentRecordId UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    EmployeeId UNIQUEIDENTIFIER NOT NULL,
+    EmploymentType NVARCHAR(50) NOT NULL,
+    Position NVARCHAR(100),
+    StartDate DATE NOT NULL,
+    EndDate DATE,
+    DailyRate DECIMAL(18,2) NOT NULL,
+    IsActive BIT DEFAULT 1,
+    FOREIGN KEY (EmployeeId) REFERENCES Employees(EmployeeId)
+);
+
+CREATE TABLE EmployeeWorkingDays (
+    EmployeeWorkingDayId UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    EmploymentRecordId UNIQUEIDENTIFIER NOT NULL,
+    DayOfWeek INT NOT NULL CHECK (DayOfWeek >= 0 AND DayOfWeek <= 6),
+    FOREIGN KEY (EmploymentRecordId) REFERENCES EmploymentRecords(EmploymentRecordId)
+);
+
+CREATE TABLE EmployeeSkillSets (
+    EmployeeSkillSetId UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    EmploymentRecordId UNIQUEIDENTIFIER NOT NULL,
+    SkillName NVARCHAR(100) NOT NULL,
+    FOREIGN KEY (EmploymentRecordId) REFERENCES EmploymentRecords(EmploymentRecordId)
+);
+
+CREATE TABLE Users (
+    UserId UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    Username NVARCHAR(50) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    Role NVARCHAR(20) NOT NULL,
+    CreatedDate DATETIME2 DEFAULT GETUTCDATE(),
+    IsActive BIT DEFAULT 1
+);
+```
 ### CI/CD Pipeline
 
 ```
@@ -765,14 +876,6 @@ GitHub Push → Build → Test (41) → Publish → Deploy EC2 → Restart Servi
 
 ---
 
-## 📊 Performance Metrics
-
-| Operation | Without Cache | With Cache | Improvement |
-|-----------|---------------|------------|-------------|
-| GET All Employees | 450ms | 45ms | **10× faster** |
-| GET by ID | 120ms | 12ms | **10× faster** |
-
----
 
 ## 🎓 Assessment Compliance Summary
 
@@ -787,10 +890,11 @@ GitHub Push → Build → Test (41) → Publish → Deploy EC2 → Restart Servi
 
 ## 📞 Contact
 
-**Developer:** Amri Azri  
-**GitHub:** [Private Repository]  
-**Gitfront.io:** [Share during interview]  
-**Email:** amriazri@example.com
+**Developer:** Amri Azri 
+**Contact:** +601128995103
+**GitHub Code:** https://github.com/amriazri89/CDN-HRMS-Code
+**Gitfront.io:** https://gitfront.io/r/amriazri89/gDerSTjthLnu/CDN-HRMS-Code/ 
+**Email:** amriazri89@gmail.com
 
 ---
 
@@ -803,7 +907,7 @@ CDN-HRMS-Code/
 │   ├── HRMS.Application/            # CQRS, Validators, Handlers
 │   ├── HRMS.Infrastructure/         # Repositories (Dapper)
 │   ├── HRMS.Domain/                 # Entities, Interfaces
-│   └── HRMS Tests/
+│   └── HRMS.Tests/
 │       ├── HRMS.UnitTests/          # 28 unit tests
 │       └── HRMS.IntegrationTests/   # 13 integration tests
 │
