@@ -280,18 +280,18 @@ Take-Home Pay: RM 800.00 ✅
 
 **Testing Strategy:**
 
-**Unit Testing (100 tests):**
+**Unit Testing :**
 - Handler Tests: CQRS command/query handlers
 - Validator Tests: FluentValidation rules
 - Service Tests: Business logic services
 - Repository Tests: Data access methods
 
-**Integration Testing (2 tests):**
+**Integration Testing:**
 - Full API endpoint flow
 - Database integration
 - Authentication flow
 
-**Test Coverage:** >40% for Application and Infrastructure layers
+**Test Coverage:** Application and Infrastructure layers
 
 ### 5. Deployment Phase
 
@@ -614,7 +614,176 @@ Password: Admin@123
 
 ---
 
-## 📖 Usage Guide
+## 📖 Usage Guide (Local)
+
+
+## 📚 API Usage
+
+### Base URL
+```
+https://localhost:5001/api
+```
+
+### Authentication
+
+All protected endpoints require a JWT token in the Authorization header:
+
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+### Endpoints
+
+#### Authentication
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/Auth/register` | Register new user | ❌ |
+| POST | `/Auth/login` | Login and get JWT token | ❌ |
+
+**Login Request:**
+```json
+{
+  "username": "admin",
+  "password": "password123"
+}
+```
+
+**Login Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "username": "admin",
+  "role": "Admin",
+  "expiresIn": 3600
+}
+```
+
+#### Employees
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/Employees` | Get all employees | ✅ |
+| GET | `/Employees/{id}` | Get employee by ID | ✅ |
+| GET | `/Employees/search?keyword={term}` | Search employees | ✅ |
+| GET | `/Employees/paged` | Get paginated employees | ✅ |
+| POST | `/Employees` | Create employee | ✅ (HR/Admin) |
+| PUT | `/Employees/{id}` | Update employee | ✅ (HR/Admin) |
+| DELETE | `/Employees/{id}` | Delete employee | ✅ (Admin) |
+| POST | `/Employees/{id}/archive` | Archive employee | ✅ (HR/Admin) |
+| POST | `/Employees/{id}/unarchive` | Unarchive employee | ✅ (HR/Admin) |
+| POST | `/Employees/{id}/calculate-salary` | Calculate salary | ✅ |
+
+**Create Employee Request:**
+```json
+{
+  "name": "Ahmad Ali",
+  "nationalNumber": "950315-01-5678",
+  "contactNumber": "+60123456789",
+  "position": "Senior Developer",
+  "address": "Kuala Lumpur, Malaysia",
+  "dateOfBirth": "1995-03-15"
+}
+```
+
+**Calculate Salary Request:**
+```
+POST /Employees/{id}/calculate-salary?startDate=2025-02-10&endDate=2025-02-14
+```
+
+**Calculate Salary Response:**
+```json
+{
+  "employeeId": "guid",
+  "startDate": "2025-02-10T00:00:00",
+  "endDate": "2025-02-14T00:00:00",
+  "takeHomePay": 900.00,
+  "currency": "MYR"
+}
+```
+
+#### Employment Records
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/EmploymentRecords/employee/{id}` | Get all records for employee | ✅ |
+| GET | `/EmploymentRecords/employee/{id}/active` | Get active record | ✅ |
+| GET | `/EmploymentRecords/{id}` | Get record by ID | ✅ |
+| POST | `/EmploymentRecords` | Create employment record | ✅ (HR/Admin) |
+| PUT | `/EmploymentRecords/{id}` | Update record | ✅ (HR/Admin) |
+| DELETE | `/EmploymentRecords/{id}` | Delete record | ✅ (Admin) |
+| POST | `/EmploymentRecords/{id}/activate` | Activate record | ✅ (HR/Admin) |
+| POST | `/EmploymentRecords/{id}/deactivate` | Deactivate record | ✅ (HR/Admin) |
+
+**Create Employment Record Request:**
+```json
+{
+  "employeeId": "guid",
+  "employmentType": "Permanent",
+  "position": "Senior Developer",
+  "startDate": "2024-01-01",
+  "endDate": null,
+  "dailyRate": 150.00,
+  "workingDays": [1, 3, 5],
+  "skillSets": ["C#", "SQL Server", "ReactJs"]
+}
+```
+
+### Pagination
+
+Paginated endpoints support the following query parameters:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `pageNumber` | int | 1 | Page number to retrieve |
+| `pageSize` | int | 10 | Items per page (max 100) |
+| `searchTerm` | string | - | Search keyword |
+| `sortBy` | string | "Name" | Sort field |
+| `sortDescending` | bool | false | Sort direction |
+
+**Example:**
+```
+GET /Employees/paged?pageNumber=1&pageSize=25&searchTerm=Ahmad&sortBy=Name
+```
+
+**Response Headers:**
+```
+X-Pagination: {
+  "totalCount": 100,
+  "pageSize": 25,
+  "pageNumber": 1,
+  "totalPages": 4
+}
+```
+
+### Error Responses
+
+All errors follow a consistent format:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Validation failed",
+  "detail": "Name is required",
+  "timestamp": "2025-02-14T10:30:00Z"
+}
+```
+
+**HTTP Status Codes:**
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 500 | Internal Server Error |
+
+---
+
+## 📚 System Usage
 
 ### 1. Login
 
@@ -848,7 +1017,7 @@ public async Task CalculateSalary_WithoutBirthday_NoBonus()
 - ❌ Third-party libraries
 - ❌ Infrastructure layer implementations
 
-### Integration Tests (13 tests - 100% Passed ✅)
+### Integration Tests (13 tests)
 
 **Testing Framework:**
 - **WebApplicationFactory** - In-memory test server
