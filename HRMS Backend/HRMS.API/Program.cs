@@ -109,7 +109,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.MapGet("/", () => "HRMS API is running...");
-app.UseCors("AllowAll");
+app.UseCors("AllowVercel");
 
 if (app.Environment.IsDevelopment())
 {
