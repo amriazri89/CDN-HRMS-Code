@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Login.scss";
 import aclogo from "../../assets/cdn-logo.jpg";
-import UserService from "../../services/UserService.js";
+import AuthService from "../../services/AuthService.js";
 import ROUTES from "../../routes";
 
 const Login = () => {
@@ -63,7 +63,7 @@ const Login = () => {
     setMessageType("");
 
     try {
-      await UserService.login(formData.username, formData.password);
+      await AuthService.login(formData.username, formData.password);
       setMessageType("success");
       setMessage("Login successful! Redirecting...");
       setTimeout(() => navigate(ROUTES.DASHBOARD), 1500);

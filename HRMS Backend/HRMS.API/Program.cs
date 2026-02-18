@@ -93,23 +93,34 @@ builder.Services.AddAuthorization();
 // ========== CORS ==========
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowVercel", policy =>
+    options.AddPolicy("AllowViteApp", policy =>
     {
-        policy
-            .SetIsOriginAllowed(origin =>
-                new Uri(origin).Host.EndsWith("vercel.app"))
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+        policy.WithOrigins(
+            // Local development
+            "http://localhost:5173",
+            "https://localhost:5173",
+            "http://127.0.0.1:5173",
+            // Vercel deployments
+            "https://cdnhrms-ten.vercel.app"
+        )
+        .SetIsOriginAllowed(origin =>
+            // Also allow any Vercel preview URL
+            new Uri(origin).Host.EndsWith("vercel.app") ||
+            // Allow any localhost port for development
+            new Uri(origin).Host == "localhost" ||
+            new Uri(origin).Host == "127.0.0.1"
+        )
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
     });
 });
-
 
 // ========== BUILD ==========
 var app = builder.Build();
 
 app.MapGet("/", () => "HRMS API is running...");
-app.UseCors("AllowVercel");
+app.UseCors("AllowViteApp");
 
 if (app.Environment.IsDevelopment())
 {
