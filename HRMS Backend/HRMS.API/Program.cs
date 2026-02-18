@@ -93,26 +93,23 @@ builder.Services.AddAuthorization();
 // ========== CORS ==========
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowViteApp", policy =>
+    options.AddPolicy("AllowVercel", policy =>
     {
-        policy.WithOrigins(
-            "http://localhost:5173",
-            "https://localhost:5173",
-            "https://etiqaassessment.vercel.app",
-            "https://cdnhrms-ten.vercel.app",
-            "https://*.vercel.app"
-        )
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials();
+        policy
+            .SetIsOriginAllowed(origin =>
+                new Uri(origin).Host.EndsWith("vercel.app"))
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
+
 
 // ========== BUILD ==========
 var app = builder.Build();
 
 app.MapGet("/", () => "HRMS API is running...");
-app.UseCors("AllowViteApp");
+app.UseCors("AllowAll");
 
 if (app.Environment.IsDevelopment())
 {
@@ -129,4 +126,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-public partial class Program { }
