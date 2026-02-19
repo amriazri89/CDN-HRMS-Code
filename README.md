@@ -9,7 +9,6 @@
 > A production-ready HRMS with advanced payroll calculation, built with Clean Architecture, CQRS pattern, and comprehensive testing for Complete Developer Network (CDN).
 
 **Developed by:** Amri Azri  
-**Contact:** +601128995103 | amriazri89@gmail.com  
 **Live Demo:** [https://cdnhrms.vercel.app/cdn/hrms/login](https://cdnhrms.vercel.app/cdn/hrms/login)
 
 ---
@@ -1833,7 +1832,7 @@ The CDN HRMS Payroll System successfully demonstrates enterprise-grade software 
 
 ✅ **100% Requirement Compliance**: All mandatory and bonus features implemented  
 ✅ **Clean Architecture**: 4-layer separation with SOLID principles  
-✅ **Comprehensive Testing**: 102 tests with >80% coverage  
+✅ **Comprehensive Testing**: 63 tests including unit & integration
 ✅ **Production Deployment**: Live on AWS EC2 + Vercel  
 ✅ **CI/CD Pipeline**: Automated deployment with GitHub Actions  
 ✅ **Modern Tech Stack**: .NET 8, React 18, Dapper, MediatR  
