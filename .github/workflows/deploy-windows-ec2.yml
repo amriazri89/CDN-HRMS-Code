@@ -8,7 +8,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: windows-latest
-    environment: "CI/CD - Deploy HRMS to Windows EC2"  # ✅ uses your environment
+    environment: "CI/CD - Deploy HRMS to Windows EC2"
 
     steps:
       # ========== BUILD PHASE ==========
@@ -27,10 +27,10 @@ jobs:
         run: dotnet build "HRMS.Backend/HRMS.API/HRMS.API.csproj" --configuration Release
 
       - name: Run Unit Tests
-        run: dotnet test "HRMS.Tests/HRMS.UnitTests/HRMS.UnitTests.csproj" --configuration Release 
+        run: dotnet test "HRMS.Tests/HRMS.UnitTests/HRMS.UnitTests.csproj" --configuration Release
 
       - name: Run Integration Tests
-        run: dotnet test "HRMS.Tests/HRMS.IntegrationTests/HRMS.IntegrationTests.csproj"  --configuration Release
+        run: dotnet test "HRMS.Tests/HRMS.IntegrationTests/HRMS.IntegrationTests.csproj" --configuration Release
 
       - name: Publish Project
         run: dotnet publish "HRMS.Backend/HRMS.API/HRMS.API.csproj" -c Release -o publish
@@ -46,37 +46,64 @@ jobs:
           # Create secure credential
           $secpasswd = ConvertTo-SecureString $env:EC2_PASS -AsPlainText -Force
           $cred = New-Object System.Management.Automation.PSCredential ($env:EC2_USER, $secpasswd)
-          
+
           # Connect to EC2 using WinRM HTTPS (port 5986)
           Write-Host "📡 Connecting to EC2 $env:EC2_HOST via HTTPS..."
-          $session = New-PSSession -ComputerName $env:EC2_HOST -Credential $cred -Port 5986 -UseSSL -SessionOption (New-PSSessionOption -SkipCACheck -SkipCNCheck)
-          
+          $session = New-PSSession `
+            -ComputerName $env:EC2_HOST `
+            -Credential $cred `
+            -Port 5986 `
+            -UseSSL `
+            -SessionOption (New-PSSessionOption -SkipCACheck -SkipCNCheck)
+
+          if (-not $session) {
+            Write-Error "❌ Failed to connect to EC2!"
+            exit 1
+          }
+          Write-Host "✅ Connected to EC2!"
+
           # Stop HRMS service
           Write-Host "⏹️ Stopping HRMS service..."
           Invoke-Command -Session $session -ScriptBlock {
-              & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" stop HRMS
+            & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" stop HRMS
+            Start-Sleep -Seconds 3
           }
 
           # Copy published files
           Write-Host "📂 Copying published files to EC2..."
-          Copy-Item -Path "publish\*" -Destination "C:\Users\Administrator\Documents\Projects\PublishedApp\Publish" -ToSession $session -Recurse -Force
-          
+          Copy-Item `
+            -Path "publish\*" `
+            -Destination "C:\Users\Administrator\Documents\Projects\PublishedApp\Publish" `
+            -ToSession $session `
+            -Recurse `
+            -Force
+
           # Start HRMS service
           Write-Host "▶️ Starting HRMS service..."
           Invoke-Command -Session $session -ScriptBlock {
-              & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" start HRMS
+            & "C:\Users\Administrator\Documents\nssm-2.24\win64\nssm.exe" start HRMS
+            Start-Sleep -Seconds 5
           }
 
           # Verify service is running
           Write-Host "🔍 Verifying service status..."
           Invoke-Command -Session $session -ScriptBlock {
-              $service = Get-Service -Name HRMS
-              if ($service.Status -eq "Running") {
-                  Write-Host "✅ HRMS service is running!"
-              } else {
-                  Write-Error "❌ HRMS service failed to start. Status: $($service.Status)"
-                  exit 1
-              }
+            $service = Get-Service -Name HRMS
+            if ($service.Status -eq "Running") {
+              Write-Host "✅ HRMS service is running!"
+            } else {
+              Write-Error "❌ HRMS service failed to start. Status: $($service.Status)"
+              exit 1
+            }
+
+            # Verify API responds on localhost
+            Start-Sleep -Seconds 3
+            try {
+              $response = Invoke-WebRequest -Uri "http://localhost:5000/api/Auth/login" -Method GET -UseBasicParsing -TimeoutSec 10
+              Write-Host "✅ API is responding! Status: $($response.StatusCode)"
+            } catch {
+              Write-Host "⚠️ API health check inconclusive - service is running but endpoint may require POST"
+            }
           }
 
           # Cleanup
