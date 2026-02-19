@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://ec2-35-172-146-76.compute-1.amazonaws.com:5000/api/:path*"
+      "destination": "https://sri.sri-eras.xyz/api/:path*"
     },
     {
       "source": "/(.*)",
