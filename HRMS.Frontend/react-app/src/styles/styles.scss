@@ -1,150 +1,61 @@
+// ==============================================
+// src/styles/styles.scss
+// Global base only – component styles live in their own CSS files.
+// ==============================================
 
 @import 'variables';
 @import 'mixins';
 
 // =============================================
-// BASE STYLES
+// BASE
 // =============================================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: $font-family-primary;
   background: $color-background;
   color: $color-text-dark;
   line-height: 1.6;
 }
 
 // =============================================
-// LAYOUT
+// LAYOUT SHELL
 // =============================================
 
 .layout {
   display: flex;
   height: 100vh;
   overflow: hidden;
-  
+
   @include responsive(mobile) {
     flex-direction: column;
   }
 }
 
 // =============================================
-// SIDEBAR
-// =============================================
-
-.sidebar {
-  width: $sidebar-width;
-  background: $color-sidebar-bg;
-  color: $color-sidebar-text;
-  padding: $spacing-md;
-  overflow-y: auto;
-  
-  @include responsive(mobile) {
-    width: 100%;
-    height: auto;
-    padding: $spacing-sm;
-  }
-  
-  h3 {
-    margin-top: 0;
-    margin-bottom: $spacing-sm;
-    font-size: 1.2rem;
-    color: $color-sidebar-text;
-  }
-  
-  ul {
-    @include reset-list;
-    
-    li {
-      margin: $spacing-xs 0;
-      
-      a {
-        @include reset-link;
-        color: $color-sidebar-text;
-        font-weight: bold;
-        display: block;
-        padding: $spacing-xs;
-        border-radius: 4px;
-        padding: 12px;
-        
-        @include hover-transition {
-          background: rgba(255, 255, 255, 0.1);
-          color: $color-white;
-          // transform: translateX(5px);
-        }
-      }
-    }
-  }
-}
-
-// =============================================
-// MAIN CONTENT
-// =============================================
-
-.main-content {
-  flex: 1;
-  @include flex-column;
-  overflow: hidden;
-}
-
-// =============================================
-// NAVBAR
-// =============================================
-
-.navbar {
-  background: $color-navbar-bg;
-  @include flex-between;
-  border-bottom: 2px solid $color-navbar-border;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  
-  @include responsive(mobile) {
-    flex-direction: column;
-    gap: $spacing-xs;
-    padding: $spacing-sm;
-  }
-  
-  .navbar-brand {
-    color: $color-white;
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .navbar-actions {
-    @include flex-center;
-    gap: $spacing-sm;
-    
-    button {
-      padding: 8px 16px;
-      background: $color-primary;
-      color: $color-white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      
-      @include hover-transition {
-        background: darken($color-primary, 10%);
-        // transform: translateY(-2px);
-      }
-    }
-  }
-}
-
-// =============================================
-// PAGE CONTENT
+// PAGE CONTENT WRAPPER
+// (used by pages that don't use MainLayout)
 // =============================================
 
 .page-content {
   padding: $spacing-md;
   flex: 1;
   overflow-y: auto;
-  
+
   @include responsive(mobile) {
     padding: $spacing-sm;
   }
 }
 
 // =============================================
-// TABLE STYLES
+// TABLE – global defaults
+// (component tables override these as needed)
 // =============================================
 
 table {
@@ -153,12 +64,12 @@ table {
   background: $color-white;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
   thead {
-    background: $color-navbar-bg;
+    background: $color-gray-800;
     color: $color-white;
-    
+
     th {
       padding: $spacing-sm;
       text-align: left;
@@ -168,30 +79,23 @@ table {
       letter-spacing: 0.5px;
     }
   }
-  
+
   tbody {
     tr {
       background-color: $color-white;
       border-bottom: 1px solid #e5e7eb;
-      
-      // @include hover-transition {
-      //   background-color: $color-hover-light;
-      //   transform: scale(1.01);
-      //   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      // }
-      
+
       td {
         padding: $spacing-sm;
-        
+
         &.link-cell {
           color: $color-link;
           cursor: pointer;
-          
-          // @include hover-transition {
-          //   text-decoration: underline;
-          //   color: $color-link-hover;
-          // }
         }
+      }
+
+      &:hover {
+        background-color: $color-gray-50;
       }
     }
   }
@@ -208,25 +112,131 @@ h3 {
   font-weight: 600;
 }
 
-label {
-  color: $color-black;
-  font-weight: 500;
-  display: block;
-  margin-bottom: 5px;
-  font-size: 0.9rem;
+// NOTE: global `label { display: none }` removed –
+// it was hiding ALL labels including checkbox labels.
+// Each component handles its own label visibility.
+
+// =============================================
+// BUTTONS
+// =============================================
+
+.btn {
+  padding: $spacing-xs $spacing-md;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition-default;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &-primary {
+    background: $color-primary;
+    color: $color-white;
+
+    @include hover-transition {
+      background: darken($color-primary, 10%);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &-secondary {
+    background: #6c757d;
+    color: $color-white;
+
+    @include hover-transition {
+      background: darken(#6c757d, 10%);
+    }
+  }
+
+  &-success {
+    background: #28a745;
+    color: $color-white;
+
+    @include hover-transition {
+      background: darken(#28a745, 10%);
+    }
+  }
+
+  &-danger {
+    background: #dc3545;
+    color: $color-white;
+
+    @include hover-transition {
+      background: darken(#dc3545, 10%);
+    }
+  }
+}
+
+// =============================================
+// FORMS – generic helpers
+// =============================================
+
+.form-group {
+  margin-bottom: $spacing-sm;
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: $spacing-xs;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+    }
+
+    &:disabled {
+      background: #f3f4f6;
+      cursor: not-allowed;
+    }
+  }
+
+  textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+}
+
+// =============================================
+// CARDS
+// =============================================
+
+.card {
+  @include card;
+  margin-bottom: $spacing-md;
+
+  &-header {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: $spacing-sm;
+    margin-bottom: $spacing-sm;
+
+    h3 { margin: 0; }
+  }
+
+  &-body  { padding: 0; }
+
+  &-footer {
+    border-top: 1px solid #e5e7eb;
+    padding-top: $spacing-sm;
+    margin-top: $spacing-sm;
+  }
 }
 
 // =============================================
 // UTILITY CLASSES
 // =============================================
 
-.text-center {
-  text-align: center;
-}
-
-.text-right {
-  text-align: right;
-}
+.text-center { text-align: center; }
+.text-right  { text-align: right;  }
 
 .mb-1 { margin-bottom: $spacing-xs; }
 .mb-2 { margin-bottom: $spacing-sm; }
@@ -243,145 +253,18 @@ label {
 .p-3 { padding: $spacing-md; }
 .p-4 { padding: $spacing-lg; }
 
-// =============================================
-// BUTTONS
-// =============================================
-
-.btn {
-  padding: $spacing-xs $spacing-md;
-  border: none;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: $transition-default;
-  
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  &-primary {
-    background: $color-primary;
-    color: $color-white;
-    
-    @include hover-transition {
-      background: darken($color-primary, 10%);
-      // transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-  }
-  
-  &-secondary {
-    background: #6c757d;
-    color: $color-white;
-    
-    @include hover-transition {
-      background: darken(#6c757d, 10%);
-    }
-  }
-  
-  &-success {
-    background: #28a745;
-    color: $color-white;
-    
-    @include hover-transition {
-      background: darken(#28a745, 10%);
-    }
-  }
-  
-  &-danger {
-    background: #dc3545;
-    color: $color-white;
-    
-    @include hover-transition {
-      background: darken(#dc3545, 10%);
-    }
-  }
-}
-
-// =============================================
-// FORMS
-// =============================================
-
-.form-group {
-  margin-bottom: $spacing-sm;
-  
-  input,
-  select,
-  textarea {
-    width: 100%;
-    padding: $spacing-xs;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    transition: $transition-fast;
-    
-    &:focus {
-      outline: none;
-      border-color: $color-primary;
-      box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
-    }
-    
-    &:disabled {
-      background: #f3f4f6;
-      cursor: not-allowed;
-    }
-  }
-  
-  textarea {
-    min-height: 100px;
-    resize: vertical;
-  }
-}
-
-// =============================================
-// CARDS
-// =============================================
-
-.card {
-  @include card;
-  margin-bottom: $spacing-md;
-  
-  &-header {
-    border-bottom: 1px solid #e5e7eb;
-    padding-bottom: $spacing-sm;
-    margin-bottom: $spacing-sm;
-    
-    h3 {
-      margin: 0;
-    }
-  }
-  
-  &-body {
-    padding: 0;
-  }
-  
-  &-footer {
-    border-top: 1px solid #e5e7eb;
-    padding-top: $spacing-sm;
-    margin-top: $spacing-sm;
-  }
-}
-
-// =============================================
-// RESPONSIVE UTILITIES
-// =============================================
-
+// Responsive visibility helpers
 @include responsive(mobile) {
-  .hide-mobile {
-    display: none !important;
-  }
+  .hide-mobile { display: none !important; }
 }
 
 @include responsive(tablet) {
-  .hide-tablet {
-    display: none !important;
-  }
+  .hide-tablet { display: none !important; }
 }
 
 .show-mobile {
   display: none;
-  
+
   @include responsive(mobile) {
     display: block !important;
   }

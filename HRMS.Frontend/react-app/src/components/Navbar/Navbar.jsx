@@ -11,7 +11,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const currentUser = UserService.getCurrentUser();
-    setUser(currentUser); // null if not logged in
+    setUser(currentUser);
     console.log("Fetched user info:", currentUser);
   }, []);
 
@@ -25,12 +25,20 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <h2 className="navbar-title">Human Resource Management System [HRMS]</h2>
+      <h2 className="navbar-title">
+        <span className="title-full">Human Resource Management System [HRMS]</span>
+        <span className="title-short">HRMS</span>
+      </h2>
 
       <div className="nav-actions">
         <div className="profile-wrapper" title={user?.username || "Profile"}>
           <FaUserCircle className="nav-icon profile-icon" />
-          Welcome [ <span className="nav-name">{user?.username || "Guest"}</span> ]
+          <span className="profile-text">
+            <span className="welcome-label">Welcome</span>
+            <span className="bracket">[</span>
+            <span className="nav-name">{user?.username || "Guest"}</span>
+            <span className="bracket">]</span>
+          </span>
         </div>
 
         <FaSignOutAlt

@@ -1,19 +1,59 @@
+/* ==============================================
+   src/components/MainLayout/MainLayout.css
+   ============================================== */
+
 .main-layout {
   display: flex;
-  position: fixed;    /* stay fixed on screen */
-  top: 0;
-  left: 0;
-  width: 100vw;       /* full viewport width */
-  height: 100vh;      /* full viewport height */
-  background: #f5f5f5;  /* or transparent if needed */
-  z-index: 999;       /* top layer */
-  overflow: hidden;   /* prevent layout overflow */
+  min-height: 100vh;
+  background-color: #f5f5f5;
 }
 
+/* ---- Right-hand content column ---- */
+.main-content {
+  flex: 1;
+  min-width: 0;              /* prevent flex blowout on narrow viewports */
+  margin-left: 220px;        /* exactly the sidebar width */
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scrollable area below the sticky navbar */
 .content {
-   flex: 1;
-  padding: 20px 40px; /* top/bottom 20px, left/right 40px */
-  margin-left: 215px; /* move content 200px to the right */
-  overflow-y: auto;   
-  background: none;   
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* ================================
+   TABLET  1024px – 881px
+   Sidebar still visible; same margin.
+   ================================ */
+@media (max-width: 1024px) and (min-width: 881px) {
+  .main-content {
+    margin-left: 220px;
+  }
+}
+
+/* ================================
+   MOBILE  ≤ 880px
+   Sidebar is off-canvas → no left margin.
+   ================================ */
+@media (max-width: 880px) {
+  .main-content {
+    margin-left: 0;
+  }
+
+  .content {
+    padding: 20px 16px;
+  }
+}
+
+/* ================================
+   VERY SMALL  ≤ 480px
+   ================================ */
+@media (max-width: 480px) {
+  .content {
+    padding: 16px 12px;
+  }
 }

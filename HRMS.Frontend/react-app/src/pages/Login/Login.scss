@@ -1,648 +1,456 @@
-// =============================================
-// LOGIN.SCSS - Fully Responsive Login
-// Uses shared variables and mixins!
-// =============================================
+// ==============================================
+// src/pages/Login/Login.scss
+// Fully responsive – matches dark navy brand
+// Desktop: left brand panel + right form panel
+// Mobile:  single centered card, full-width
+// ==============================================
 
-// ========== IMPORT SHARED STYLES ==========
-@import '../../styles/variables.scss';
-@import '../../styles/mixins.scss';
+@import '../../styles/variables';
+@import '../../styles/mixins';
 
-// ========== LOCAL VARIABLES (Login-specific) ==========
-$login-primary: #1a4b58;
-$login-primary-hover: rgb(27, 52, 105);
-$login-bg-image: url("../../assets/hrms-bg.jpg");
+// ---- Local tokens ----
+$nav:        #1e3a4a;   // primary navy (matches navbar/sidebar active)
+$nav-dark:   #152b38;   // deeper shade for gradients
+$nav-light:  #2a5068;   // lighter shade for hover
+$accent:     #4a9aba;   // slate-blue accent (links, focus rings)
+$panel-bg:   #f0f4f7;   // very light blue-grey for page bg
 
-// =============================================
-// BASE STYLES (Using shared variables)
-// =============================================
+// ==============================================
+// RESET
+// ==============================================
+*,
+*::before,
+*::after { box-sizing: border-box; }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  padding: 0;
+// ==============================================
+// PAGE SHELL
+// ==============================================
+.login-page {
+  display: flex;
   min-height: 100vh;
-  width: 100%;
-  background-image: $login-bg-image;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  overflow-x: hidden;
-  font-family: $font-family-primary;
-  
-  p {
-    font-size: clamp(14px, 4vw, 22px);
-    line-height: 1.6;
-    margin: 0;
-  }
+  background: $panel-bg;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 }
 
-// =============================================
-// CONTAINER (Using mixins)
-// =============================================
-
+// ==============================================
+// OUTER CONTAINER  –  flex row on desktop
+// ==============================================
 .login-signup-container {
-  @include flex-center;
-  flex-direction: column;
-  
+  display: flex;
+  width: 100%;
   min-height: 100vh;
-  width: 280%;
-  padding: $spacing-md;
-  
-  background: rgba($color-white, 1);
-  animation: gradientShift 12s ease infinite;
-  
-  // Responsive padding
-  @include responsive(tablet) {
-    padding: $spacing-lg;
-  }
-  
-  @include responsive(desktop) {
-    padding: $spacing-xl;
-  }
 }
 
-// =============================================
-// LOGIN ICON
-// =============================================
-
-.login-icon {
-  width: clamp(150px, 50vw, 220px);
-  height: clamp(60px, 20vw, 100px);
-  margin-bottom: $spacing-lg;
-  object-fit: contain;
-}
-
-// =============================================
-// PORTAL TITLE
-// =============================================
-
-.portal-title {
-  font-size: clamp(1.2rem, 4vw, 1.5rem);
-  color: $color-gray-800;
-  margin-bottom: $spacing-md;
-  font-weight: $font-weight-semibold;
+// ==============================================
+// LEFT BRAND PANEL  (hidden on mobile)
+// ==============================================
+.login-brand-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 42%;
+  min-height: 100vh;
+  background: linear-gradient(160deg, $nav-dark 0%, $nav 55%, $nav-light 100%);
+  padding: 48px 40px;
   text-align: center;
-  padding: 0 $spacing-sm;
-  
-  @include responsive(tablet) {
-    text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+
+  // Decorative circle overlays for depth
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.07;
+    background: #fff;
+  }
+
+  &::before {
+    width: 420px;
+    height: 420px;
+    bottom: -140px;
+    left: -120px;
+  }
+
+  &::after {
+    width: 260px;
+    height: 260px;
+    top: -80px;
+    right: -80px;
   }
 }
 
-// =============================================
-// FORM CARD (Using card mixin + variables)
-// =============================================
+.brand-logo {
+  width: clamp(120px, 14vw, 180px);
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.3));
+}
 
+.brand-title {
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 12px 0;
+  line-height: 1.2;
+  position: relative;
+  z-index: 1;
+
+  span { color: $accent; }
+}
+
+.brand-subtitle {
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 280px;
+  position: relative;
+  z-index: 1;
+}
+
+.brand-divider {
+  width: 48px;
+  height: 3px;
+  background: $accent;
+  border-radius: 2px;
+  margin: 20px auto;
+  position: relative;
+  z-index: 1;
+}
+
+.brand-features {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.72);
+    text-align: left;
+
+    &::before {
+      content: '✓';
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border-radius: 50%;
+      background: rgba(74, 154, 186, 0.3);
+      color: $accent;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+  }
+}
+
+// ==============================================
+// RIGHT FORM PANEL
+// ==============================================
+.login-form-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  min-height: 100vh;
+  padding: 48px 32px;
+  background: #fff;
+}
+
+// ==============================================
+// FORM CARD
+// ==============================================
 .login-signup-form {
-  @include card($spacing-lg, $color-white, 3);
   width: 100%;
   max-width: 400px;
-  
-  @include flex-column;
-  gap: $spacing-md;
-  
-  border: 1px solid $border-color-light;
-  transition: $transition-default;
-  
-  // Mobile
-  @include responsive(mobile) {
-    width: calc(100% - #{$spacing-lg});
-    max-width: 100%;
-    margin: 0 $spacing-sm;
-    padding: $spacing-md;
-  }
-  
-  // Tablet
-  @include responsive(tablet) {
-    width: 85%;
-    
-    @include hover-transition {
-      transform: translateY(-2px);
-      @include shadow(4);
-    }
-  }
-  
-  // Desktop
-  @include responsive(desktop) {
-    width: 70%;
-  }
-  
-  // Form heading
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
   .form-heading {
-    font-size: clamp(0.95rem, 3vw, 1.1rem);
-    color: $color-gray-700;
-    font-weight: $font-weight-medium;
-    margin-bottom: $spacing-md;
-    text-align: center;
-    position: relative;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 50px;
-      height: 3px;
-      background: $login-primary;
-      border-radius: $border-radius-base;
-    }
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: $nav;
+    margin: 0 0 6px 0;
+    line-height: 1.2;
   }
-  
-  // Input styling (Using input-base mixin)
-  input {
-    @include input-base;
-    width: 100%;
-    padding: clamp(0.625rem, 2vw, 0.75rem);
-    color: $color-black;
-    margin: 0.5rem 0 1rem 0;
-    border-radius: $border-radius-md;
-    font-size: clamp(0.875rem, 3vw, 1.1rem);
-    background-color: $color-gray-50;
-    
-    // Prevent iOS zoom
-    @include responsive(mobile) {
-      font-size: 16px;
-    }
-    
-    &:focus {
-      border-color: $login-primary;
-      background-color: $color-white;
-      box-shadow: 0 0 0 3px rgba($login-primary, 0.15);
-    }
-    
-    @include placeholder {
-      color: $color-gray-400;
-      font-size: clamp(0.8rem, 2.5vw, 0.95rem);
-    }
-  }
-  
-  // Button styling (Using button-variant mixin)
-  button {
-    @include button-variant($login-primary, $color-white);
-    width: 100%;
-    padding: clamp(0.625rem, 2vw, 0.75rem);
-    border-radius: $border-radius-md;
-    font-size: clamp(0.875rem, 3vw, 1rem);
-    text-transform: uppercase;
-    
-    // Larger tap target on mobile
-    @include responsive(mobile) {
-      padding: 0.875rem;
-      min-height: 48px;
-    }
-    
-    &:hover {
-      background-color: $login-primary-hover;
-    }
-    
-    &:active {
-      transform: scale(0.98);
-    }
-  }
-  
-  // Small text
-  p {
-    font-size: clamp(0.75rem, 2vw, 0.85rem);
+
+  .form-subheading {
+    font-size: 0.9rem;
     color: $color-gray-500;
-    text-align: center;
-    margin-top: $spacing-md;
+    margin: 0 0 32px 0;
   }
 }
 
-// =============================================
-// TOGGLE LINK
-// =============================================
-
-.toggle-link {
-  font-size: clamp(15px, 3.5vw, 17px);
-  color: $color-link;
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  transition: $transition-color;
-  display: inline-block;
-  padding: $spacing-xs;
-  
-  // Larger tap target on mobile
-  @include responsive(mobile) {
-    padding: 8px;
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-  }
-  
-  @include hover-transition {
-    color: $color-link-hover;
-  }
-  
-}
-
-// =============================================
-// FORM GROUP (Floating Labels)
-// =============================================
-
+// ==============================================
+// FORM GROUPS (floating labels)
+// ==============================================
 .form-group {
   position: relative;
   width: 100%;
-  margin-bottom: $spacing-xs;
-  
-  // Input fields
+  margin-bottom: 20px;
+
   input {
-    @include input-base;
     width: 100%;
-    padding: clamp(10px, 2.5vw, 12px);
-    font-size: clamp(0.75rem, 2.5vw, 0.80rem);
-    border-radius: $border-radius-md;
-    background-color: $color-gray-50;
-    
-    // Prevent zoom on iOS
-    @include responsive(mobile) {
-      font-size: 16px;
-    }
-    
+    padding: 16px 14px 8px;
+    border: 1.5px solid $color-gray-300;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: $color-gray-900;
+    background: $color-gray-50;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    font-family: inherit;
+
+    // Prevent iOS zoom
+    @include responsive(mobile) { font-size: 16px; }
+
     &:focus {
-      border-color: $login-primary;
-      background-color: $color-white;
-      box-shadow: 0 0 0 3px rgba($login-primary, 0.15);
+      border-color: $nav;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(30, 58, 74, 0.10);
+    }
+
+    &:focus + label,
+    &:not(:placeholder-shown) + label {
+      top: 6px;
+      font-size: 0.72rem;
+      color: $nav;
+      font-weight: 600;
     }
   }
-  
-  // Floating labels
+
   label {
+    display: block !important;   // override global hide
     position: absolute;
-    left: clamp(15px, 5vw, 25px);
-    top: 44%;
-    transform: translateY(-50%);
-    font-size: clamp(0.875rem, 3vw, 1rem);
-    color: $color-gray-400;
-    pointer-events: none;
-    transition: $transition-default;
-    background: transparent;
-  }
-  
-  // When focused or filled
-  input:focus + label,
-  input:not(:placeholder-shown) + label {
-    top: 2px;
-    left: clamp(8px, 2vw, 10px);
-    font-size: clamp(0.7rem, 2vw, 0.85rem);
-    font-weight: $font-weight-medium;
-    color: $login-primary;
-    background: $color-white;
-    padding: 0 4px;
-  }
-}
-
-// =============================================
-// FORM MESSAGES
-// =============================================
-
-.form-message {
-  text-align: center;
-  font-size: smaller;
-  width: 100%;
-  height: 20px;
-  &.success {
-    color: $color-success;
-    background-color: lighten($color-success, 45%);
-  }
-  
-  &.error {
-    color: $color-danger;
-    background-color: lighten($color-danger, 45%);
-  }
-}
-
-// =============================================
-// PORTAL MESSAGE
-// =============================================
-
-.portal-message {
-  width: clamp(150px, 50vw, 180px);
-  margin: $spacing-md 0;
-  padding: clamp(10px, 2vw, 12px) clamp(12px, 3vw, 16px);
-  border-radius: $border-radius-lg;
-  font-size: clamp(12px, 3vw, 14px);
-  font-weight: $font-weight-medium;
-  text-align: center;
-  opacity: 1;
-  transition: opacity 0.5s ease-in-out;
-  
-  &.fade-out {
-    opacity: 0;
-  }
-  
-  &.success {
-    color: #c5090d;
-    background-color: lighten($color-success, 45%);
-    border: 1px solid lighten($color-success, 30%);
-  }
-  
-  &.error {
-    background-color: #fdecea;
-    color: #b71c1c;
-    border: 1px solid #b71c1c;
-  }
-}
-
-// =============================================
-// REMEMBER ME (Using shared variables)
-// =============================================
-
-.remember-me {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  margin: $spacing-sm 0;
-  
-  input[type="checkbox"] {
-    width: clamp(16px, 4vw, 18px);
-    height: clamp(16px, 4vw, 18px);
-    cursor: pointer;
-    accent-color: $login-primary;
-    margin: 0;
-  }
-  
-  label {
-    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-    color: $color-black;
-    cursor: pointer;
-    user-select: none;
-  }
-}
-
-// =============================================
-// FORGOT PASSWORD
-// =============================================
-
-.forgot-password {
-  text-align: right;
-  margin-top: -$spacing-sm;
-  margin-bottom: $spacing-md;
-  
-  a {
-    font-size: clamp(0.75rem, 2.5vw, 0.85rem);
-    color: $color-link;
-    text-decoration: none;
-    padding: $spacing-xs;
-    display: inline-block;
-    
-    @include responsive(mobile) {
-      padding: 8px;
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-    }
-    
-    @include hover-transition {
-      color: $color-link-hover;
-      text-decoration: underline;
-    }
-  }
-}
-
-// =============================================
-// PASSWORD STRENGTH (Bonus)
-// =============================================
-
-.password-strength {
-  margin-top: $spacing-sm;
-  height: 4px;
-  border-radius: $border-radius-base;
-  background-color: $color-gray-200;
-  overflow: hidden;
-  
-  .strength-bar {
-    height: 100%;
-    transition: $transition-default;
-    border-radius: $border-radius-base;
-    
-    &.weak {
-      width: 33%;
-      background-color: $color-danger;
-    }
-    
-    &.medium {
-      width: 66%;
-      background-color: $color-warning;
-    }
-    
-    &.strong {
-      width: 100%;
-      background-color: $color-success;
-    }
-  }
-}
-
-// =============================================
-// PASSWORD TOGGLE (Bonus)
-// =============================================
-
-.password-toggle {
-  position: relative;
-  
-  input {
-    padding-right: 40px;
-  }
-  
-  .toggle-icon {
-    position: absolute;
-    right: 25px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    cursor: pointer;
-    color: $color-gray-500;
-    transition: $transition-color;
-    
-    @include hover-transition {
-      color: $login-primary;
-    }
+    font-size: 0.92rem;
+    color: $color-gray-400;
+    pointer-events: none;
+    transition: top 0.18s ease, font-size 0.18s ease, color 0.18s ease;
+    background: transparent;
+    padding: 0 2px;
+    line-height: 1;
   }
 }
 
-// =============================================
-// ANIMATIONS (Using shared animations)
-// =============================================
+// ==============================================
+// LOGIN BUTTON
+// ==============================================
+.login-submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, $nav 0%, $nav-light 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.4px;
+  transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  margin-top: 8px;
+  font-family: inherit;
 
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
+  &:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(30, 58, 74, 0.28);
   }
-  50% {
-    background-position: 100% 50%;
+
+  &:active { transform: translateY(0); }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
 
-// Apply animations
-.login-signup-form {
-  @include slide-up(0.5s);
+// ==============================================
+// FORM MESSAGES
+// ==============================================
+.form-message {
+  display: block;
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  border-radius: 7px;
+  margin-top: 14px;
+  font-weight: 500;
+
+  &.success {
+    background: #e6f4ea;
+    color: #1a6b32;
+    border: 1px solid #a8d5b5;
+  }
+
+  &.error {
+    background: #fdecea;
+    color: #b71c1c;
+    border: 1px solid #f5b8b5;
+  }
 }
 
-// =============================================
-// RESPONSIVE BREAKPOINTS (Using shared mixin)
-// =============================================
+// Portal-level messages (e.g. logout redirect)
+.portal-message {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 0 20px 0;
+  padding: 11px 16px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-align: center;
+  opacity: 1;
+  transition: opacity 0.5s ease;
 
-// Extra Small Mobile
-@include responsive(mobile) {
-  .login-signup-container {
-    padding: $spacing-sm;
+  &.fade-out { opacity: 0; }
+
+  &.success {
+    background: #e6f4ea;
+    color: #1a6b32;
+    border: 1px solid #a8d5b5;
   }
-  
+
+  &.error {
+    background: #fdecea;
+    color: #b71c1c;
+    border: 1px solid #f5b8b5;
+  }
+}
+
+// ==============================================
+// PORTAL TITLE (mobile only – hidden on desktop
+// since the brand panel already shows the name)
+// ==============================================
+.portal-title {
+  display: none;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: $nav;
+  text-align: center;
+  margin: 0 0 24px 0;
+}
+
+// Mobile-only logo
+.login-icon {
+  display: none;
+  width: clamp(100px, 30vw, 140px);
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  margin: 0 auto 20px;
+}
+
+// ==============================================
+// RESPONSIVE
+// ==============================================
+
+// ---- Tablet: narrow brand panel ----
+@media (max-width: 900px) and (min-width: 601px) {
+  .login-brand-panel {
+    width: 36%;
+    padding: 40px 24px;
+  }
+
+  .brand-features { display: none; }
+
+  .brand-subtitle { display: none; }
+}
+
+// ---- Mobile: hide brand panel entirely ----
+@media (max-width: 600px) {
+  .login-brand-panel { display: none; }
+
+  // Show mobile logo + title above the form
+  .login-icon    { display: block; }
+  .portal-title  { display: block; }
+
+  .login-form-panel {
+    padding: 32px 20px;
+    justify-content: flex-start;
+    padding-top: 48px;
+    background: $panel-bg;
+  }
+
   .login-signup-form {
-    gap: $spacing-sm;
-  }
-  
-  .portal-title {
-    font-size: 1.1rem;
-  }
-}
-
-// Tablet
-@include responsive(tablet) {
-  .login-signup-container {
-    padding: $spacing-xl;
-  }
-  
-  .login-signup-form {
-    width: 80%;
-    max-width: 500px;
-    padding: $spacing-lg;
-  }
-  
-  .portal-title {
-    font-size: 1.4rem;
-  }
-}
-
-// Desktop
-@include responsive(desktop) {
-  .login-signup-form {
-    width: 50%;
-    max-width: 400px;
-  }
-}
-
-// Landscape Mode (Mobile)
-@media (max-height: 500px) and (orientation: landscape) {
-  .login-signup-container {
-    min-height: auto;
-    padding: $spacing-lg $spacing-xl;
-    flex-direction: row;
-    justify-content: center;
-    gap: $spacing-lg;
-  }
-  
-  .login-icon {
-    width: 120px;
-    height: 60px;
-    margin: 0;
-  }
-  
-  .portal-title {
-    margin: 0 $spacing-lg;
-    font-size: 1rem;
-  }
-  
-  .login-signup-form {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 24px 24px;
+    box-shadow: 0 4px 24px rgba(30, 58, 74, 0.10);
     width: 100%;
-    max-width: 400px;
-    margin: 0;
+    max-width: 420px;
   }
 }
 
-// =============================================
-// TOUCH DEVICE OPTIMIZATIONS
-// =============================================
+// ---- Very small ----
+@media (max-width: 380px) {
+  .login-form-panel { padding: 24px 12px; }
 
+  .login-signup-form {
+    padding: 24px 16px 20px;
+    border-radius: 12px;
+  }
+
+  .login-submit-btn { padding: 13px; }
+}
+
+// ---- Landscape mobile ----
+@media (max-height: 500px) and (orientation: landscape) {
+  .login-brand-panel { display: none; }
+
+  .login-form-panel {
+    padding: 16px 20px;
+    justify-content: center;
+  }
+
+  .login-signup-form {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 20px rgba(30, 58, 74, 0.10);
+    max-width: 360px;
+  }
+
+  .form-group { margin-bottom: 12px; }
+  .login-submit-btn { padding: 11px; margin-top: 4px; }
+}
+
+// ---- Touch devices ----
 @media (hover: none) and (pointer: coarse) {
-  .login-signup-form {
-    input, button, .toggle-link, a {
-      min-height: 44px;
-      min-width: 44px;
-    }
-  }
-  
-  // Remove hover effects on touch
-  .login-signup-form:hover {
-    transform: none;
-  }
-  
-  button:hover {
-    transform: none;
-  }
+  .login-submit-btn { min-height: 48px; }
+
+  .form-group input { min-height: 52px; }
 }
 
-// =============================================
-// PRINT STYLES
-// =============================================
-
-@media print {
-  body {
-    background: $color-white;
-  }
-  
-  .login-signup-container {
-    background: $color-white;
-  }
-  
-  button, .toggle-link {
-    display: none;
-  }
-}
-
-// =============================================
-// ACCESSIBILITY (Using shared utilities)
-// =============================================
-
-*:focus-visible {
-  outline: 2px solid $login-primary;
-  outline-offset: 2px;
-}
-
-// Reduce motion
+// ---- Reduced motion ----
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 
-// High contrast
+// ---- High contrast ----
 @media (prefers-contrast: high) {
-  .login-signup-form {
-    border: 2px solid $color-black;
-  }
-  
-  button {
-    border: 2px solid $color-white;
-  }
-}
-
-// =============================================
-// UTILITY CLASSES
-// =============================================
-
-.hide-mobile {
-  @include responsive(mobile) {
-    display: none !important;
-  }
-}
-
-.show-mobile {
-  display: none !important;
-  
-  @include responsive(mobile) {
-    display: block !important;
-  }
-}
-
-.hide-desktop {
-  @include responsive(desktop) {
-    display: none !important;
-  }
+  .login-signup-form { border: 2px solid $nav; }
+  .form-group input  { border-color: $nav; }
 }
