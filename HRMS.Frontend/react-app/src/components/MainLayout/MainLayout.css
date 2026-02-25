@@ -2,58 +2,64 @@
    src/components/MainLayout/MainLayout.css
    ============================================== */
 
+/* The navbar is position:fixed height 56px.
+   Everything below must be offset by that amount. */
+:root {
+  --navbar-h: 56px;
+}
+
 .main-layout {
   display: flex;
+  /* Push all content below the fixed navbar */
+  padding-top: var(--navbar-h);
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #f0f4f8;
+  box-sizing: border-box;
 }
 
-/* ---- Right-hand content column ---- */
+/* Sidebar is also fixed and starts from top:0,
+   so it needs the same padding-top to clear the navbar */
+/* (Handled in Sidebar.css — sidebar starts below navbar naturally
+    because .main-layout itself shifts down) */
+
+/* ---- Content column (right of sidebar) ---- */
 .main-content {
   flex: 1;
-  min-width: 0;              /* prevent flex blowout on narrow viewports */
-  margin-left: 220px;        /* exactly the sidebar width */
+  min-width: 0;
+  margin-left: 220px;   /* sidebar width */
   display: flex;
   flex-direction: column;
-  transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: margin-left 0.28s ease;
 }
 
-/* Scrollable area below the sticky navbar */
 .content {
   flex: 1;
-  padding: 24px;
+  padding: 0;           /* pages control their own padding */
   overflow-y: auto;
 }
 
 /* ================================
-   TABLET  1024px – 881px
-   Sidebar still visible; same margin.
+   TABLET 1024px–881px
    ================================ */
 @media (max-width: 1024px) and (min-width: 881px) {
-  .main-content {
-    margin-left: 220px;
-  }
+  .main-content { margin-left: 220px; }
 }
 
 /* ================================
-   MOBILE  ≤ 880px
-   Sidebar is off-canvas → no left margin.
+   MOBILE ≤ 880px
+   Sidebar off-canvas → no margin
    ================================ */
 @media (max-width: 880px) {
-  .main-content {
-    margin-left: 0;
-  }
-
-  .content {
-    padding: 20px 16px;
-  }
+  .main-content { margin-left: 0; }
 }
 
 /* ================================
-   VERY SMALL  ≤ 480px
+   VERY SMALL ≤ 480px
    ================================ */
 @media (max-width: 480px) {
-  .content {
-    padding: 16px 12px;
-  }
+  :root { --navbar-h: 52px; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  :root { --navbar-h: 44px; }
 }

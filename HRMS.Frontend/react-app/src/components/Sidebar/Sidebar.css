@@ -2,11 +2,7 @@
    src/components/Sidebar/Sidebar.css
    ============================================== */
 
-*,
-.sidebar,
-.sidebar * {
-  box-sizing: border-box;
-}
+*, .sidebar, .sidebar * { box-sizing: border-box; }
 
 /* ================================
    HAMBURGER TOGGLE (mobile only)
@@ -16,9 +12,9 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 110000;           /* above sidebar (99999) and navbar (90000) */
+  z-index: 110000;        /* above everything */
   width: 56px;
-  height: 56px;              /* matches navbar min-height so it sits flush */
+  height: 56px;           /* matches navbar height */
   background: transparent;
   border: none;
   cursor: pointer;
@@ -33,61 +29,56 @@
   display: block;
   width: 22px;
   height: 2px;
-  background-color: #ffffff;
+  background: #fff;
   border-radius: 2px;
   transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
-/* Animate to X when open */
-.sidebar-toggle.is-open span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-.sidebar-toggle.is-open span:nth-child(2) {
-  opacity: 0;
-}
-.sidebar-toggle.is-open span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
+.sidebar-toggle.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.sidebar-toggle.is-open span:nth-child(2) { opacity: 0; }
+.sidebar-toggle.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ================================
-   OVERLAY (mobile only)
+   OVERLAY
    ================================ */
 .sidebar-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.50);
+  background: rgba(0,0,0,0.50);
   z-index: 99998;
 }
 
 /* ================================
-   SIDEBAR CONTAINER
+   SIDEBAR
+   Starts BELOW the fixed navbar
    ================================ */
 .sidebar {
   width: 220px;
-  height: 100vh;
+  /* Sit below navbar, full height beneath it */
+  height: calc(100vh - 56px);
   background-color: #1c2b36;
   color: #c8cdd6;
   display: flex;
   flex-direction: column;
-  padding: 0 0 20px 0;
+  padding: 16px 0 20px;
   position: fixed;
-  top: 0;
+  top: 56px;              /* navbar height */
   left: 0;
   z-index: 99999;
   overflow-y: auto;
   overflow-x: hidden;
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
 }
 
 /* ================================
-   LOGO AREA
+   LOGO
    ================================ */
 .sidebar-logo-img {
   width: 100%;
-  max-width: 180px;
+  max-width: 160px;
   height: auto;
   display: block;
-  margin: 20px auto 12px;
+  margin: 4px auto 16px;
   border-radius: 8px;
   object-fit: contain;
   padding: 0 16px;
@@ -97,10 +88,8 @@
    NAV
    ================================ */
 .sidebar-nav {
-  display: flex;
-  flex-direction: column;
   flex: 1 1 auto;
-  padding: 8px 12px 0;
+  padding: 0 12px;
 }
 
 .sidebar-nav ul {
@@ -112,35 +101,32 @@
   gap: 4px;
 }
 
-.sidebar-nav li {
-  border-radius: 8px;
-  overflow: hidden;
-}
+.sidebar-nav li { border-radius: 8px; overflow: hidden; }
 
 .sidebar-nav li a {
   display: flex;
   align-items: center;
   padding: 11px 14px;
-  color: #a8b3bd;
+  color: #8fa8b8;
   text-decoration: none;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   border-radius: 8px;
   transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
 }
 
 .sidebar-nav li a:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: #ffffff;
+  background: rgba(255,255,255,0.07);
+  color: #fff;
   transform: translateX(3px);
 }
 
-/* Active item – matches navbar red brand */
 .sidebar-nav li.active a {
   background: #1e3a4a;
-  color: #ffffff;
-  transform: none;
-  font-weight: 600;
+  color: #fff;
+  font-weight: 700;
+  border-left: 3px solid #fbfbfb;
+  padding-left: 11px;
 }
 
 /* ================================
@@ -155,52 +141,48 @@
 .sidebar-footer button {
   width: 100%;
   background: transparent;
-  color: #a8c8e0;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #8fa8b8;
+  border: 1px solid rgba(255,255,255,0.10);
   padding: 10px 12px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   transition: background 0.18s ease, color 0.18s ease;
   text-align: center;
 }
 
 .logout-btn:hover,
 .sidebar-footer button:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,0.07);
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.25);
 }
 
 /* ================================
-   MOBILE ≤ 880px  –  Off-canvas drawer
+   MOBILE ≤ 880px
    ================================ */
 @media (max-width: 880px) {
-  .sidebar-toggle {
-    display: flex;
-  }
+  .sidebar-toggle { display: flex; }
 
   .sidebar {
     transform: translateX(-100%);
     width: 240px;
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35);
+    top: 0;                     /* on mobile drawer covers full height */
+    height: 100vh;
+    padding-top: 64px;          /* space below toggle button */
+    box-shadow: 4px 0 24px rgba(0,0,0,0.35);
   }
 
-  .sidebar.sidebar-open {
-    transform: translateX(0);
-  }
+  .sidebar.sidebar-open { transform: translateX(0); }
 
-  .sidebar-nav ul {
-    flex-direction: column;
-  }
+  .sidebar-nav ul { flex-direction: column; }
 }
 
-/* ================================
-   VERY SMALL ≤ 480px
-   ================================ */
 @media (max-width: 480px) {
-  .sidebar {
-    width: 210px;
-  }
+  .sidebar { width: 210px; }
+  .sidebar-toggle { height: 52px; width: 52px; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .sidebar { top: 44px; height: calc(100vh - 44px); }
 }

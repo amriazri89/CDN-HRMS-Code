@@ -1,385 +1,251 @@
+// src/pages/Dashboard/Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EmployeeService from "../../services/EmployeeService";
 import MainLayout from "../../components/MainLayout/MainLayout";
 import ROUTES from "../../routes";
 import {
-  FaUsers,
-  FaUserTie,
-  FaMoneyBillWave,
-  FaBriefcase,
-  FaCalendarAlt,
-  FaChartLine,
-  FaArrowUp,
-  FaArrowDown,
-  FaClock,
-  FaBirthdayCake,
+  FaUsers, FaUserTie, FaMoneyBillWave, FaBriefcase,
+  FaCalendarAlt, FaChartLine, FaArrowUp, FaArrowDown,
+  FaClock, FaBirthdayCake,
 } from "react-icons/fa";
 import "./Dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
-    totalEmployees: 0,
-    activeEmployees: 0,
-    archivedEmployees: 0,
-    newThisMonth: 0,
+    total: 0, active: 0, archived: 0, newThisMonth: 0,
   });
-  const [recentEmployees, setRecentEmployees] = useState([]);
-  const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [recent, setRecent]       = useState([]);
+  const [birthdays, setBirthdays] = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [time, setTime]           = useState(new Date());
 
   useEffect(() => {
     document.title = "HRMS - Dashboard";
-    fetchDashboardData();
-
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
+    load();
+    const t = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(t);
   }, []);
 
-  const fetchDashboardData = async () => {
+  const load = async () => {
     try {
-      setLoading(true);
-      
-      const activeEmployees = await EmployeeService.getAll(false);
-      const archivedEmployees = await EmployeeService.getAll(true);
-      const archived = archivedEmployees.filter(emp => emp.isArchived);
+      const active   = await EmployeeService.getAll(false);
+      const archived = (await EmployeeService.getAll(true)).filter(e => e.isArchived);
+      const first    = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      const newMonth = active.filter(e => new Date(e.dateCreated) >= first);
 
-      const now = new Date();
-      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      
-      const newThisMonth = activeEmployees.filter(emp => {
-        const createdDate = new Date(emp.dateCreated);
-        return createdDate >= firstDayOfMonth;
-      });
+      setStats({ total: active.length + archived.length, active: active.length, archived: archived.length, newThisMonth: newMonth.length });
 
-      setStats({
-        totalEmployees: activeEmployees.length + archived.length,
-        activeEmployees: activeEmployees.length,
-        archivedEmployees: archived.length,
-        newThisMonth: newThisMonth.length,
-      });
-
-      const sortedByDate = [...activeEmployees].sort((a, b) => 
-        new Date(b.dateCreated) - new Date(a.dateCreated)
-      );
-      setRecentEmployees(sortedByDate.slice(0, 5));
-
-      const upcomingBdays = getUpcomingBirthdays(activeEmployees, 30);
-      setUpcomingBirthdays(upcomingBdays);
-
-    } catch (err) {
-      console.error("❌ Failed to fetch dashboard data:", err);
+      const sorted = [...active].sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
+      setRecent(sorted.slice(0, 5));
+      setBirthdays(upcomingBdays(active, 30));
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
   };
 
-  const getUpcomingBirthdays = (employees, daysAhead) => {
+  const upcomingBdays = (employees, days) => {
     const today = new Date();
-    const futureDate = new Date();
-    futureDate.setDate(today.getDate() + daysAhead);
-
     return employees
-      .filter(emp => emp.dateOfBirth)
-      .map(emp => {
-        const dob = new Date(emp.dateOfBirth);
-        const thisYearBirthday = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
-        
-        if (thisYearBirthday < today) {
-          thisYearBirthday.setFullYear(today.getFullYear() + 1);
-        }
-
-        const daysUntil = Math.ceil((thisYearBirthday - today) / (1000 * 60 * 60 * 24));
-
-        return {
-          ...emp,
-          nextBirthday: thisYearBirthday,
-          daysUntil: daysUntil,
-          age: today.getFullYear() - dob.getFullYear(),
-        };
+      .filter(e => e.dateOfBirth)
+      .map(e => {
+        const dob  = new Date(e.dateOfBirth);
+        const next = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
+        if (next < today) next.setFullYear(today.getFullYear() + 1);
+        const daysUntil = Math.ceil((next - today) / 86400000);
+        return { ...e, next, daysUntil, turnsAge: today.getFullYear() - dob.getFullYear() + 1 };
       })
-      .filter(emp => emp.daysUntil <= daysAhead)
+      .filter(e => e.daysUntil <= days)
       .sort((a, b) => a.daysUntil - b.daysUntil)
       .slice(0, 5);
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-MY', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  const fmtDate = d => new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" });
+  const fmtTime = d => d.toLocaleTimeString("en-MY", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+  const greeting = () => {
+    const h = time.getHours();
+    return h < 12 ? "Good Morning" : h < 18 ? "Good Afternoon" : "Good Evening";
   };
 
-  const formatTime = (date) => {
-    return date.toLocaleTimeString('en-MY', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  };
-
-  const getGreeting = () => {
-    const hour = currentTime.getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 18) return "Good Afternoon";
-    return "Good Evening";
-  };
-
-  const username = localStorage.getItem("username") || "User";
+  const user = localStorage.getItem("username") || "User";
 
   return (
     <MainLayout>
-      <div className="dashboard-page">
-        <div className="dashboard-header">
-          <div className="header-left">
-            <h1>{getGreeting()}, {username}! 👋</h1>
+      <div className="db-page">
+
+        {/* HEADER */}
+        <div className="db-header">
+          <div className="db-header-left">
+            <h1>{greeting()}, {user}! 👋</h1>
             <p>Welcome back to HRMS Payroll System</p>
           </div>
-          <div className="header-right">
-            <div className="current-datetime">
-              <FaCalendarAlt className="datetime-icon" />
-              <div className="datetime-content">
-                <div className="current-date">{currentTime.toLocaleDateString('en-MY', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}</div>
-                <div className="current-time">{formatTime(currentTime)}</div>
+          <div className="db-clock">
+            <FaCalendarAlt className="db-clock-icon" />
+            <div>
+              <div className="db-clock-date">
+                {time.toLocaleDateString("en-MY", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
               </div>
+              <div className="db-clock-time">{fmtTime(time)}</div>
             </div>
           </div>
         </div>
 
-        {/* Statistics Cards */}
-        <div className="stats-grid">
-          <div className="stat-card blue" onClick={() => navigate(ROUTES.EMPLOYEE)}>
-            <div className="stat-icon-wrapper blue-bg">
-              <FaUsers className="stat-icon" />
-            </div>
-            <div className="stat-content">
-              <div className="stat-label">Total Employees</div>
-              <div className="stat-value">{loading ? "..." : stats.totalEmployees}</div>
-              <div className="stat-change positive">
-                <FaArrowUp /> {stats.newThisMonth} new this month
-              </div>
+        {/* STATS */}
+        <div className="db-stats">
+          <div className="db-stat db-stat-blue" onClick={() => navigate(ROUTES.EMPLOYEE)}>
+            <div className="db-stat-icon db-stat-icon-blue"><FaUsers /></div>
+            <div className="db-stat-body">
+              <div className="db-stat-label">Total Employees</div>
+              <div className="db-stat-value">{loading ? "…" : stats.total}</div>
+              <div className="db-stat-note db-stat-note-pos"><FaArrowUp /> {stats.newThisMonth} new this month</div>
             </div>
           </div>
 
-          <div className="stat-card green" onClick={() => navigate(ROUTES.EMPLOYEE)}>
-            <div className="stat-icon-wrapper green-bg">
-              <FaUserTie className="stat-icon" />
-            </div>
-            <div className="stat-content">
-              <div className="stat-label">Active Employees</div>
-              <div className="stat-value">{loading ? "..." : stats.activeEmployees}</div>
-              <div className="stat-change neutral">
-                <FaClock /> Currently working
-              </div>
+          <div className="db-stat db-stat-green" onClick={() => navigate(ROUTES.EMPLOYEE)}>
+            <div className="db-stat-icon db-stat-icon-green"><FaUserTie /></div>
+            <div className="db-stat-body">
+              <div className="db-stat-label">Active Employees</div>
+              <div className="db-stat-value">{loading ? "…" : stats.active}</div>
+              <div className="db-stat-note db-stat-note-neu"><FaClock /> Currently working</div>
             </div>
           </div>
 
-          <div className="stat-card purple" onClick={() => navigate(ROUTES.PAYROLL)}>
-            <div className="stat-icon-wrapper purple-bg">
-              <FaMoneyBillWave className="stat-icon" />
-            </div>
-            <div className="stat-content">
-              <div className="stat-label">Payroll</div>
-              <div className="stat-value">Ready</div>
-              <div className="stat-change neutral">
-                <FaChartLine /> Calculate salary
-              </div>
+          <div className="db-stat db-stat-purple" onClick={() => navigate(ROUTES.PAYROLL)}>
+            <div className="db-stat-icon db-stat-icon-purple"><FaMoneyBillWave /></div>
+            <div className="db-stat-body">
+              <div className="db-stat-label">Payroll</div>
+              <div className="db-stat-value">Ready</div>
+              <div className="db-stat-note db-stat-note-neu"><FaChartLine /> Calculate salary</div>
             </div>
           </div>
 
-          <div className="stat-card orange" onClick={() => navigate(ROUTES.EMPLOYEE)}>
-            <div className="stat-icon-wrapper orange-bg">
-              <FaBriefcase className="stat-icon" />
-            </div>
-            <div className="stat-content">
-              <div className="stat-label">Archived</div>
-              <div className="stat-value">{loading ? "..." : stats.archivedEmployees}</div>
-              <div className="stat-change negative">
-                <FaArrowDown /> Inactive employees
-              </div>
+          <div className="db-stat db-stat-orange" onClick={() => navigate(ROUTES.EMPLOYEE)}>
+            <div className="db-stat-icon db-stat-icon-orange"><FaBriefcase /></div>
+            <div className="db-stat-body">
+              <div className="db-stat-label">Archived</div>
+              <div className="db-stat-value">{loading ? "…" : stats.archived}</div>
+              <div className="db-stat-note db-stat-note-neg"><FaArrowDown /> Inactive employees</div>
             </div>
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="dashboard-content">
+        {/* GRID */}
+        <div className="db-grid">
+
           {/* Recent Employees */}
-          <div className="content-card">
-            <div className="card-header">
-              <div className="card-title">
-                <FaClock className="card-title-icon" />
-                <h2>Recent Employees</h2>
-              </div>
-              <button 
-                className="view-all-btn"
-                onClick={() => navigate(ROUTES.EMPLOYEE)}
-              >
-                View All →
-              </button>
+          <div className="db-card">
+            <div className="db-card-head">
+              <h2 className="db-card-title">
+                <FaClock className="db-card-icon" /> Recent Employees
+              </h2>
+              <button className="db-view-all" onClick={() => navigate(ROUTES.EMPLOYEE)}>View All →</button>
             </div>
-            <div className="card-body">
-              {loading ? (
-                <div className="loading-state">Loading...</div>
-              ) : recentEmployees.length === 0 ? (
-                <div className="empty-state">
-                  <FaUsers className="empty-icon" />
-                  <p>No employees yet</p>
-                </div>
-              ) : (
-                <div className="employee-list">
-                  {recentEmployees.map((emp) => (
-                    <div 
-                      key={emp.employeeId} 
-                      className="employee-item"
-                      onClick={() => navigate(ROUTES.EMPLOYEE)}
-                    >
-                      <div className="employee-avatar">
-                        {emp.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="employee-info">
-                        <div className="employee-name">{emp.name}</div>
-                        <div className="employee-meta">
-                          {emp.employeeNumber} • {emp.position || "N/A"}
-                        </div>
-                      </div>
-                      <div className="employee-date">
-                        {formatDate(emp.dateCreated)}
-                      </div>
+
+            {loading ? (
+              <div className="db-empty"><FaUsers className="db-empty-icon" /><span>Loading…</span></div>
+            ) : recent.length === 0 ? (
+              <div className="db-empty"><FaUsers className="db-empty-icon" /><span>No employees yet</span></div>
+            ) : (
+              <div className="db-emp-list">
+                {recent.map(emp => (
+                  <div key={emp.employeeId} className="db-emp-row" onClick={() => navigate(ROUTES.EMPLOYEE)}>
+                    <div className="db-emp-avatar">{emp.name.charAt(0).toUpperCase()}</div>
+                    <div className="db-emp-body">
+                      <div className="db-emp-name">{emp.name}</div>
+                      <div className="db-emp-meta">{emp.employeeNumber} · {emp.position || "N/A"}</div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    <div className="db-emp-date">{fmtDate(emp.dateCreated)}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Upcoming Birthdays */}
-          <div className="content-card">
-            <div className="card-header">
-              <div className="card-title">
-                <FaBirthdayCake className="card-title-icon birthday" />
-                <h2>Upcoming Birthdays</h2>
-              </div>
-              <span className="badge">Next 30 Days</span>
+          <div className="db-card">
+            <div className="db-card-head">
+              <h2 className="db-card-title">
+                <FaBirthdayCake className="db-card-icon-bday" /> Upcoming Birthdays
+              </h2>
+              <span className="db-badge">Next 30 Days</span>
             </div>
-            <div className="card-body">
-              {loading ? (
-                <div className="loading-state">Loading...</div>
-              ) : upcomingBirthdays.length === 0 ? (
-                <div className="empty-state">
-                  <FaBirthdayCake className="empty-icon" />
-                  <p>No birthdays in the next 30 days</p>
-                </div>
-              ) : (
-                <div className="birthday-list">
-                  {upcomingBirthdays.map((emp) => (
-                    <div key={emp.employeeId} className="birthday-item">
-                      <div className="birthday-icon-wrapper">
-                        <FaBirthdayCake className="birthday-icon" />
-                      </div>
-                      <div className="birthday-info">
-                        <div className="birthday-name">{emp.name}</div>
-                        <div className="birthday-meta">
-                          {formatDate(emp.nextBirthday)} • Turning {emp.age + 1}
-                        </div>
-                      </div>
-                      <div className="birthday-countdown">
-                        {emp.daysUntil === 0 ? (
-                          <span className="today-badge">Today! 🎉</span>
-                        ) : emp.daysUntil === 1 ? (
-                          <span className="tomorrow-badge">Tomorrow</span>
-                        ) : (
-                          <span className="days-badge">{emp.daysUntil} days</span>
-                        )}
-                      </div>
+
+            {loading ? (
+              <div className="db-empty"><FaBirthdayCake className="db-empty-icon" /><span>Loading…</span></div>
+            ) : birthdays.length === 0 ? (
+              <div className="db-empty"><FaBirthdayCake className="db-empty-icon" /><span>No birthdays in the next 30 days</span></div>
+            ) : (
+              <div className="db-bday-list">
+                {birthdays.map(emp => (
+                  <div key={emp.employeeId} className="db-bday-row">
+                    <div className="db-bday-icon"><FaBirthdayCake /></div>
+                    <div className="db-bday-body">
+                      <div className="db-bday-name">{emp.name}</div>
+                      <div className="db-bday-meta">{fmtDate(emp.next)} · Turning {emp.turnsAge}</div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    <div>
+                      {emp.daysUntil === 0
+                        ? <span className="db-bday-tag-today">Today! 🎉</span>
+                        : emp.daysUntil === 1
+                          ? <span className="db-bday-tag-tomorrow">Tomorrow</span>
+                          : <span className="db-bday-tag-days">{emp.daysUntil}d</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Quick Actions */}
-          <div className="content-card quick-actions-card">
-            <div className="card-header">
-              <div className="card-title">
-                <FaChartLine className="card-title-icon" />
-                <h2>Quick Actions</h2>
-              </div>
+          <div className="db-card">
+            <div className="db-card-head">
+              <h2 className="db-card-title"><FaChartLine className="db-card-icon" /> Quick Actions</h2>
             </div>
-            <div className="card-body">
-              <div className="quick-actions-grid">
-                <button 
-                  className="quick-action-btn blue"
-                  onClick={() => navigate(ROUTES.EMPLOYEE)}
-                >
-                  <FaUsers className="quick-action-icon" />
-                  <span>Add Employee</span>
-                </button>
-                <button 
-                  className="quick-action-btn green"
-                  onClick={() => navigate(ROUTES.PAYROLL)}
-                >
-                  <FaMoneyBillWave className="quick-action-icon" />
-                  <span>Calculate Salary</span>
-                </button>
-                <button 
-                  className="quick-action-btn purple"
-                  onClick={() => navigate(ROUTES.EMPLOYEE)}
-                >
-                  <FaBriefcase className="quick-action-icon" />
-                  <span>Manage Records</span>
-                </button>
-                <button 
-                  className="quick-action-btn orange"
-                  onClick={() => navigate(ROUTES.EMPLOYEE)}
-                >
-                  <FaUserTie className="quick-action-icon" />
-                  <span>View All</span>
-                </button>
-              </div>
+            <div className="db-actions">
+              <button className="db-action-btn db-action-blue"   onClick={() => navigate(ROUTES.EMPLOYEE)}>
+                <FaUsers className="db-action-icon" /> Add Employee
+              </button>
+              <button className="db-action-btn db-action-green"  onClick={() => navigate(ROUTES.PAYROLL)}>
+                <FaMoneyBillWave className="db-action-icon" /> Calculate Salary
+              </button>
+              <button className="db-action-btn db-action-purple" onClick={() => navigate(ROUTES.EMPLOYEE)}>
+                <FaBriefcase className="db-action-icon" /> Manage Records
+              </button>
+              <button className="db-action-btn db-action-orange" onClick={() => navigate(ROUTES.EMPLOYEE)}>
+                <FaUserTie className="db-action-icon" /> View All
+              </button>
             </div>
           </div>
 
           {/* System Info */}
-          <div className="content-card system-info-card">
-            <div className="card-header">
-              <div className="card-title">
-                <FaChartLine className="card-title-icon" />
-                <h2>System Information</h2>
-              </div>
+          <div className="db-card">
+            <div className="db-card-head">
+              <h2 className="db-card-title"><FaChartLine className="db-card-icon" /> System Information</h2>
             </div>
-            <div className="card-body">
-              <div className="system-info-list">
-                <div className="system-info-item">
-                  <span className="info-label">System:</span>
-                  <span className="info-value">HRMS Payroll System</span>
-                </div>
-                <div className="system-info-item">
-                  <span className="info-label">Version:</span>
-                  <span className="info-value">1.0.0</span>
-                </div>
-                <div className="system-info-item">
-                  <span className="info-label">Status:</span>
-                  <span className="status-badge active">Active</span>
-                </div>
-                <div className="system-info-item">
-                  <span className="info-label">Last Updated:</span>
-                  <span className="info-value">{formatDate(new Date())}</span>
-                </div>
+            <div className="db-sysinfo">
+              <div className="db-sysinfo-row">
+                <span className="db-sysinfo-label">System</span>
+                <span className="db-sysinfo-value">HRMS Payroll System</span>
+              </div>
+              <div className="db-sysinfo-row">
+                <span className="db-sysinfo-label">Version</span>
+                <span className="db-sysinfo-value">1.0.0</span>
+              </div>
+              <div className="db-sysinfo-row">
+                <span className="db-sysinfo-label">Status</span>
+                <span className="db-sysinfo-active">Active</span>
+              </div>
+              <div className="db-sysinfo-row">
+                <span className="db-sysinfo-label">Last Updated</span>
+                <span className="db-sysinfo-value">{fmtDate(new Date())}</span>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </MainLayout>
