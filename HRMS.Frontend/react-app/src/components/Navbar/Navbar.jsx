@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
 import UserService from "../../services/AuthService";
-import "./Navbar.css";
+import "./Navbar.scss";
 
 const Navbar = () => {
   const navigate = useNavigate();

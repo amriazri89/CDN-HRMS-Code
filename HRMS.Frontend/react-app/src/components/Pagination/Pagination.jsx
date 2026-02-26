@@ -1,5 +1,5 @@
 import React from 'react';
-import './Pagination.css';
+import './Pagination.scss';
 
 const Pagination = ({ 
   pageNumber, 
@@ -51,7 +51,7 @@ const Pagination = ({
           disabled={pageNumber === 1}
           className="pagination-btn"
         >
-          ‹ Previous
+          ‹ Prev
         </button>
 
         {getPageNumbers().map(page => (

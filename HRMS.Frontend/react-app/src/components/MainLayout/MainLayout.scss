@@ -1,0 +1,55 @@
+// ==============================================
+// src/components/MainLayout/MainLayout.scss
+// ==============================================
+
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+$navbar-h:    56px;
+$navbar-h-sm: 52px;
+$navbar-h-xs: 44px;
+$sidebar-w:   220px;
+
+:root {
+  --navbar-h: #{$navbar-h};
+}
+
+@media (max-width: 480px) {
+  :root { --navbar-h: #{$navbar-h-sm}; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  :root { --navbar-h: #{$navbar-h-xs}; }
+}
+
+// ── LAYOUT SHELL ──────────────────────────────
+.main-layout {
+  display: flex;
+  padding-top: var(--navbar-h);
+  min-height: 100vh;
+  background-color: #f0f4f8;
+  box-sizing: border-box;
+}
+
+// ── CONTENT AREA ──────────────────────────────
+.main-content {
+  flex: 1;
+  min-width: 0;
+  margin-left: $sidebar-w;
+  @include flex-column;
+  transition: margin-left 0.28s ease;
+
+  @media (max-width: 1024px) and (min-width: 881px) {
+    margin-left: $sidebar-w;
+  }
+
+  @include responsive(mobile) {
+    margin-left: 0;
+  }
+}
+
+.content {
+  flex: 1;
+  padding: 0;
+  overflow-y: auto;
+}

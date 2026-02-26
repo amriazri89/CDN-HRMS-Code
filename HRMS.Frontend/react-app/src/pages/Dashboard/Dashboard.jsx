@@ -9,7 +9,7 @@ import {
   FaCalendarAlt, FaChartLine, FaArrowUp, FaArrowDown,
   FaClock, FaBirthdayCake,
 } from "react-icons/fa";
-import "./Dashboard.css";
+import "./Dashboard.scss";
 
 const Dashboard = () => {
   const navigate = useNavigate();

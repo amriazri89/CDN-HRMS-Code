@@ -1,0 +1,195 @@
+// ==============================================
+// src/components/Sidebar/Sidebar.scss
+// ==============================================
+
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+$sb-bg:       #1c2b36;
+$sb-text:     #c8cdd6;
+$sb-muted:    #8fa8b8;
+$sb-active:   #1e3a4a;
+$sb-accent:   #e4f1f6;
+$sb-width:    220px;
+$sb-width-m:  240px;
+$sb-width-xs: 210px;
+$navbar-h:    56px;
+$navbar-h-xs: 44px;
+
+*, .sidebar, .sidebar * { box-sizing: border-box; }
+
+// ── HAMBURGER TOGGLE ──────────────────────────
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 110000;
+  width: $navbar-h;
+  height: $navbar-h;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+
+  span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  &.is-open {
+    span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    span:nth-child(2) { opacity: 0; }
+    span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  }
+
+  @media (max-width: 480px) {
+    height: 52px;
+    width: 52px;
+  }
+}
+
+// ── OVERLAY ───────────────────────────────────
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99998;
+}
+
+// ── SIDEBAR ───────────────────────────────────
+.sidebar {
+  width: $sb-width;
+  height: calc(100vh - #{$navbar-h});
+  background-color: $sb-bg;
+  color: $sb-text;
+  @include flex-column;
+  padding: 16px 0 20px;
+  position: fixed;
+  top: $navbar-h;
+  left: 0;
+  z-index: 99999;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+
+  @include custom-scrollbar(4px, rgba(#fff, 0.2), transparent);
+
+  @media (max-height: 500px) and (orientation: landscape) {
+    top: $navbar-h-xs;
+    height: calc(100vh - #{$navbar-h-xs});
+  }
+}
+
+// ── LOGO ──────────────────────────────────────
+.sidebar-logo-img {
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  display: block;
+  margin: 4px auto 16px;
+  border-radius: 8px;
+  object-fit: contain;
+  padding: 0 16px;
+}
+
+// ── NAV ───────────────────────────────────────
+.sidebar-nav {
+  flex: 1 1 auto;
+  padding: 0 12px;
+
+  ul {
+    @include reset-list;
+    @include flex-column;
+    gap: 4px;
+  }
+
+  li {
+    border-radius: 8px;
+    overflow: hidden;
+
+    a {
+      display: flex;
+      align-items: center;
+      padding: 11px 14px;
+      color: $sb-muted;
+      @include reset-link;
+      font-weight: 500;
+      font-size: 0.92rem;
+      border-radius: 8px;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+
+      &:hover {
+        background: rgba(#fff, 0.07);
+        color: #fff;
+        transform: translateX(3px);
+      }
+    }
+
+    &.active a {
+      background: $sb-active;
+      color: #fff;
+      font-weight: 700;
+      border-left: 3px solid $sb-accent;
+      padding-left: 11px;
+    }
+  }
+}
+
+// ── FOOTER ────────────────────────────────────
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 12px 0;
+}
+
+%sb-btn {
+  width: 100%;
+  background: transparent;
+  color: $sb-muted;
+  border: 1px solid rgba(#fff, 0.1);
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: background 0.18s ease, color 0.18s ease;
+  text-align: center;
+
+  &:hover {
+    background: rgba(#fff, 0.07);
+    color: #fff;
+  }
+}
+
+.logout-btn            { @extend %sb-btn; }
+.sidebar-footer button { @extend %sb-btn; }
+
+// ── MOBILE ≤ 880px ────────────────────────────
+@include responsive(mobile) {
+  .sidebar-toggle { display: flex; }
+
+  .sidebar {
+    transform: translateX(-100%);
+    width: $sb-width-m;
+    top: 0;
+    height: 100vh;
+    padding-top: 64px;
+    @include shadow(4);
+
+    &.sidebar-open { transform: translateX(0); }
+
+    .sidebar-nav ul { flex-direction: column; }
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar { width: $sb-width-xs; }
+}

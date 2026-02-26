@@ -1,0 +1,128 @@
+// ==============================================
+// src/components/Pagination/Pagination.scss
+// ==============================================
+
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+$pg-border:  #e5e7eb;
+$pg-text:    #374151;
+$pg-muted:   #6b7280;
+$pg-blue:    #2563eb;
+
+.pagination-container {
+  @include flex-between;
+  padding: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-top: 1px solid $pg-border;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  @include responsive(mobile) {
+    @include flex-column;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+// ── INFO ──────────────────────────────────────
+.pagination-info {
+  font-size: 0.85rem;
+  color: $pg-muted;
+
+  strong {
+    color: #111827;
+    font-weight: 600;
+  }
+
+  @include responsive(mobile) {
+    font-size: 0.82rem;
+    text-align: center;
+  }
+}
+
+// ── CONTROLS ──────────────────────────────────
+.pagination-controls {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+
+  @include responsive(mobile) {
+    justify-content: center;
+    gap: 4px;
+  }
+}
+
+.pagination-btn {
+  @include flex-center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid $pg-border;
+  background: transparent;
+  color: $pg-text;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: $pg-blue;
+    border-color: $pg-blue;
+  }
+
+  &.active {
+    color: $pg-blue;
+    border-color: $pg-blue;
+    font-weight: 600;
+    background: rgba($pg-blue, 0.06);
+  }
+
+  @include disabled-state;
+
+  @include responsive(mobile) {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.82rem;
+  }
+}
+
+// ── PAGE SIZE ─────────────────────────────────
+.pagination-size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: $pg-muted;
+
+  // Override global label { display: none !important }
+  label {
+    display: inline !important;
+    color: $pg-muted;
+    font-size: 0.85rem;
+    cursor: default;
+  }
+
+  @include responsive(mobile) { justify-content: center; }
+}
+
+.pagination-select {
+  padding: 4px 8px;
+  border: 1px solid $pg-border;
+  border-radius: 4px;
+  background: transparent;
+  color: $pg-text;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: $pg-blue;
+  }
+
+  @include responsive(mobile) { padding: 6px 10px; }
+}

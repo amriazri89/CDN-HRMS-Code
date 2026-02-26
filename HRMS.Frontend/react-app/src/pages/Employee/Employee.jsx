@@ -7,7 +7,7 @@ import {
   FaEdit, FaTrash, FaArchive, FaUndo,
   FaMoneyBillWave, FaBriefcase, FaList, FaSearch,
 } from "react-icons/fa";
-import "./Employee.css";
+import "./Employee.scss";
 
 const daysOfWeek = [
   { name: "Sunday", value: 0 },

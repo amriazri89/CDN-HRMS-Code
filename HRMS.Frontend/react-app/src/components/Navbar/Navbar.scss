@@ -1,0 +1,128 @@
+// ==============================================
+// src/components/Navbar/Navbar.scss
+// ==============================================
+
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+$navbar-h:    56px;
+$navbar-h-sm: 52px;
+$navbar-h-xs: 44px;
+$navbar-bg:   #1e3a4a;
+$navbar-accent: #ffffff;//4a9aba
+
+.navbar {
+  @include flex-between;
+  width: 100%;
+  height: $navbar-h;
+  background-color: $navbar-bg;
+  padding: 0 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 90000;
+  box-sizing: border-box;
+
+  @media (max-width: 1024px)                              { padding: 0 16px; }
+  @include responsive(mobile)                             { padding: 0 16px 0 64px; height: $navbar-h; }
+  @media (max-width: 480px)                               { height: $navbar-h-sm; }
+  @media (max-height: 500px) and (orientation: landscape) { height: $navbar-h-xs; padding: 0 12px 0 64px; }
+}
+
+// ── Title ──────────────────────────────────────
+.navbar-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #ffffff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (max-width: 1024px) { font-size: 0.9rem; }
+}
+
+.title-short { display: none; }
+
+@include responsive(mobile) {
+  .title-full  { display: none; }
+  .title-short { display: inline; font-size: 0.95rem; }
+}
+
+// ── Nav actions ────────────────────────────────
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.profile-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #fff;
+  cursor: default;
+}
+
+.profile-icon {
+  font-size: 20px;
+  color: lighten($navbar-accent, 10%);
+  flex-shrink: 0;
+
+  @include responsive(mobile) { font-size: 16px; }
+}
+
+.profile-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.welcome-label {
+  font-weight: 400;
+  color: rgba(#fff, 0.75);
+
+  @include responsive(mobile) { display: none; }
+}
+
+.bracket {
+  color: rgba(#fff, 0.5);
+  font-weight: 400;
+
+  @media (max-width: 640px) { display: none; }
+}
+
+.nav-name {
+  font-weight: 700;
+  color: $navbar-accent;
+  max-width: 140px;
+  overflow: hidden;
+  color: #edf108;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @include responsive(mobile)                             { font-size: 12px; max-width: 90px; }
+  @media (max-width: 640px)                               { max-width: 70px; font-size: 11px; }
+  @media (max-width: 480px)                               { max-width: 55px; font-size: 10px; }
+  @media (max-height: 500px) and (orientation: landscape) { font-size: 10px; }
+}
+
+.logout-icon {
+  margin-left: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  color: rgba(#fff, 0.75);
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover { color: #ff6b6b; }
+
+  @include responsive(mobile) { font-size: 16px; margin-left: 6px; }
+  @media (max-width: 480px)   { font-size: 15px; }
+}

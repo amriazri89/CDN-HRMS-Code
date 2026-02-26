@@ -4,7 +4,7 @@ import Sidebar from "../Sidebar/Sidebar.jsx";
 import Navbar from "../Navbar/Navbar.jsx";
 import LoadingOverlay from "../Loading/LoadingOverlay";
 import Skeleton from "../Loading/Skeleton";
-import "./MainLayout.css";
+import "./MainLayout.scss";
 import "../../styles/styles.scss";
 /**
  * props:

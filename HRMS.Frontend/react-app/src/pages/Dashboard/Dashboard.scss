@@ -1,0 +1,385 @@
+// ==============================================
+// src/pages/Dashboard/Dashboard.scss
+// ==============================================
+
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+// ── Local tokens ──────────────────────────────
+$db-bg:      #f0f4f8;
+$db-white:   #ffffff;
+$db-navy:    #1e3a4a;
+$db-navy-lt: #2a5068;
+$db-text:    #0f172a;
+$db-muted:   #64748b;
+$db-border:  #e2e8f0;
+$db-subtle:  #f8fafc;
+
+$db-blue:    #2563eb;
+$db-green:   #16a34a;
+$db-purple:  #7c3aed;
+$db-orange:  #f59e0b;
+
+// ── PAGE ──────────────────────────────────────
+.db-page {
+  padding: 28px 32px 40px;
+  background: $db-bg;
+  min-height: 100vh;
+  box-sizing: border-box;
+
+  @include responsive(tablet) { padding: 16px 14px 32px; }
+  @include responsive(mobile) { padding: 14px 10px 28px; }
+}
+
+// ── HEADER ────────────────────────────────────
+.db-header {
+  @include flex-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: $db-white;
+  padding: 22px 28px;
+  border-radius: 14px;
+  border-left: 5px solid $db-navy;
+  box-shadow: 0 2px 10px rgba(30, 58, 74, 0.08);
+  margin-bottom: 24px;
+
+  @include responsive(tablet) {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+  }
+}
+
+.db-header-left {
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $db-text;
+    margin: 0 0 4px;
+  }
+
+  p {
+    font-size: 0.88rem;
+    color: $db-muted;
+    margin: 0;
+  }
+}
+
+.db-clock {
+  @include flex-center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, $db-navy, $db-navy-lt);
+  border-radius: 10px;
+  color: #fff;
+  justify-content: flex-start;
+
+  @include responsive(tablet) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.db-clock-icon { font-size: 18px; opacity: 0.8; color: #fff; }
+.db-clock-date { font-size: 0.8rem; color: rgba(#fff, 0.75); }
+.db-clock-time { font-size: 1rem; font-weight: 700; font-family: 'Courier New', monospace; color: #fff; }
+
+// ── STATS ─────────────────────────────────────
+.db-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+
+  @media (max-width: 1200px) { grid-template-columns: repeat(2, 1fr); }
+  @include responsive(tablet) { gap: 10px; }
+  @include responsive(mobile) { grid-template-columns: 1fr; }
+}
+
+.db-stat {
+  @include card(20px, $db-white, 1);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  border-radius: 12px;
+  border-top: 3px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(30, 58, 74, 0.12);
+  }
+
+  &-blue   { border-top-color: $db-blue; }
+  &-green  { border-top-color: $db-green; }
+  &-purple { border-top-color: $db-purple; }
+  &-orange { border-top-color: $db-orange; }
+}
+
+.db-stat-icon {
+  @include flex-center;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  font-size: 22px;
+  color: #fff;
+
+  &-blue   { @include gradient(#3b82f6, $db-blue, 135deg); }
+  &-green  { @include gradient(#22c55e, $db-green, 135deg); }
+  &-purple { @include gradient(#a855f7, $db-purple, 135deg); }
+  &-orange { @include gradient(#fb923c, $db-orange, 135deg); }
+}
+
+.db-stat-body  { flex: 1; min-width: 0; }
+
+.db-stat-label {
+  font-size: 0.8rem;
+  color: $db-muted;
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+
+.db-stat-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: $db-text;
+  line-height: 1;
+  margin-bottom: 4px;
+
+  @include responsive(mobile) { font-size: 1.5rem; }
+}
+
+.db-stat-note {
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  &-pos { color: $db-green; }
+  &-neg { color: #dc2626; }
+  &-neu { color: $db-muted; }
+}
+
+// ── GRID ──────────────────────────────────────
+.db-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  @media (max-width: 1000px) { grid-template-columns: 1fr; }
+}
+
+// ── CARD ──────────────────────────────────────
+.db-card {
+  @include card(22px, $db-white, 1);
+  border-radius: 14px;
+}
+
+.db-card-head {
+  @include flex-between;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.db-card-title {
+  @include flex-center;
+  gap: 8px;
+  justify-content: flex-start;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $db-text;
+  margin: 0;
+}
+
+.db-card-icon      { font-size: 15px; color: $db-blue; }
+.db-card-icon-bday { font-size: 15px; color: $db-orange; }
+
+.db-view-all {
+  @include reset-button;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $db-blue;
+  transition: color 0.15s ease;
+
+  &:hover { color: #1d4ed8; }
+}
+
+.db-badge {
+  background: #eff6ff;
+  color: $db-blue;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+// ── EMPTY / LOADING ───────────────────────────
+.db-empty {
+  @include flex-column;
+  @include flex-center;
+  padding: 40px 0;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 0.88rem;
+}
+
+.db-empty-icon { font-size: 36px; opacity: 0.3; }
+
+// ── EMPLOYEE LIST ─────────────────────────────
+.db-emp-list { @include flex-column; gap: 6px; }
+
+.db-emp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: $db-subtle;
+  border: 1px solid $db-border;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    transform: translateX(2px);
+  }
+}
+
+.db-emp-avatar {
+  @include flex-center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: $db-navy;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.db-emp-body { flex: 1; min-width: 0; }
+
+.db-emp-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $db-text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.db-emp-meta {
+  font-size: 0.76rem;
+  color: $db-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.db-emp-date {
+  font-size: 0.76rem;
+  color: #94a3b8;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+// ── BIRTHDAY LIST ─────────────────────────────
+.db-bday-list { @include flex-column; gap: 6px; }
+
+.db-bday-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  transition: background 0.15s ease;
+
+  &:hover { background: #fef3c7; }
+}
+
+.db-bday-icon {
+  @include flex-center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: $db-orange;
+  color: #fff;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.db-bday-body { flex: 1; min-width: 0; }
+.db-bday-name { font-size: 0.88rem; font-weight: 600; color: $db-text; margin-bottom: 2px; }
+.db-bday-meta { font-size: 0.76rem; color: #92400e; }
+
+%bday-tag {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  color: #fff;
+}
+
+.db-bday-tag-today    { @extend %bday-tag; background: #dc2626; font-weight: 700; }
+.db-bday-tag-tomorrow { @extend %bday-tag; background: $db-orange; font-weight: 600; }
+.db-bday-tag-days     { @extend %bday-tag; background: #e2e8f0; color: #475569; font-weight: 600; }
+
+// ── QUICK ACTIONS ─────────────────────────────
+.db-actions {
+  @include grid(2, 10px);
+
+  @include responsive(tablet) { grid-template-columns: 1fr; }
+}
+
+.db-action-btn {
+  @include flex-column;
+  @include flex-center;
+  gap: 8px;
+  padding: 18px 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &-blue   { @include gradient(#3b82f6, $db-blue, 135deg); }
+  &-green  { @include gradient(#22c55e, $db-green, 135deg); }
+  &-purple { @include gradient(#a855f7, $db-purple, 135deg); }
+  &-orange { @include gradient(#fb923c, $db-orange, 135deg); }
+}
+
+.db-action-icon { font-size: 22px; color: #fff; }
+
+// ── SYSTEM INFO ───────────────────────────────
+.db-sysinfo { @include flex-column; gap: 6px; }
+
+.db-sysinfo-row {
+  @include flex-between;
+  padding: 10px 14px;
+  background: $db-subtle;
+  border-radius: 8px;
+  border: 1px solid $db-border;
+}
+
+.db-sysinfo-label  { font-size: 0.84rem; color: $db-muted; font-weight: 500; }
+.db-sysinfo-value  { font-size: 0.84rem; color: $db-text; font-weight: 600; }
+
+.db-sysinfo-active {
+  background: #dcfce7;
+  color: #166534;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
