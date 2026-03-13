@@ -1,12 +1,12 @@
 # 🏢 CDN HRMS Payroll System
-## ETIQA IT Fullstack .NET + ReactJs Developer Assessment
+## Human Resource Management System
 
 [![.NET 8.0](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat&logo=.net)](https://dotnet.microsoft.com/)
 [![React 18](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react)](https://reactjs.org/)
 [![Dapper](https://img.shields.io/badge/Dapper-2.1.35-orange)](https://github.com/DapperLib/Dapper)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> A production-ready HRMS with advanced payroll calculation, built with Clean Architecture, CQRS pattern, and comprehensive testing for Complete Developer Network (CDN).
+> An HRMS with payroll calculation built with Clean Architecture, CQRS, and Dapper for Complete Developer Network (CDN).
 
 **Developed by:** Amri Azri  
 **Live Demo:** [https://cdnhrms.vercel.app/cdn/hrms/login](https://cdnhrms.vercel.app/cdn/hrms/login)
@@ -16,7 +16,7 @@
 ## 📋 Table of Contents
 
 1. [Introduction](#-introduction)
-2. [Assessment Requirements](#-assessment-requirements-compliance)
+2. [System Requirements](#-system-requirements-compliance)
 3. [System Architecture](#-system-architecture)
 4. [SDLC Documentation](#-sdlc-documentation)
 5. [Technical Implementation](#-technical-implementation)
@@ -33,7 +33,7 @@
 
 ## 📖 Introduction
 
-The CDN HRMS Payroll System is a comprehensive employee management solution designed to streamline HR operations and automate payroll calculations for Complete Developer Network (CDN). This system demonstrates modern software development practices with Clean Architecture, CQRS pattern, and enterprise-grade testing.
+The CDN HRMS Payroll System handles employee management and payroll calculations for Complete Developer Network (CDN), built using Clean Architecture and CQRS pattern with Dapper for data access.
 
 ### Key Features
 
@@ -42,7 +42,7 @@ The CDN HRMS Payroll System is a comprehensive employee management solution desi
 - ✅ Intelligent Payroll Calculation (2× daily rate + birthday bonus)
 - ✅ Wildcard Search (by employee number and name)
 - ✅ JWT Authentication & Authorization
-- ✅ Comprehensive Testing (50 unit tests + 13 integration tests)
+- ✅ Comprehensive Testing (44 unit tests + 13 integration tests)
 - ✅ CI/CD Pipeline with GitHub Actions
 - ✅ Production Deployment on AWS EC2 + Vercel
 
@@ -68,7 +68,7 @@ Take-Home Pay: RM 800.00 ✅
 
 ---
 
-## ✅ Assessment Requirements Compliance
+## ✅ System Requirements Compliance
 
 ### Mandatory Requirements
 
@@ -81,7 +81,7 @@ Take-Home Pay: RM 800.00 ✅
 | 5 | CRUD Operations | ✅ | Create, Read, Update, Delete, Archive/Unarchive |
 | 6 | Wildcard Search | ✅ | Search by employee number & name |
 | 7 | Payroll Calculation | ✅ | 2× daily rate + birthday bonus logic |
-| 8 | Unit Tests | ✅ | 50 unit tests covering handlers, validators, repositories |
+| 8 | Unit Tests | ✅ | 44 unit tests covering handlers, validators, repositories |
 | 9 | ReactJs Frontend | ✅ | React 18 + Vite |
 | 10 | Routing | ✅ | React Router v6 with centralized routes |
 | 11 | Route Protection | ✅ | JWT-based authentication guards |
@@ -91,17 +91,17 @@ Take-Home Pay: RM 800.00 ✅
 | 15 | Add/Update/Delete | ✅ | Full CRUD with modals |
 | 16 | Archive/Unarchive | ✅ | Soft delete functionality |
 | 17 | Calculate Pay | ✅ | Date range with breakdown display |
-| 18 | GitHub Repository | ✅ | Private repo accessible via Gitfront.io |
-| 19 | Documentation | ✅ | Comprehensive README with SDLC |
+| 18 | GitHub Repository | ✅ | Private GitHub repository |
+| 19 | Documentation | ✅ | README with SDLC documentation |
 
 ### Bonus Features
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| **Endpoint Security** | ✅ | JWT authentication + role-based authorization |
+| **Endpoint Security** | ✅ | JWT authentication — single Admin role (HR/Admin) |
 | **Pagination** | ✅ | Server-side with X-Pagination header |
 | **Error Handling** | ✅ | FluentValidation + global exception middleware |
-| **Testing Strategy** | ✅ | 63 tests (50 unit + 13 integration) |
+| **Testing Strategy** | ✅ | 57 tests (44 unit + 13 integration) |
 | **CI/CD Pipeline** | ✅ | GitHub Actions with automated deployment |
 | **Design Patterns** | ✅ | CQRS + MediatR + Repository Pattern |
 | **FluentValidation** | ✅ | Declarative validation rules |
@@ -535,9 +535,7 @@ cd CDN-HRMS-Code
 # Open SQL Server Management Studio
 # Run scripts in /Database folder in order
 
-# Option 2: Use dotnet CLI (if using EF migrations)
-cd HRMS.API
-dotnet ef database update
+# Note: This project uses Dapper (no EF migrations). Run SQL scripts manually.
 ```
 
 #### 4. Build and Run
@@ -644,7 +642,7 @@ Authorization: Bearer <your-jwt-token>
 ```json
 {
   "username": "admin",
-  "password": "password123"
+  "password": "Admin@123"
 }
 ```
 
@@ -653,7 +651,6 @@ Authorization: Bearer <your-jwt-token>
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "username": "admin",
-  "role": "Admin",
   "expiresIn": 3600
 }
 ```
@@ -666,11 +663,11 @@ Authorization: Bearer <your-jwt-token>
 | GET | `/Employees/{id}` | Get employee by ID | ✅ |
 | GET | `/Employees/search?keyword={term}` | Search employees | ✅ |
 | GET | `/Employees/paged` | Get paginated employees | ✅ |
-| POST | `/Employees` | Create employee | ✅ (HR/Admin) |
-| PUT | `/Employees/{id}` | Update employee | ✅ (HR/Admin) |
-| DELETE | `/Employees/{id}` | Delete employee | ✅ (Admin) |
-| POST | `/Employees/{id}/archive` | Archive employee | ✅ (HR/Admin) |
-| POST | `/Employees/{id}/unarchive` | Unarchive employee | ✅ (HR/Admin) |
+| POST | `/Employees` | Create employee | ✅ |
+| PUT | `/Employees/{id}` | Update employee | ✅ |
+| DELETE | `/Employees/{id}` | Delete employee | ✅ |
+| POST | `/Employees/{id}/archive` | Archive employee | ✅ |
+| POST | `/Employees/{id}/unarchive` | Unarchive employee | ✅ |
 | POST | `/Employees/{id}/calculate-salary` | Calculate salary | ✅ |
 
 **Create Employee Request:**
@@ -708,11 +705,11 @@ POST /Employees/{id}/calculate-salary?startDate=2025-02-10&endDate=2025-02-14
 | GET | `/EmploymentRecords/employee/{id}` | Get all records for employee | ✅ |
 | GET | `/EmploymentRecords/employee/{id}/active` | Get active record | ✅ |
 | GET | `/EmploymentRecords/{id}` | Get record by ID | ✅ |
-| POST | `/EmploymentRecords` | Create employment record | ✅ (HR/Admin) |
-| PUT | `/EmploymentRecords/{id}` | Update record | ✅ (HR/Admin) |
-| DELETE | `/EmploymentRecords/{id}` | Delete record | ✅ (Admin) |
-| POST | `/EmploymentRecords/{id}/activate` | Activate record | ✅ (HR/Admin) |
-| POST | `/EmploymentRecords/{id}/deactivate` | Deactivate record | ✅ (HR/Admin) |
+| POST | `/EmploymentRecords` | Create employment record | ✅ |
+| PUT | `/EmploymentRecords/{id}` | Update record | ✅ |
+| DELETE | `/EmploymentRecords/{id}` | Delete record | ✅ |
+| POST | `/EmploymentRecords/{id}/activate` | Activate record | ✅ |
+| POST | `/EmploymentRecords/{id}/deactivate` | Deactivate record | ✅ |
 
 **Create Employment Record Request:**
 ```json
@@ -786,7 +783,7 @@ All errors follow a consistent format:
 
 ### 1. Login
 
-1. Navigate to `http://localhost:5173`
+1. Navigate to [https://cdnhrms.vercel.app/cdn/hrms/login](https://cdnhrms.vercel.app/cdn/hrms/login)
 2. Enter credentials (admin / Admin@123)
 3. JWT token stored in localStorage
 4. Redirected to Dashboard
@@ -872,7 +869,7 @@ All errors follow a consistent format:
 
 ### Testing Pyramid Strategy
 
-Following industry best practices, this project implements the **Testing Pyramid** approach:
+This project follows the **Testing Pyramid** approach:
 
 ```
         🔺 E2E Tests (10%)
@@ -887,7 +884,7 @@ Following industry best practices, this project implements the **Testing Pyramid
 - Reliable CI/CD pipeline
 
 
-### Unit Tests (28 tests)
+### Unit Tests (44 tests)
 
 **Testing Framework:**
 - **xUnit** - Test runner
@@ -1396,7 +1393,7 @@ GitHub Push → Build → Test → Publish → Deploy EC2 → Restart Service
 - ✅ Performance (10× faster for reads)
 - ✅ Full SQL control
 - ✅ Lightweight (minimal overhead)
-- ✅ Assessment requirement (NO EF)
+- ✅ Project requirement (NO EF)
 
 **Cons:**
 - ❌ Manual SQL writing
@@ -1429,7 +1426,7 @@ GitHub Push → Build → Test → Publish → Deploy EC2 → Restart Service
 **Reason:**
 - ⚠️ Data consistency issues in testing
 - ⚠️ Complexity for small dataset
-- ⚠️ Not critical for assessment scope
+- ⚠️ Not critical for current scope
 
 **Note:** Caching implementation exists (CachedEmployeeRepository with Decorator pattern) but disabled in Production to ensure data consistency.
 
@@ -1437,33 +1434,7 @@ GitHub Push → Build → Test → Publish → Deploy EC2 → Restart Service
 
 ## ⚠️ Known Limitations
 
-### 1. Self-Signed SSL Certificate
-
-**Issue:** Backend uses self-signed SSL certificate
-
-**Impact:**
-- Browsers show "Not Secure" warning
-- Vercel can randomly fail to connect
-- Mobile devices may block connection
-
-**Workaround:** Vercel serverless proxy bypasses this for end users
-
-**Solution:** For production, use Let's Encrypt or AWS Certificate Manager
-
-### 2. Frontend Responsiveness
-
-**Issue:** Limited mobile responsiveness
-
-**Reason:** Time constraints
-
-**Impact:**
-- Best viewed on desktop/laptop (1024px+)
-- Some UI elements not optimized for mobile
-- Tablet view partially supported
-
-**Recommendation:** Use desktop browser for demo
-
-### 3. Limited Integration Tests
+### 1. Limited Integration Tests
 
 **Current:** Only 2 passed over 13 integration tests
 
@@ -1476,6 +1447,18 @@ GitHub Push → Build → Test → Publish → Deploy EC2 → Restart Service
 ---
 
 ## 🚧 Future Enhancements
+
+### User Roles
+
+Currently the system has a single Admin (HR) user. A planned enhancement is to introduce an Employee role with limited, self-service access:
+
+| Feature | Admin | Employee (Planned) |
+|---------|-------|--------------------|
+| Manage all employees | ✅ | ❌ |
+| View own profile | ✅ | ✅ |
+| View own employment records | ✅ | ✅ |
+| View own payslip/salary | ✅ | ✅ |
+| Add/edit/delete employees | ✅ | ❌ |
 
 ### Frontend Improvements
 
@@ -1491,17 +1474,23 @@ GitHub Push → Build → Test → Publish → Deploy EC2 → Restart Service
 
 **Proposed (BEM Methodology):**
 ```scss
+// Block
 .employee-list { }
+
+// Elements (double underscore)
 .employee-list__item { }
-.employee-list__item--active { }
 .employee-list__actions { }
+
+// Modifiers (double dash)
+.employee-list__item--active { }
+.employee-list__item--archived { }
 ```
 
 **Benefits:**
-- Clearer naming convention
-- Better CSS organization
-- Easier maintenance
-- No specificity wars
+- Clearer naming convention — block, element, and modifier roles are explicit
+- Better CSS organization with flat specificity (no nesting wars)
+- Easier maintenance and predictable class naming
+- Scales well across large component libraries
 
 #### 2. Component Standardization
 
@@ -1530,22 +1519,6 @@ src/components/
 - Reusable components
 - Faster development
 - Easier theming
-
-#### 3. Mobile Responsiveness
-
-**Priority Areas:**
-- Dashboard cards (stack on mobile)
-- Employee table (horizontal scroll or card view)
-- Forms (full-width on mobile)
-- Navigation (hamburger menu)
-
-**Target Breakpoints:**
-```scss
-$mobile: 320px;
-$tablet: 768px;
-$desktop: 1024px;
-$wide: 1440px;
-```
 
 ### Backend Improvements
 
@@ -1826,13 +1799,13 @@ public class AttendanceRecord
 
 ## 🎓 Conclusion
 
-The CDN HRMS Payroll System successfully demonstrates enterprise-grade software development practices with Clean Architecture, CQRS pattern, and comprehensive testing. The system meets all assessment requirements and provides a solid foundation for future enhancements.
+The CDN HRMS Payroll System meets all project requirements using Clean Architecture, CQRS, and Dapper with unit and integration test coverage.
 
 ### Key Achievements
 
-✅ **100% Requirement Compliance**: All mandatory and bonus features implemented  
+✅ **All Requirements Met**: Mandatory and bonus features implemented  
 ✅ **Clean Architecture**: 4-layer separation with SOLID principles  
-✅ **Comprehensive Testing**: 63 tests including unit & integration
+✅ **Comprehensive Testing**: 57 tests including unit & integration
 ✅ **Production Deployment**: Live on AWS EC2 + Vercel  
 ✅ **CI/CD Pipeline**: Automated deployment with GitHub Actions  
 ✅ **Modern Tech Stack**: .NET 8, React 18, Dapper, MediatR  
@@ -1848,7 +1821,7 @@ The CDN HRMS Payroll System successfully demonstrates enterprise-grade software 
 
 ### Learning Outcomes
 
-This project provided valuable experience in:
+Key areas covered:
 - Clean Architecture implementation
 - CQRS pattern with MediatR
 - Advanced testing strategies
@@ -1858,7 +1831,7 @@ This project provided valuable experience in:
 
 ### Acknowledgments
 
-Thank you to ETIQA IT for this comprehensive assessment opportunity. The requirements challenged me to implement best practices and modern development patterns, resulting in a production-ready system.
+Built for Complete Developer Network (CDN).
 
 ---
 
@@ -1891,8 +1864,7 @@ CDN-HRMS-Code/
 │       │   ├── services/            # API services
 │       │   ├── components/          # Reusable components
 │       │   └── routes.js            # Centralized routing
-│       ├── routes.js                # Centralized routing
-│       └── styles/                  # global scss styling
+│       └── styles/                  # Global SCSS styling
 │
 ├── .github/
 │   └── workflows/
@@ -1904,16 +1876,12 @@ CDN-HRMS-Code/
 
 ---
 
-**© 2026 Amri Azri - ETIQA IT Assessment Submission**
+**© 2026 Amri Azri**
 
-**Status:** ✅ Complete & Ready for Interview
+**Status:** ✅ Complete & Production Ready
 
 **Last Updated:** February 19, 2026
 
 ---
 
 # 🎉 Thank You!
-
-This project represents my commitment to quality, best practices, and continuous learning. I look forward to discussing the implementation details during the interview session.
-
-**Built with dedication and attention to detail** ❤️
