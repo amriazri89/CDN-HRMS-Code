@@ -482,14 +482,22 @@ public class ValidationBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
+    private readonly ILogger<ValidationBehavior<TRequest, TResponse>> _logger;
 
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        var failures = _validators
-            .Select(v => v.Validate(request))
+        if (!_validators.Any())
+            return await next();
+
+        var context = new ValidationContext<TRequest>(request);
+
+        var validationResults = await Task.WhenAll(
+            _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+
+        var failures = validationResults
             .SelectMany(r => r.Errors)
             .Where(f => f != null)
             .ToList();
@@ -625,17 +633,26 @@ public async Task<string> LoginAsync(string username, string password)
     return GenerateJwtToken(user);
 }
 
-private string GenerateJwtToken(User user)
+public string GenerateJwtToken(string username, string userId)
 {
-    var claims = new[] { new Claim(ClaimTypes.Name, user.Username) };
-    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
+    var key = new SymmetricSecurityKey(
+        Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+
+    var claims = new[]
+    {
+        new Claim(ClaimTypes.Name, username),
+        new Claim(ClaimTypes.NameIdentifier, userId),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
+
     var token = new JwtSecurityToken(
-        issuer: _jwtSettings.Issuer,
-        audience: _jwtSettings.Audience,
+        issuer: _configuration["Jwt:Issuer"],
+        audience: _configuration["Jwt:Audience"],
         claims: claims,
-        expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+        expires: DateTime.UtcNow.AddHours(8),
         signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
     );
+
     return new JwtSecurityTokenHandler().WriteToken(token);
 }
 ```
@@ -679,10 +696,18 @@ public class CachedEmployeeRepository : IEmployeeRepository
 }
 ```
 
-Registered via DI:
+Registered via DI — currently disabled, direct repository used instead:
 ```csharp
+// Active (caching disabled for data consistency)
 services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-services.Decorate<IEmployeeRepository, CachedEmployeeRepository>();
+
+// Uncomment to enable caching via decorator:
+// services.AddScoped<IEmployeeRepository>(sp =>
+//     new CachedEmployeeRepository(
+//         sp.GetRequiredService<EmployeeRepository>(),
+//         sp.GetRequiredService<ICacheService>(),
+//         sp.GetRequiredService<ILogger<CachedEmployeeRepository>>()
+//     ));
 ```
 
 ---
@@ -795,7 +820,7 @@ cd HRMS-Payroll
     "Key": "YourSuperSecretKeyThatIsAtLeast32CharactersLong!",
     "Issuer": "HRMSApi",
     "Audience": "HRMSClient",
-    "ExpiryMinutes": 480
+    "ExpiryMinutes": 480  // Note: currently hardcoded to 8 hours in AuthService
   }
 }
 ```
@@ -848,13 +873,13 @@ CREATE TABLE EmploymentRecords (
 );
 
 CREATE TABLE EmployeeWorkingDays (
-    WorkingDayId        UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-    EmploymentRecordId  UNIQUEIDENTIFIER NOT NULL REFERENCES EmploymentRecords(EmploymentRecordId),
-    DayOfWeek           INT              NOT NULL  -- 0=Sun, 1=Mon, ..., 6=Sat
+    EmployeeWorkingDayId  UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    EmploymentRecordId    UNIQUEIDENTIFIER NOT NULL REFERENCES EmploymentRecords(EmploymentRecordId),
+    DayOfWeek             INT              NOT NULL  -- Maps to .NET DayOfWeek enum (0=Sun, 1=Mon, ..., 6=Sat)
 );
 
 CREATE TABLE EmployeeSkillSets (
-    SkillSetId          UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    EmployeeSkillSetId  UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
     EmploymentRecordId  UNIQUEIDENTIFIER NOT NULL REFERENCES EmploymentRecords(EmploymentRecordId),
     SkillName           NVARCHAR(100)    NOT NULL
 );
@@ -985,7 +1010,7 @@ Authorization: Bearer <your-jwt-token>
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "username": "admin",
-  "expiresIn": 3600
+  "message": "Login successful"
 }
 ```
 
@@ -1024,7 +1049,7 @@ POST /Employees/{id}/calculate-salary?startDate=2025-02-10&endDate=2025-02-14
 **Calculate Salary Response:**
 ```json
 {
-  "employeeId": "guid",
+  "employeeId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "startDate": "2025-02-10T00:00:00",
   "endDate": "2025-02-14T00:00:00",
   "takeHomePay": 900.00,
@@ -1600,21 +1625,17 @@ New-NetFirewallRule -DisplayName "HRMS HTTPS" `
 **File: `api/[...all].js`**
 
 ```javascript
-import https from 'https';
-
-const agent = new https.Agent({ rejectUnauthorized: false });
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
+
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
   const path = req.url.replace('/api/', '');
-  const backendUrl = `https://ec2-35-172-146-76.compute-1.amazonaws.com:5001/api/${path}`;
+  const backendUrl = `${process.env.BACKEND_URL}/api/${path}`;
 
   try {
     const headers = { 'Content-Type': 'application/json' };
@@ -1626,7 +1647,6 @@ export default async function handler(req, res) {
       method: req.method,
       headers: headers,
       body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
-      agent: agent,
     });
 
     const data = await response.json();
@@ -1736,6 +1756,8 @@ GitHub Push → Build → Test → Publish → Deploy EC2 → Restart Service
 
 **Cost:** ~Manual SQL writing and mapping
 **Benefit:** Better performance, full control
+
+> **Note:** A `HrmsDbContext.cs` file exists in `HRMS.Domain/Data/` — scaffolded by EF Core tooling to reverse-engineer the schema during development. It is not used anywhere in the application. All data access goes through Dapper repositories.
 
 ### Q: Why CQRS with MediatR?
 
