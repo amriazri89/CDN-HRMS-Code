@@ -1,12 +1,11 @@
 # 🏢 CDN HRMS Payroll System
-## Human Resource Management System
 
 [![.NET 8.0](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat&logo=.net)](https://dotnet.microsoft.com/)
 [![React 18](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react)](https://reactjs.org/)
 [![Dapper](https://img.shields.io/badge/Dapper-2.1.35-orange)](https://github.com/DapperLib/Dapper)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> An HRMS with payroll calculation built with Clean Architecture, CQRS, and Dapper for Complete Developer Network (CDN).
+> An HRMS built for Cendana Digital Network (CDN) to manage employee records and payroll, using Clean Architecture, CQRS, and Dapper with a full-stack .NET + React setup.
 
 **Developed by:** Amri Azri  
 **Live Demo:** [https://cdnhrms.vercel.app/cdn/hrms/login](https://cdnhrms.vercel.app/cdn/hrms/login)
@@ -16,7 +15,7 @@
 ## 📋 Table of Contents
 
 1. [Introduction](#-introduction)
-2. [System Requirements](#-system-requirements-compliance)
+2. [Tech Stack & Features](#-tech-stack--features)
 3. [System Architecture](#-system-architecture)
 4. [SDLC Documentation](#-sdlc-documentation)
 5. [Technical Implementation](#-technical-implementation)
@@ -33,7 +32,7 @@
 
 ## 📖 Introduction
 
-The CDN HRMS Payroll System handles employee management and payroll calculations for Complete Developer Network (CDN), built using Clean Architecture and CQRS pattern with Dapper for data access.
+Built for Cendana Digital Network (CDN), this system handles employee management, employment records, and payroll calculation. The backend uses .NET 8 with Clean Architecture and CQRS, Dapper for data access, and React on the frontend.
 
 ### Key Features
 
@@ -68,45 +67,25 @@ Take-Home Pay: RM 800.00 ✅
 
 ---
 
-## ✅ System Requirements Compliance
+## 🛠 Tech Stack & Features
 
-### Mandatory Requirements
+**Backend:** ASP.NET Core (.NET 8), C#, Dapper, MediatR, FluentValidation, JWT, BCrypt, xUnit
 
-| # | Requirement | Status | Implementation |
-|---|-------------|--------|----------------|
-| 1 | ASP.NET Core Web API | ✅ | .NET 8.0 with Clean Architecture |
-| 2 | Clean Architecture | ✅ | 4-layer separation (API, Application, Domain, Infrastructure) |
-| 3 | Dapper ORM (NO EF) | ✅ | Pure Dapper for all data access |
-| 4 | RESTful API | ✅ | Proper HTTP verbs, status codes, headers |
-| 5 | CRUD Operations | ✅ | Create, Read, Update, Delete, Archive/Unarchive |
-| 6 | Wildcard Search | ✅ | Search by employee number & name |
-| 7 | Payroll Calculation | ✅ | 2× daily rate + birthday bonus logic |
-| 8 | Unit Tests | ✅ | 44 unit tests covering handlers, validators, repositories |
-| 9 | ReactJs Frontend | ✅ | React 18 + Vite |
-| 10 | Routing | ✅ | React Router v6 with centralized routes |
-| 11 | Route Protection | ✅ | JWT-based authentication guards |
-| 12 | REST API Calls | ✅ | Axios with interceptors |
-| 13 | HTML5 & CSS3 | ✅ | Semantic HTML + SCSS styling |
-| 14 | Employee Listing | ✅ | Search, filter, sort, pagination |
-| 15 | Add/Update/Delete | ✅ | Full CRUD with modals |
-| 16 | Archive/Unarchive | ✅ | Soft delete functionality |
-| 17 | Calculate Pay | ✅ | Date range with breakdown display |
-| 18 | GitHub Repository | ✅ | Private GitHub repository |
-| 19 | Documentation | ✅ | README with SDLC documentation |
+**Frontend:** React 18, Vite, React Router v6, Axios, SCSS
 
-### Bonus Features
+**Infrastructure:** AWS EC2, AWS RDS (SQL Server), AWS ACM, Vercel, GitHub Actions
 
-| Feature | Status | Description |
-|---------|--------|-------------|
-| **Endpoint Security** | ✅ | JWT authentication — single Admin role (HR/Admin) |
-| **Pagination** | ✅ | Server-side with X-Pagination header |
-| **Error Handling** | ✅ | FluentValidation + global exception middleware |
-| **Testing Strategy** | ✅ | 57 tests (44 unit + 13 integration) |
-| **CI/CD Pipeline** | ✅ | GitHub Actions with automated deployment |
-| **Design Patterns** | ✅ | CQRS + MediatR + Repository Pattern |
-| **FluentValidation** | ✅ | Declarative validation rules |
-| **Flow Control** | ✅ | MediatR pipeline behaviors |
-| **Live Deployment** | ✅ | AWS EC2 + Vercel |
+**Patterns:** Clean Architecture, CQRS, Repository Pattern, MediatR Pipeline
+
+**Features implemented:**
+- Employee CRUD with archive/unarchive (soft delete)
+- Employment records per employee (multiple records, one active)
+- Payroll calculation — 2× daily rate per working day + birthday bonus
+- Wildcard search by employee number and name
+- Server-side pagination
+- JWT authentication
+- 57 tests — 44 unit + 13 integration
+- CI/CD via GitHub Actions → AWS EC2 + Vercel
 
 ---
 
@@ -507,7 +486,7 @@ public async Task<SalaryCalculationResult> CalculateSalaryAsync(
 
 ```bash
 git clone https://github.com/amriazri89/CDN-HRMS-Code.git
-cd CDN-HRMS-Code
+cd HRMS-Payroll
 ```
 
 #### 2. Configure Database
@@ -1223,7 +1202,7 @@ dotnet publish HRMS.API -c Release -o publish
 # Install service
 nssm install HRMS "C:\inetpub\HRMS\HRMS.API.exe"
 nssm set HRMS AppDirectory "C:\inetpub\HRMS"
-nssm set HRMS DisplayName "CDN HRMS API"
+nssm set HRMS DisplayName "HRMS API"
 nssm set HRMS Start SERVICE_AUTO_START
 
 # Start service
@@ -1393,7 +1372,7 @@ GitHub Push → Build → Test → Publish → Deploy EC2 → Restart Service
 - ✅ Performance (10× faster for reads)
 - ✅ Full SQL control
 - ✅ Lightweight (minimal overhead)
-- ✅ Project requirement (NO EF)
+- ✅ Intentional choice — keeps SQL explicit and avoids ORM magic
 
 **Cons:**
 - ❌ Manual SQL writing
@@ -1419,7 +1398,7 @@ GitHub Push → Build → Test → Publish → Deploy EC2 → Restart Service
 **Cost:** ~Increase implementation time
 **Benefit:** Better code organization, scalability
 
-### Q: Why CDN HRMS No Caching?
+### Q: Why CDN HRMS Has No Caching?
 
 **Decision:** Caching disabled
 
@@ -1799,16 +1778,14 @@ public class AttendanceRecord
 
 ## 🎓 Conclusion
 
-The CDN HRMS Payroll System meets all project requirements using Clean Architecture, CQRS, and Dapper with unit and integration test coverage.
+The CDN HRMS covers the full stack from backend API design to frontend UI and cloud deployment, built for Cendana Digital Network (CDN).
 
-### Key Achievements
+### What Was Built
 
-✅ **All Requirements Met**: Mandatory and bonus features implemented  
-✅ **Clean Architecture**: 4-layer separation with SOLID principles  
-✅ **Comprehensive Testing**: 57 tests including unit & integration
-✅ **Production Deployment**: Live on AWS EC2 + Vercel  
-✅ **CI/CD Pipeline**: Automated deployment with GitHub Actions  
-✅ **Modern Tech Stack**: .NET 8, React 18, Dapper, MediatR  
+- Full-stack app with .NET 8 backend and React frontend
+- Clean Architecture with 4-layer separation
+- 57 tests across unit and integration levels
+- Live deployment on AWS EC2 + Vercel with CI/CD pipeline
 
 ### Technical Highlights
 
@@ -1819,19 +1796,13 @@ The CDN HRMS Payroll System meets all project requirements using Clean Architect
 - **Repository Pattern** with dependency injection
 - **Automated CI/CD** with testing and deployment
 
-### Learning Outcomes
+### What I Practised
 
-Key areas covered:
-- Clean Architecture implementation
-- CQRS pattern with MediatR
-- Advanced testing strategies
-- Production deployment (AWS, Vercel)
-- CI/CD pipeline setup
-- Enterprise-grade security practices
-
-### Acknowledgments
-
-Built for Complete Developer Network (CDN).
+- Clean Architecture and CQRS with MediatR
+- Unit and integration testing with xUnit
+- AWS deployment (EC2, RDS, ACM) and Vercel
+- CI/CD pipeline with GitHub Actions
+- JWT authentication and BCrypt password hashing
 
 ---
 
@@ -1847,7 +1818,7 @@ Built for Complete Developer Network (CDN).
 ## 📚 Repository Structure
 
 ```
-CDN-HRMS-Code/
+HRMS-Payroll/
 ├── HRMS.Backend/
 │   ├── HRMS.API/                    # Controllers, Program.cs
 │   ├── HRMS.Application/            # CQRS, Validators, Services
