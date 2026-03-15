@@ -19,18 +19,18 @@
 1. [Introduction](#-introduction)
 2. [Tech Stack & Features](#-tech-stack--features)
 3. [System Architecture](#-system-architecture)
-4. [SDLC Documentation](#-sdlc-documentation)
-5. [Technical Implementation](#-technical-implementation)
-6. [Advanced Implementation](#-advanced-implementation)
-7. [Setup & Installation](#-setup--installation)
-8. [Usage Guide](#-usage-guide)
-9. [Testing Documentation](#-testing-documentation)
-10. [Deployment Guide](#-deployment-guide)
+4. [SDLC](#-sdlc-documentation)
+5. [Advanced Implementation](#-advanced-implementation)
+6. [Setup & Installation](#-setup--installation)
+7. [Usage Guide](#-usage-guide)
+8. [API Reference](#-api-reference)
+9. [Testing](#-testing-documentation)
+10. [Deployment](#-deployment-guide)
 11. [Key Design Decisions](#-key-design-decisions)
 12. [Known Limitations](#-known-limitations)
 13. [Future Enhancements](#-future-enhancements)
-14. [Conclusion](#-conclusion)
-15. [Lessons Learned](#-lessons-learned)
+14. [Lessons Learned](#-lessons-learned)
+15. [Conclusion](#-conclusion)
 
 ---
 
@@ -290,184 +290,6 @@ Take-Home Pay: RM 800.00 ✅
 4. Deploy to EC2 via WinRM
 5. Restart NSSM service
 6. Vercel auto-deploys frontend
-
-### 6. Maintenance Phase
-
-**Monitoring:**
-- Application logs via Serilog
-- Server health monitoring
-- Database performance metrics
-- User activity tracking
-
-**Support Plan:**
-- Bug fix priority levels (Critical, High, Medium, Low)
-- Regular security updates
-- Performance optimization reviews
-- User feedback incorporation
-
----
-
-## 🔧 Technical Implementation
-
-### CQRS Pattern with MediatR
-
-**What is CQRS?**
-CQRS (Command Query Responsibility Segregation) separates read operations (Queries) from write operations (Commands). This provides:
-- Clear separation of concerns
-- Optimized queries for reads
-- Better scalability
-- Easier testing
-
-**How It Works:**
-
-```csharp
-// Command (Write Operation)
-public record CreateEmployeeCommand : IRequest<Employee>
-{
-    public string Name { get; init; }
-    public DateTime DateOfBirth { get; init; }
-}
-
-// Command Handler
-public class CreateEmployeeCommandHandler 
-    : IRequestHandler<CreateEmployeeCommand, Employee>
-{
-    public async Task<Employee> Handle(
-        CreateEmployeeCommand request, 
-        CancellationToken cancellationToken)
-    {
-        // Business logic here
-        return createdEmployee;
-    }
-}
-
-// Query (Read Operation)
-public record GetEmployeeByIdQuery : IRequest<Employee>
-{
-    public Guid EmployeeId { get; init; }
-}
-
-// Query Handler
-public class GetEmployeeByIdQueryHandler 
-    : IRequestHandler<GetEmployeeByIdQuery, Employee>
-{
-    public async Task<Employee> Handle(
-        GetEmployeeByIdQuery request, 
-        CancellationToken cancellationToken)
-    {
-        return await _repository.GetByIdAsync(request.EmployeeId);
-    }
-}
-```
-
-**MediatR Pipeline:**
-```
-Request → MediatR → ValidationBehavior → Handler → Response
-                         ↓
-                  FluentValidation
-```
-
-### FluentValidation
-
-**What is FluentValidation?**
-A library for building strongly-typed validation rules using a fluent interface. Benefits:
-- Declarative validation rules
-- Reusable validators
-- Separation from business logic
-- Easy to test
-
-**How It Works:**
-
-```csharp
-public class CreateEmployeeCommandValidator 
-    : AbstractValidator<CreateEmployeeCommand>
-{
-    public CreateEmployeeCommandValidator()
-    {
-        RuleFor(x => x.Name)
-            .NotEmpty()
-            .WithMessage("Name is required")
-            .MinimumLength(2)
-            .MaximumLength(100);
-        
-        RuleFor(x => x.NationalNumber)
-            .NotEmpty()
-            .Matches(@"^\d{6}-\d{2}-\d{4}$")
-            .WithMessage("Format must be YYMMDD-XX-XXXX");
-        
-        RuleFor(x => x.DateOfBirth)
-            .Must(BeAtLeast18YearsOld)
-            .WithMessage("Employee must be 18 or older");
-    }
-    
-    private bool BeAtLeast18YearsOld(DateTime dob)
-    {
-        var age = DateTime.Today.Year - dob.Year;
-        if (dob.Date > DateTime.Today.AddYears(-age)) age--;
-        return age >= 18;
-    }
-}
-```
-
-**Automatic Validation via Pipeline:**
-```csharp
-public class ValidationBehavior<TRequest, TResponse> 
-    : IPipelineBehavior<TRequest, TResponse>
-{
-    public async Task<TResponse> Handle(...)
-    {
-        var failures = _validators
-            .Select(v => v.Validate(request))
-            .SelectMany(r => r.Errors)
-            .Where(f => f != null)
-            .ToList();
-        
-        if (failures.Any())
-        {
-            throw new ValidationException(failures);
-        }
-        
-        return await next();
-    }
-}
-```
-
-### Payroll Calculation Algorithm
-
-```csharp
-public async Task<SalaryCalculationResult> CalculateSalaryAsync(
-    Guid employeeId, DateTime startDate, DateTime endDate)
-{
-    var employee = await _employeeRepository.GetByIdAsync(employeeId);
-    var activeRecord = await _employmentRecordRepository
-                             .GetActiveByEmployeeIdAsync(employeeId);
-    
-    decimal totalPay = 0;
-    
-    // Loop through each day in date range
-    for (var date = startDate; date <= endDate; date = date.AddDays(1))
-    {
-        // Working day: 2× daily rate
-        if (activeRecord.WorkingDays.Any(wd => wd.DayOfWeek == date.DayOfWeek))
-        {
-            totalPay += activeRecord.DailyRate * 2;
-        }
-        
-        // Birthday: +1× daily rate (regardless of working day)
-        if (date.Month == employee.DateOfBirth.Month && 
-            date.Day == employee.DateOfBirth.Day)
-        {
-            totalPay += activeRecord.DailyRate;
-        }
-    }
-    
-    return new SalaryCalculationResult
-    {
-        TakeHomePay = totalPay,
-        Currency = "MYR"
-    };
-}
-```
 
 ---
 
@@ -970,10 +792,16 @@ Password: Admin@123
 
 ---
 
-## 📖 Usage Guide (Local)
+## 📖 Usage Guide
 
+### Live Demo
 
-## 📚 API Usage
+1. Navigate to [https://cdnhrms.vercel.app/cdn/hrms/login](https://cdnhrms.vercel.app/cdn/hrms/login)
+2. Login with `admin` / `Admin@123`
+
+---
+
+## 📚 API Reference
 
 ### Base URL
 ```
@@ -1135,92 +963,6 @@ All errors follow a consistent format:
 | 403 | Forbidden |
 | 404 | Not Found |
 | 500 | Internal Server Error |
-
----
-
-## 📚 System Usage
-
-### 1. Login
-
-1. Navigate to [https://cdnhrms.vercel.app/cdn/hrms/login](https://cdnhrms.vercel.app/cdn/hrms/login)
-2. Enter credentials (admin / Admin@123)
-3. JWT token stored in localStorage
-4. Redirected to Dashboard
-
-### 2. Dashboard
-
-- View total employees (active/archived)
-- Recent employee additions
-- Upcoming birthdays (30 days)
-- Quick navigation links
-
-### 3. Employee Management
-
-**View Employees:**
-- Navigate to Employees page
-- Use search bar for wildcard search
-- Sort by any column
-- Pagination controls at bottom
-
-**Add Employee:**
-1. Click "Add Employee" button
-2. Fill in required fields:
-   - Name (min 2 characters)
-   - National Number (YYMMDD-XX-XXXX format)
-   - Contact Number (+60XXXXXXXXX format)
-   - Position
-   - Address
-   - Date of Birth
-3. Employee number auto-generated
-4. Submit form
-
-**Edit Employee:**
-1. Click edit icon on employee row
-2. Modal opens with pre-filled data
-3. Modify fields
-4. Save changes
-
-**Archive/Unarchive:**
-- Click archive/unarchive button
-- Confirmation modal appears
-- Archived employees hidden by default
-- Toggle "Show Archived" to view
-
-### 4. Employment Records
-
-**View Records:**
-1. Click on employee row
-2. "View Records" button
-3. Modal shows all employment records
-4. Active record highlighted in green
-
-**Add Record:**
-1. Click "Add Employment Record"
-2. Fill in:
-   - Employment Type (Permanent/Contract)
-   - Position
-   - Start Date / End Date
-   - Daily Rate
-   - Working Days (checkboxes)
-   - Skills (comma-separated)
-3. Submit
-
-**Activate/Deactivate:**
-- Only one record can be active per employee
-- Click activate button
-- Previous active record auto-deactivated
-
-### 5. Payroll Calculation
-
-1. Select employee
-2. Click "Calculate Salary" button
-3. Select date range
-4. Click "Calculate"
-5. View breakdown:
-   - Working days count
-   - Working days pay (2× daily rate)
-   - Birthday bonus (if applicable)
-   - Total take-home pay
 
 ---
 
@@ -1830,9 +1572,14 @@ Currently the system has a single Admin (HR) user. A planned enhancement is to i
 
 **Proposed (BEM Methodology):**
 ```scss
+// Block
 .employee-list { }
+
+// Elements
 .employee-list__item { }
 .employee-list__actions { }
+
+// Modifiers
 .employee-list__item--active { }
 .employee-list__item--archived { }
 ```
