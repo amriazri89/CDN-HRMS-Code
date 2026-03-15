@@ -1,0 +1,590 @@
+// ================= VARIABLES =================
+
+$color-primary: #2563eb;
+$color-primary-dark: #1d4ed8;
+$color-primary-light: #eff6ff;
+$color-primary-text: #1e40af;
+
+$color-success: #16a34a;
+$color-success-dark: #15803d;
+$color-success-shadow: rgba(22, 163, 74, 0.3);
+
+$color-danger: #dc2626;
+$color-danger-bg: #fee2e2;
+$color-danger-text: #991b1b;
+
+$color-warning: #f59e0b;
+
+$color-bg: #f9fafb;
+$color-bg-hover: #f3f4f6;
+$color-border: #e5e7eb;
+$color-border-input: #d1d5db;
+
+$color-text: #000000;
+$color-text-muted: #6b7280;
+
+$color-white: #ffffff;
+
+$shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
+$border-radius-card: 16px;
+$border-radius-input: 10px;
+$border-radius-btn: 10px;
+
+$breakpoint-tablet: 1024px;
+$breakpoint-mobile: 768px;
+
+// ================= MIXINS =================
+
+@mixin card {
+  background: $color-white;
+  border-radius: $border-radius-card;
+  padding: 28px;
+  box-shadow: $shadow-card;
+}
+
+@mixin flex-center($gap: 0) {
+  display: flex;
+  align-items: center;
+  @if $gap > 0 { gap: $gap; }
+}
+
+@mixin section-header {
+  @include flex-center(12px);
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid $color-border;
+}
+
+@mixin btn-base {
+  padding: 14px 24px;
+  border: none;
+  border-radius: $border-radius-btn;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// ================= PAGE =================
+
+.payroll-page {
+  padding: 32px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: 16px;
+  }
+}
+
+// ================= HEADER =================
+
+.payroll-header {
+  margin-bottom: 32px;
+
+  &__content {
+    @include flex-center(16px);
+    background: $color-white;
+    padding: 24px;
+    border-radius: $border-radius-card;
+    box-shadow: $shadow-card;
+
+    @media (max-width: $breakpoint-mobile) {
+      padding: 16px;
+    }
+  }
+
+  &__icon {
+    font-size: 48px;
+    color: $color-success;
+
+    @media (max-width: $breakpoint-mobile) {
+      font-size: 36px;
+    }
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $color-text;
+    margin: 0 0 4px 0;
+
+    @media (max-width: $breakpoint-mobile) {
+      font-size: 1.5rem;
+    }
+  }
+
+  p {
+    color: $color-text-muted;
+    font-size: 1rem;
+    margin: 0;
+  }
+}
+
+// ================= CONTAINER =================
+
+.payroll-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+
+  @media (max-width: $breakpoint-tablet) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ================= FORM CARD =================
+
+.payroll-form-card {
+  @include card;
+
+  &__header {
+    @include section-header;
+  }
+
+  &__icon {
+    font-size: 24px;
+    color: $color-primary;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: $color-text;
+    margin: 0;
+  }
+}
+
+// ================= FORM =================
+
+.payroll-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    @include flex-center(8px);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $color-text;
+  }
+}
+
+.label-icon {
+  font-size: 14px;
+  color: $color-text-muted;
+}
+
+.select-input,
+.date-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid $color-border-input;
+  border-radius: $border-radius-input;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: $color-white;
+  color: $color-text;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  &:disabled {
+    background: $color-bg-hover;
+    cursor: not-allowed;
+  }
+}
+
+// ================= EMPLOYEE INFO BOX =================
+
+.employee-info-box {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: $color-white;
+  padding: 16px;
+  border-radius: $border-radius-input;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.employee-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.info-label {
+  font-weight: 500;
+  opacity: 0.9;
+  @include flex-center(6px);
+  color: #e5e7eb;
+}
+
+.info-value {
+  font-weight: 600;
+  color: #dcd0d3;
+}
+
+.birthday-icon {
+  color: $color-warning;
+  font-size: 16px;
+}
+
+// ================= DATE RANGE =================
+
+.date-range-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.period-info {
+  @include flex-center(10px);
+  padding: 12px;
+  background: $color-primary-light;
+  border-left: 4px solid $color-primary;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: $color-primary-text;
+}
+
+.period-icon {
+  font-size: 18px;
+  color: $color-primary;
+}
+
+// ================= ERROR MESSAGE =================
+
+.error-message {
+  padding: 12px 16px;
+  background: $color-danger-bg;
+  border-left: 4px solid $color-danger;
+  border-radius: 8px;
+  color: $color-danger-text;
+  font-size: 0.9rem;
+}
+
+// ================= FORM ACTIONS =================
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+  }
+}
+
+.btn-calculate {
+  @include btn-base;
+  flex: 1;
+  background: linear-gradient(135deg, $color-success 0%, $color-success-dark 100%);
+  color: $color-white;
+  @include flex-center(8px);
+  justify-content: center;
+  box-shadow: 0 4px 12px $color-success-shadow;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+  }
+
+  &:disabled {
+    background: #9ca3af;
+    box-shadow: none;
+  }
+}
+
+.btn-reset {
+  @include btn-base;
+  background: $color-border;
+  color: $color-text;
+
+  &:hover:not(:disabled) {
+    background: $color-border-input;
+  }
+}
+
+// ================= RESULT CARD =================
+
+.payroll-result-card {
+  @include card;
+  animation: slideIn 0.4s ease;
+
+  @media print {
+    box-shadow: none;
+    border: 1px solid $color-border;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-header {
+  @include section-header;
+}
+
+.result-icon {
+  font-size: 24px;
+  color: $color-success;
+}
+
+// ================= RESULT CONTENT =================
+
+.result-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.result-section {
+  padding: 16px;
+  background: $color-bg;
+  border-radius: $border-radius-input;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $color-text;
+    margin: 0 0 12px 0;
+  }
+
+  &--breakdown {
+    background: $color-primary-light;
+    border-left: 4px solid $color-primary;
+  }
+}
+
+.result-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid $color-border;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.detail-label {
+  font-size: 0.9rem;
+  color: $color-text-muted;
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 0.9rem;
+  color: $color-text;
+  font-weight: 600;
+}
+
+// ================= SALARY BREAKDOWN =================
+
+.breakdown-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: $color-primary-text;
+  }
+}
+
+// ================= TOTAL AMOUNT =================
+
+.result-total {
+  background: linear-gradient(135deg, $color-success 0%, $color-success-dark 100%);
+  color: $color-white;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 8px 24px $color-success-shadow;
+}
+
+.total-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.total-amount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 8px 0;
+
+  @media (max-width: $breakpoint-mobile) {
+    font-size: 2rem;
+  }
+}
+
+.total-currency {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+// ================= RESULT ACTIONS =================
+
+.result-actions {
+  display: flex;
+  gap: 12px;
+
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+  }
+
+  @media print {
+    display: none;
+  }
+}
+
+.btn-print,
+.btn-calculate-another {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: $border-radius-btn;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-print {
+  background: $color-primary;
+  color: $color-white;
+
+  &:hover {
+    background: $color-primary-dark;
+  }
+}
+
+.btn-calculate-another {
+  background: $color-bg-hover;
+  color: $color-text;
+
+  &:hover {
+    background: $color-border;
+  }
+}
+
+// ================= INFO CARD =================
+
+.info-card {
+  @include card;
+
+  &__header {
+    @include flex-center(12px);
+    margin-bottom: 24px;
+  }
+
+  &__icon {
+    font-size: 24px;
+    color: $color-warning;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: $color-text;
+    margin: 0;
+  }
+}
+
+.info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-item {
+  @include flex-center(16px);
+  padding: 16px;
+  background: $color-bg;
+  border-radius: $border-radius-input;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $color-bg-hover;
+    transform: translateX(4px);
+  }
+}
+
+.info-number {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  color: $color-white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.info-text {
+  h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $color-text;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: $color-text-muted;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+// ================= PRINT =================
+
+@media print {
+  .payroll-header,
+  .payroll-form-card,
+  .info-card {
+    display: none;
+  }
+
+  .payroll-container {
+    grid-template-columns: 1fr;
+  }
+}

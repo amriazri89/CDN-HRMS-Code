@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import EmployeeService from "../../services/EmployeeService";
 import MainLayout from "../../components/MainLayout/MainLayout";
 import { FaCalculator, FaCalendarAlt, FaMoneyBillWave, FaUser, FaBirthdayCake } from "react-icons/fa";
-import "./Payroll.css";
+import "./Payroll.scss";
 
 const Payroll = () => {
   const [employees, setEmployees] = useState([]);

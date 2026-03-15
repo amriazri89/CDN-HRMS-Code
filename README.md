@@ -802,13 +802,75 @@ cd HRMS-Payroll
 
 #### 3. Create Database
 
-```bash
-# Option 1: Run SQL scripts manually
-# Open SQL Server Management Studio
-# Run scripts in /Database folder in order
+Run the following SQL scripts in order against your SQL Server instance.
 
-# Note: This project uses Dapper (no EF migrations). Run SQL scripts manually.
+**Step 1 — Create the database:**
+```sql
+CREATE DATABASE HRMSDb;
+GO
+
+USE HRMSDb;
+GO
 ```
+
+**Step 2 — Create tables:**
+```sql
+CREATE TABLE Users (
+    UserId        UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    Username      NVARCHAR(100)    NOT NULL UNIQUE,
+    PasswordHash  NVARCHAR(255)    NOT NULL,
+    CreatedAt     DATETIME2        NOT NULL DEFAULT GETUTCDATE(),
+    IsActive      BIT              NOT NULL DEFAULT 1
+);
+
+CREATE TABLE Employees (
+    EmployeeId      UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    EmployeeNumber  NVARCHAR(50)     NOT NULL UNIQUE,
+    Name            NVARCHAR(100)    NOT NULL,
+    NationalNumber  NVARCHAR(20)     NOT NULL UNIQUE,
+    ContactNumber   NVARCHAR(20)     NOT NULL,
+    Position        NVARCHAR(100)    NOT NULL,
+    Address         NVARCHAR(255)    NOT NULL,
+    DateOfBirth     DATE             NOT NULL,
+    DateCreated     DATETIME2        NOT NULL DEFAULT GETUTCDATE(),
+    IsArchived      BIT              NOT NULL DEFAULT 0
+);
+
+CREATE TABLE EmploymentRecords (
+    EmploymentRecordId  UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    EmployeeId          UNIQUEIDENTIFIER NOT NULL REFERENCES Employees(EmployeeId),
+    EmploymentType      NVARCHAR(50)     NOT NULL,
+    Position            NVARCHAR(100)    NOT NULL,
+    StartDate           DATE             NOT NULL,
+    EndDate             DATE             NULL,
+    DailyRate           DECIMAL(10, 2)   NOT NULL,
+    IsActive            BIT              NOT NULL DEFAULT 0
+);
+
+CREATE TABLE EmployeeWorkingDays (
+    WorkingDayId        UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    EmploymentRecordId  UNIQUEIDENTIFIER NOT NULL REFERENCES EmploymentRecords(EmploymentRecordId),
+    DayOfWeek           INT              NOT NULL  -- 0=Sun, 1=Mon, ..., 6=Sat
+);
+
+CREATE TABLE EmployeeSkillSets (
+    SkillSetId          UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    EmploymentRecordId  UNIQUEIDENTIFIER NOT NULL REFERENCES EmploymentRecords(EmploymentRecordId),
+    SkillName           NVARCHAR(100)    NOT NULL
+);
+```
+
+**Step 3 — Seed default admin user:**
+```sql
+-- Password: Admin@123 (BCrypt hashed)
+INSERT INTO Users (Username, PasswordHash)
+VALUES (
+    'admin',
+    '$2a$11$hashed_value_here'
+);
+```
+
+> **Note:** Generate the BCrypt hash for `Admin@123` using the app's register endpoint (`POST /Auth/register`) or a BCrypt tool, then insert manually.
 
 #### 4. Build and Run
 
@@ -1163,7 +1225,7 @@ This project follows the **Testing Pyramid** approach:
 - **Moq** - Mocking framework
 - **FluentAssertions** - Readable assertions
 
-**What We Test:**
+**What I Test:**
 
 **1. CQRS Handlers (10 tests)**
 ```csharp
@@ -1279,7 +1341,7 @@ public async Task CalculateSalary_WithoutBirthday_NoBonus()
 - Date range validation
 - Active employment record check
 
-**What We DON'T Unit Test:**
+**What I Don't Unit Test:**
 - ❌ Database queries (tested in integration tests)
 - ❌ Framework code (ASP.NET, Dapper)
 - ❌ Third-party libraries
@@ -1292,7 +1354,7 @@ public async Task CalculateSalary_WithoutBirthday_NoBonus()
 - **xUnit** - Test runner
 - **FluentAssertions** - Assertions
 
-**What We Test:**
+**What I Test:**
 
 **Full HTTP Request Flow:**
 ```csharp
