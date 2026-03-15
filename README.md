@@ -10,6 +10,8 @@
 **Developed by:** Amri Azri  
 **Live Demo:** [https://cdnhrms.vercel.app/cdn/hrms/login](https://cdnhrms.vercel.app/cdn/hrms/login)
 
+> **Note:** Cendana Digital Network (CDN) is a fictional company used as context for this self-development project.
+
 ---
 
 ## 📋 Table of Contents
@@ -19,14 +21,16 @@
 3. [System Architecture](#-system-architecture)
 4. [SDLC Documentation](#-sdlc-documentation)
 5. [Technical Implementation](#-technical-implementation)
-6. [Setup & Installation](#-setup--installation)
-7. [Usage Guide](#-usage-guide)
-8. [Testing Documentation](#-testing-documentation)
-9. [Deployment Guide](#-deployment-guide)
-10. [Key Design Decisions](#-key-design-decisions)
-11. [Known Limitations](#-known-limitations)
-12. [Future Enhancements](#-future-enhancements)
-13. [Conclusion](#-conclusion)
+6. [Advanced Implementation](#-advanced-implementation)
+7. [Setup & Installation](#-setup--installation)
+8. [Usage Guide](#-usage-guide)
+9. [Testing Documentation](#-testing-documentation)
+10. [Deployment Guide](#-deployment-guide)
+11. [Key Design Decisions](#-key-design-decisions)
+12. [Known Limitations](#-known-limitations)
+13. [Future Enhancements](#-future-enhancements)
+14. [Conclusion](#-conclusion)
+15. [Lessons Learned](#-lessons-learned)
 
 ---
 
@@ -463,6 +467,295 @@ public async Task<SalaryCalculationResult> CalculateSalaryAsync(
         Currency = "MYR"
     };
 }
+```
+
+---
+
+## ⚡ Advanced Implementation
+
+### 1. MediatR Pipeline Behaviors
+
+Requests pass through a pipeline before reaching their handler. Used here for automatic validation — any command or query is validated by FluentValidation before the handler runs.
+
+```csharp
+public class ValidationBehavior<TRequest, TResponse>
+    : IPipelineBehavior<TRequest, TResponse>
+{
+    private readonly IEnumerable<IValidator<TRequest>> _validators;
+
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
+    {
+        var failures = _validators
+            .Select(v => v.Validate(request))
+            .SelectMany(r => r.Errors)
+            .Where(f => f != null)
+            .ToList();
+
+        if (failures.Any())
+            throw new ValidationException(failures);
+
+        return await next();
+    }
+}
+```
+
+Pipeline flow:
+```
+Request → ValidationBehavior → Handler → Response
+```
+
+---
+
+### 2. FluentValidation Pipeline Integration
+
+Validators are registered and automatically picked up by the pipeline behavior above — no manual validation calls in handlers.
+
+```csharp
+public class CreateEmployeeCommandValidator
+    : AbstractValidator<CreateEmployeeCommand>
+{
+    public CreateEmployeeCommandValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .MinimumLength(2)
+            .MaximumLength(100);
+
+        RuleFor(x => x.NationalNumber)
+            .NotEmpty()
+            .Matches(@"^\d{6}-\d{2}-\d{4}$")
+            .WithMessage("Format must be YYMMDD-XX-XXXX");
+
+        RuleFor(x => x.DateOfBirth)
+            .Must(dob => {
+                var age = DateTime.Today.Year - dob.Year;
+                if (dob.Date > DateTime.Today.AddYears(-age)) age--;
+                return age >= 18;
+            })
+            .WithMessage("Employee must be at least 18 years old");
+    }
+}
+```
+
+---
+
+### 3. Global Exception Middleware
+
+Catches all unhandled exceptions in one place and returns a consistent error response shape.
+
+```csharp
+public class GlobalExceptionMiddleware
+{
+    private readonly RequestDelegate _next;
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (ValidationException ex)
+        {
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsJsonAsync(new ErrorResponse
+            {
+                StatusCode = 400,
+                Message = "Validation failed",
+                Detail = string.Join(", ", ex.Errors.Select(e => e.ErrorMessage))
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            context.Response.StatusCode = 404;
+            await context.Response.WriteAsJsonAsync(new ErrorResponse
+            {
+                StatusCode = 404,
+                Message = ex.Message
+            });
+        }
+        catch (Exception)
+        {
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsJsonAsync(new ErrorResponse
+            {
+                StatusCode = 500,
+                Message = "An unexpected error occurred"
+            });
+        }
+    }
+}
+```
+
+All error responses follow the same shape:
+```json
+{
+  "statusCode": 400,
+  "message": "Validation failed",
+  "detail": "Name is required",
+  "timestamp": "2025-02-14T10:30:00Z"
+}
+```
+
+---
+
+### 4. JWT + BCrypt Auth Flow
+
+Passwords are hashed with BCrypt on registration and verified on login. A JWT is issued and must be included in all protected requests.
+
+```csharp
+// Registration — hash password before storing
+public async Task<User> RegisterAsync(string username, string password)
+{
+    var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+    var user = new User { Username = username, PasswordHash = passwordHash };
+    await _userRepository.CreateAsync(user);
+    return user;
+}
+
+// Login — verify hash, issue JWT
+public async Task<string> LoginAsync(string username, string password)
+{
+    var user = await _userRepository.GetByUsernameAsync(username);
+    if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+        throw new UnauthorizedException("Invalid credentials");
+
+    return GenerateJwtToken(user);
+}
+
+private string GenerateJwtToken(User user)
+{
+    var claims = new[] { new Claim(ClaimTypes.Name, user.Username) };
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
+    var token = new JwtSecurityToken(
+        issuer: _jwtSettings.Issuer,
+        audience: _jwtSettings.Audience,
+        claims: claims,
+        expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+        signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+    );
+    return new JwtSecurityTokenHandler().WriteToken(token);
+}
+```
+
+---
+
+### 5. Decorator Pattern — Cached Repository
+
+A caching layer wraps the real repository without modifying it. Disabled in production to ensure data consistency, but the implementation exists.
+
+```csharp
+public class CachedEmployeeRepository : IEmployeeRepository
+{
+    private readonly IEmployeeRepository _inner;
+    private readonly ICacheService _cache;
+    private const string CacheKey = "employees";
+
+    public CachedEmployeeRepository(IEmployeeRepository inner, ICacheService cache)
+    {
+        _inner = inner;
+        _cache = cache;
+    }
+
+    public async Task<IEnumerable<Employee>> GetAllAsync()
+    {
+        var cached = await _cache.GetAsync<IEnumerable<Employee>>(CacheKey);
+        if (cached != null) return cached;
+
+        var result = await _inner.GetAllAsync();
+        await _cache.SetAsync(CacheKey, result, TimeSpan.FromMinutes(5));
+        return result;
+    }
+
+    // Write operations delegate directly and invalidate cache
+    public async Task<Employee> CreateAsync(Employee employee)
+    {
+        var result = await _inner.CreateAsync(employee);
+        await _cache.RemoveAsync(CacheKey);
+        return result;
+    }
+}
+```
+
+Registered via DI:
+```csharp
+services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+services.Decorate<IEmployeeRepository, CachedEmployeeRepository>();
+```
+
+---
+
+### 6. Vercel Serverless Proxy
+
+The frontend is hosted on Vercel but the backend runs on AWS EC2. A serverless function on Vercel proxies all API requests to EC2, handling CORS and forwarding the JWT header.
+
+```javascript
+// api/[...all].js
+export default async function handler(req, res) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+    if (req.method === "OPTIONS") return res.status(200).end();
+
+    const path = req.url.replace("/api/", "");
+    const backendUrl = `https://<ec2-host>:5001/api/${path}`;
+
+    const headers = { "Content-Type": "application/json" };
+    if (req.headers.authorization) {
+        headers["Authorization"] = req.headers.authorization;
+    }
+
+    const response = await fetch(backendUrl, {
+        method: req.method,
+        headers,
+        body: req.method !== "GET" ? JSON.stringify(req.body) : undefined,
+    });
+
+    const data = await response.json();
+    return res.status(response.status).json(data);
+}
+```
+
+This keeps the EC2 backend private — only Vercel communicates with it directly.
+
+---
+
+### 7. CI/CD Pipeline — GitHub Actions
+
+Every push to `main` triggers a workflow that builds, tests, and deploys. Deployment is blocked if any test fails.
+
+```
+git push origin main
+        │
+        ▼
+┌──────────────────────────────────┐
+│         GitHub Actions           │
+│                                  │
+│  1. dotnet restore               │
+│  2. dotnet build                 │
+│  3. dotnet test ── fail? stop.   │
+│  4. dotnet publish               │
+│  5. Copy to EC2 via WinRM        │
+│  6. Restart NSSM service         │
+└──────────────────────────────────┘
+        │
+        ▼
+  Vercel auto-deploys frontend on same push
+```
+
+```yaml
+- name: Test
+  run: dotnet test --no-build -c Release
+
+- name: Deploy to EC2
+  if: success()
+  run: |
+    Invoke-Command -ScriptBlock { nssm stop HRMS }
+    Copy-Item publish/* C:\inetpub\HRMS\ -Recurse -Force
+    Invoke-Command -ScriptBlock { nssm start HRMS }
 ```
 
 ---
@@ -1453,23 +1746,17 @@ Currently the system has a single Admin (HR) user. A planned enhancement is to i
 
 **Proposed (BEM Methodology):**
 ```scss
-// Block
 .employee-list { }
-
-// Elements (double underscore)
 .employee-list__item { }
 .employee-list__actions { }
-
-// Modifiers (double dash)
 .employee-list__item--active { }
 .employee-list__item--archived { }
 ```
 
 **Benefits:**
-- Clearer naming convention — block, element, and modifier roles are explicit
-- Better CSS organization with flat specificity (no nesting wars)
-- Easier maintenance and predictable class naming
-- Scales well across large component libraries
+- Flat specificity — no nesting wars
+- Predictable class naming across the codebase
+- Scales well as the component library grows
 
 #### 2. Component Standardization
 
@@ -1804,6 +2091,33 @@ The CDN HRMS covers the full stack from backend API design to frontend UI and cl
 - CI/CD pipeline with GitHub Actions
 - JWT authentication and BCrypt password hashing
 
+
+---
+
+## 📝 Lessons Learned
+
+### What Went Well
+
+- **Clean Architecture** made the codebase easy to navigate and test — each layer has a clear responsibility and changes in one layer rarely ripple into others
+- **CQRS with MediatR** kept handlers small and focused; adding a new feature meant adding a new command/query file rather than modifying existing ones
+- **FluentValidation via pipeline** was a good call — validation is declarative, reusable, and completely separate from business logic
+- **Dapper** gave full SQL control which made query optimisation straightforward, especially for the payroll calculation which involves looping through date ranges
+- **GitHub Actions CI/CD** saved time — push to main and everything deploys automatically; catching a broken test before it hits production happened more than once
+
+### What Was Challenging
+
+- **Integration tests** were harder to set up than expected — configuring `WebApplicationFactory` with a real SQL Server connection required more work than unit tests; only 2 out of 13 currently pass consistently
+- **Vercel + EC2 CORS** — the serverless proxy workaround works but adds a layer of complexity; a cleaner solution would be a proper domain with a reverse proxy like Nginx
+- **Self-signed SSL** was a recurring issue during development before switching to AWS ACM; browser rejections and Vercel connectivity issues cost time
+- **Employee number generation** (format: `ABC-XXXXX-DDMMMYYYY`) required careful edge case handling for names shorter than 3 characters and duplicate number collisions
+
+### What I Would Do Differently
+
+- Set up the integration test environment properly from the start rather than focusing only on unit tests
+- Use a proper domain name from the beginning instead of relying on the raw EC2 URL
+- Add structured logging (Serilog + Seq) earlier — debugging production issues without it was harder than it needed to be
+- Introduce the BEM naming convention from the start rather than retrofitting it later
+
 ---
 
 ## 📞 Contact Information
@@ -1825,7 +2139,7 @@ HRMS-Payroll/
 │   ├── HRMS.Infrastructure/         # Repositories (Dapper)
 │   ├── HRMS.Domain/                 # Entities (DTOs), Interfaces
 │   └── HRMS.Tests/
-│       ├── HRMS.UnitTests/          # 50 unit tests
+│       ├── HRMS.UnitTests/          # 44 unit tests
 │       └── HRMS.IntegrationTests/   # 13 integration tests
 │
 ├── HRMS.Frontend/
@@ -1854,5 +2168,3 @@ HRMS-Payroll/
 **Last Updated:** February 19, 2026
 
 ---
-
-# 🎉 Thank You!
